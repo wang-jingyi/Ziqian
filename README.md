@@ -1,0 +1,64 @@
+# README #
+
+
+***For FASE reviewers, check the ziqian/model folder for all the relevant systems and models used of the evaluation part the paper.***
+
+
+***For TACAS reviewers, check the ziqian/lar folder for all the relevant systems and models used for the evaluation part of the paper.*** 
+
+
+
+
+
+***ZiQian*** is a research tool actively maintained in SUTD, Singapore, to learn probabilistic models (mainly DTMCs) from system logs for model checking. 
+
+* In the first stage, ZiQian supports learning from multiple executions and a single execution. For both cases, two categories of algorithms are implemented: state-of-art tree based algorithms and evolution-based algorithms.
+* In the second stage, ZiQian integrates predicate abstraction to the learning framework. ZiQian starts from the coarsest abstraction and iteratively refine it by learning a new predicate by SVM.
+* In the next stage, we are planning to adopt active learning in the framework.
+
+ZiQian has been evaluated by multiple PRISM benchmark systems, random generated DTMCs, probabilistic boolean networks, as well as a real world water purification system testbed in SUTD. The experimental results prove that the theory and ZiQian work smoothly.     
+
+### What is this repository for? ###
+
+* This repository is maintained for ZiQian and contains conducted evaluation of multiple systems of submitted research papers. 
+
+
+* The current version supports the first two stages described above.
+
+### How do I set up? ###
+
+* This is a maven project based on jdk1.7 or later.
+* You have to install maven to run this project, which can be downloaded [here](http://maven.apache.org/).
+* There are multiple example case studies in the package 'example'.
+
+### Dependencies ###
+The following external tools is not included in maven repository and have to be manually installed to your local maven repository. Before this, make sure maven has been installed in your system by running "mvn -version" in command line.
+
+
+* PRISM
+
+Download PRISM at http://www.prismmodelchecker.org/download.php
+
+Execute 'mvn install:install-file -Dfile=<path-to-file> -DgroupId=oxford.modelchecker 
+    -DartifactId=prism -Dversion=4.2.1 -Dpackaging=jar' in command line
+
+
+
+* javaml
+
+Download javaml at https://sourceforge.net/projects/java-ml/files/
+
+
+Execute 'mvn install:install-file -Dfile=<path-to-file> -aDgroupId=net.sf 
+    -DartifactId=javaml -Dversion=0.1.7 -Dpackaging=jar' in command line
+
+
+, where <path-to-file> is the path to the .jar file in both cases.
+
+
+### Guidelines ###
+* Follow the examples in 'example' package and guidelines in 'run.Main' and 'run.LearnMain' to write your own case studies. Check run.Config for configuration of the algorithms. The learned model is in PRISM DTMC model format, which can be directly used for model checking using PRISM.
+
+### Who do I talk to? ###
+
+* This project is maintained by ***WANG Jingyi (王竟亦)***, contact ***wangjyee@gmail.com*** if you encounter any issues or have suggestions to improve.

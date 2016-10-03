@@ -1,0 +1,136 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+
+<html>
+<head>
+
+<title>
+PRISM Manual | ConfiguringPRISM / IterativeNumericalMethods 
+</title>
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="keywords" content="prism, probabilistic, symbolic, model, checker, verification, birmingham, oxford, parker, norman, kwiatkowska">
+
+<link rel="icon" href="../pub/skins/offline/images/p16.ico" type="image/x-icon">
+<link rel="shortcut icon" href="../pub/skins/offline/images/p16.ico" type="image/x-icon">
+
+<!--HTMLHeader--><style type='text/css'><!--
+  ul, ol, pre, dl, p { margin-top:0px; margin-bottom:0px; }
+  code.escaped { white-space: nowrap; }
+  .vspace { margin-top:1.33em; }
+  .indent { margin-left:40px; }
+  .outdent { margin-left:40px; text-indent:-40px; }
+  a.createlinktext { text-decoration:none; border-bottom:1px dotted gray; }
+  a.createlink { text-decoration:none; position:relative; top:-0.5em;
+    font-weight:bold; font-size:smaller; border-bottom:none; }
+  img { border:0px; }
+  .editconflict { color:green; 
+  font-style:italic; margin-top:1.33em; margin-bottom:1.33em; }
+
+  table.markup { border:2px dotted #ccf; width:90%; }
+  td.markup1, td.markup2 { padding-left:10px; padding-right:10px; }
+  table.vert td.markup1 { border-bottom:1px solid #ccf; }
+  table.horiz td.markup1 { width:23em; border-right:1px solid #ccf; }
+  table.markup caption { text-align:left; }
+  div.faq p, div.faq pre { margin-left:2em; }
+  div.faq p.question { margin:1em 0 0.75em 0; font-weight:bold; }
+  div.faqtoc div.faq * { display:none; }
+  div.faqtoc div.faq p.question 
+    { display:block; font-weight:normal; margin:0.5em 0 0.5em 20px; line-height:normal; }
+  div.faqtoc div.faq p.question * { display:inline; }
+   
+    .frame 
+      { border:1px solid #cccccc; padding:4px; background-color:#f9f9f9; }
+    .lfloat { float:left; margin-right:0.5em; }
+    .rfloat { float:right; margin-left:0.5em; }
+a.varlink { text-decoration:none; }
+
+--></style>  <meta name='robots' content='index,follow' />
+
+
+<link type="text/css" rel="stylesheet" href="../pub/skins/offline/css/base.css">
+<link type="text/css" rel="stylesheet" href="../pub/skins/offline/css/prism.css">
+<link type="text/css" rel="stylesheet" href="../pub/skins/offline/css/prismmanual.css">
+
+</head>
+
+<body text="#000000" bgcolor="#ffffff">
+
+<div id="layout-maincontainer">
+<div id="layout-main">
+
+<div id="prism-mainbox">
+
+<!-- ============================================================================= -->
+
+<!--PageHeaderFmt-->
+<!--/PageHeaderFmt-->
+
+<!--PageTitleFmt-->
+  <div id="prism-man-title">
+    <p><a class='wikilink' href='Main.html'>Configuring PRISM</a> /
+</p><h1>Iterative Numerical Methods</h1>
+
+  </div>
+<!--PageText-->
+<div id='wikitext'>
+<p>When performing the computation of probabilities and expected costs/rewards during verification, PRISM often uses iterative numerical methods. The methods used vary depending on the type of verification being performed. In some cases, PRISM solves systems of linear equation systems (e.g. "until" properties for DTMCs and CTMCs, steady-state properties for CTMCs and "reachability reward" properties for DTMCs). For this, a range of methods are available (see below). For "until" and "reachability reward" properties of MDPs, PRISM uses a method called "value iteration". For computations involving transient probabilities of CTMCs (e.g. "bounded until" and "cumulative reward" properties), it uses a method called "uniformisation".
+</p>
+<div class='vspace'></div><h3>Convergence</h3>
+<p>Common to all of these methods is the way that PRISM checks convergence, i.e. decides when to terminate the iterative methods because the answers have converged sufficiently. This is done by checking when the maximum difference between elements in the solution vectors from successive iterations drops below a given threshold. The default value for this threshold is 10<sup>-6</sup> but it can be altered with the "Termination epsilon" option (switch <code>-epsilon &lt;val&gt;</code>). The way that the maximum difference is computed can also be varied:
+either "relative" or "absolute" (the default is "relative"). This can be changed using the "Termination criteria" option (command-line switches <code>-relative</code> and <code>-absolute</code>, or <code>-rel</code> and <code>-abs</code> for short).
+</p>
+<p class='vspace'>Also, the maximum number of iterations performed is given an upper limit
+in order to trap the cases when computation will not converge.
+The default limit is 10,000 but can be changed with the "Termination max. iterations" option (switch <code>-maxiters &lt;val&gt;</code>). Computations that reach this upper limit will trigger an error during model checking to alert the user to this fact.
+</p>
+<div class='vspace'></div><h3>Linear equation systems</h3>
+<p>For instances where PRISM has to solve a linear equation system (see above), the numerical method used can be selected by the user. Below is a list of the alternatives available and the switches used to select them from the command-line. The corresponding GUI option is "Linear equations method".
+</p>
+<div class='vspace'></div><ul><li>Power method: <code>-power</code> (or <code>-pow</code>, <code>-pwr</code>)
+</li><li>Jacobi method: <code>-jacobi</code> (or <code>-jac</code>)
+</li><li>Gauss-Seidel method: <code>-gaussseidel</code> (or <code>-gs</code>)
+</li><li>Backwards Gauss-Seidel method: <code>-bgaussseidel</code> (or <code>-bgs</code>)
+</li><li>JOR method (Jacobi with over-relaxation): <code>-jor</code>
+</li><li>SOR method: <code>-sor</code>
+</li><li>Backwards SOR method: <code>-bsor</code>
+</li></ul><p class='vspace'>When using the MTBDD engine, Gauss-Seidel/SOR based methods are not available. When using the hybrid engine, <em>pseudo</em> variants of Gauss-Seidel/SOR based method can also be used [<a class='wikilink' href='../Main/References.html#Par02'>Par02</a>] (type <code>prism -help</code> at the command-line for details of the corresponding switches). For methods which use over-relaxation (JOR/SOR), the over-relaxation parameter (between 0.0 and 2.0) can also be specified with option "Over-relaxation parameter" (switch <code>-omega &lt;val&gt;</code>).
+</p>
+<div class='vspace'></div><h3>More information</h3>
+<p>For more information about all the issues discussed in this section, see e.g. [<a class='wikilink' href='../Main/References.html#Ste94'>Ste94</a>].
+</p>
+</div>
+
+
+<!--PageFooterFmt-->
+  <div id='prism-man-footer'>
+  </div>
+<!--/PageFooterFmt-->
+
+
+<!-- ============================================================================= -->
+
+</div> <!-- id="prism-mainbox" -->
+
+</div> <!-- id="layout-main" -->
+</div> <!-- id="layout-maincontainer" -->
+
+<div id="layout-leftcol">
+<div id="prism-navbar2">
+
+<h3><a class='wikilink' href='../Main/Main.html'>PRISM Manual</a></h3>
+<p><strong><a class='wikilink' href='Main.html'>Configuring PRISM</a></strong>
+</p><ul><li><a class='wikilink' href='Main.html'>Introduction</a>
+</li><li><a class='wikilink' href='ComputationEngines.html'>Computation Engines</a>
+</li><li><a class='wikilink' href='SolutionMethodsAndOptions.html'>Solution Methods And Options</a>
+</li><li><a class='selflink' href='IterativeNumericalMethods.html'>Iterative Numerical Methods</a>
+</li><li><a class='wikilink' href='OtherOptions.html'>Other Options</a>
+</li></ul><p>[ <a class='wikilink' href='AllOnOnePage.html'>View all</a> ]
+</p>
+
+
+</div>  <!-- id="prism-navbar2" -->
+</div> <!-- id="layout-leftcol" -->
+
+</body>
+</html>
