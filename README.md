@@ -10,7 +10,7 @@ ZiQian has been evaluated by multiple PRISM benchmark systems, random generated 
 
 ### What is this repository for? ###
 
-* This repository is maintained for the tool ZiQian and the evaluation results of multiple systems of submitted research papers is hosted in another neighborhood repository called ziqian_evaluation. 
+* This repository is maintained for the development of tool ZiQian. The evaluation results of multiple systems of submitted research papers are hosted in another neighborhood repository called ziqian_evaluation. 
 
 
 ### The current version supports the all three stages described above. Our next plan is to apply our research into the real world Singapore water treatment system testbed to build a complete environment model from system logs fully automatically. ###
