@@ -1,6 +1,7 @@
 package io.github.wang_jingyi.ZiQian.active;
 
 import gurobi.GRBException;
+import io.github.wang_jingyi.ZiQian.run.Config;
 import io.github.wang_jingyi.ZiQian.run.GlobalVars;
 import io.github.wang_jingyi.ZiQian.run.PlatformDependent;
 import io.github.wang_jingyi.ZiQian.utils.FileUtil;
@@ -10,6 +11,7 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings("restriction")
 public class SwatActiveMain {
 	
 	
@@ -59,12 +61,12 @@ public class SwatActiveMain {
 			validInitDist.add((double)1/ssp.getStateNumber());
 		}
 		Estimator estimator = new LaplaceEstimator();
-		Sampler sampler = new SwatSampler(new SwatBridge(ssp, ssa), PlatformDependent.MODEL_ROOT + "/new_sample");
+		Sampler sampler = new SwatSampler(new SwatBridge(ssp, ssa), PlatformDependent.MODEL_ROOT + Config.modelPath + "/new_sample");
 		InitialDistGetter idoidg = new InitialDistributionOptimizer(ssp.getStateNumber(), validInitStates, pathLength);
 //		InitialDistGetter uniformidg = new UniformInitialDistribution(ssp.getStateNumber(), validInitStates);
 		
 		try {
-			Samples idosample = IterSampling(frequencyMatrix, validInitStates, pathLength, sampleNumber, estimator, sampler, idoidg);
+			Samples idosample = IterSampling(frequencyMatrix, pathLength, sampleNumber, estimator, sampler, idoidg);
 //			Samples uniformsample = IterSampling(frequencyMatrix, validInitStates, pathLength, sampleNumber, estimator, sampler, uniformidg);
 			System.out.println(idosample.toString());
 //			System.out.println(uniformsample.toString());
@@ -75,7 +77,7 @@ public class SwatActiveMain {
 	
 	} 
 	
-	public static Samples IterSampling(int[][] currentFrequencyMatrix, List<Integer> validInitStates, int sampleLength, int numSample, Estimator estimator, 
+	public static Samples IterSampling(int[][] currentFrequencyMatrix, int sampleLength, int numSample, Estimator estimator, 
 			Sampler sampler, InitialDistGetter idg) throws GRBException{
 		Samples sample = new Samples(sampleLength, currentFrequencyMatrix, estimator, sampler, idg);
 		for(int i=1; i<=numSample; i++){

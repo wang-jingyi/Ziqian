@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings("restriction")
 public class Main {
 
 	public static void main(String[] args) throws GRBException, FileNotFoundException{

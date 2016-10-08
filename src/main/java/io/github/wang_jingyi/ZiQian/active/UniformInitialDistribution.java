@@ -22,4 +22,9 @@ public class UniformInitialDistribution implements InitialDistGetter {
 		return id;
 	}
 
+	@Override
+	public void setValidInitialStates(List<Integer> validInitialStates) {
+		this.validInitialStates = validInitialStates;
+	}
+
 }

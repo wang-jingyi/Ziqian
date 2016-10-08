@@ -1,6 +1,7 @@
 package io.github.wang_jingyi.ZiQian.active;
 
 import io.github.wang_jingyi.ZiQian.run.Config;
+import io.github.wang_jingyi.ZiQian.run.GlobalVars;
 import io.github.wang_jingyi.ZiQian.swat.SwatSimulation;
 import io.github.wang_jingyi.ZiQian.utils.FileUtil;
 
@@ -57,7 +58,8 @@ public class SwatSampler implements Sampler {
 				newTrace.add(bridge.getSsp().getSwatStateMap().get(ss));
 			}
 			else{ // new state occurs, update state pool
-				System.out.println("new states happens, update state pool...");
+				System.out.println("new state, updatistate pool...");
+				GlobalVars.newStateNumber ++;
 				int stateIndex = bridge.getSsp().getStateNumber();
 				bridge.getSsp().getSwatStateMap().put(ss, stateIndex);
 				bridge.getSsp().getReSwatStateMap().put(stateIndex, ss);

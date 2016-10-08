@@ -20,7 +20,7 @@ public class SwatStatePool {
 	
 	public void buildPool(){
 		
-		int stateIndex = 0; // notice start from 0
+		int stateIndex = 0; // notice that state index starts from 0
 		for(SwatTrace trace : traces){
 			for(SwatState ss : trace.getTrace()){
 				if(!swatStateMap.containsKey(ss)){

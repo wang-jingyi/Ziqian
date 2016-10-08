@@ -14,6 +14,7 @@ import java.util.List;
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
 
+@SuppressWarnings("restriction")
 public class InitialDistributionOptimizer implements InitialDistGetter{
 
 	private int nodeNumber;
@@ -112,6 +113,11 @@ public class InitialDistributionOptimizer implements InitialDistGetter{
 			e.printStackTrace();
 		}
 		return optimalDistribution;
+	}
+
+	@Override
+	public void setValidInitialStates(List<Integer> validInitialStates) {
+		this.validInitialStates = validInitialStates;
 	}
 
 }
