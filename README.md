@@ -6,7 +6,7 @@
 * In the second stage, ZiQian integrates predicate abstraction to the learning framework. ZiQian starts from the coarsest abstraction and iteratively refine it by learning a new predicate by SVM.
 * In the third stage, ZiQian supports active learning for probabilistic models, where 'active' means we compute an optimal initial distribution for new samples to better estimate the model.
 
-ZiQian has been evaluated by multiple PRISM benchmark systems, random generated DTMCs, probabilistic boolean networks, as well as a real world water purification system testbed in SUTD. The experimental results prove that the theory and ZiQian work smoothly.     
+ZiQian has been evaluated by multiple PRISM benchmark systems, random generated DTMCs, probabilistic boolean networks, as well as a real world water purification system testbed in SUTD. The promising experimental results prove that our theory and ZiQian work smoothly.     
 
 ### What is this repository for? ###
 
