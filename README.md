@@ -1,15 +1,5 @@
 # README #
 
-
-***For FASE reviewers, check the ziqian/model folder for all the relevant systems and models used of the evaluation part the paper.***
-
-
-***For TACAS reviewers, check the ziqian/lar folder for all the relevant systems and models used for the evaluation part of the paper.*** 
-
-
-
-
-
 ***ZiQian*** is a research tool actively maintained in SUTD, Singapore, to learn probabilistic models (mainly DTMCs) from system logs for model checking. 
 
 * In the first stage, ZiQian supports learning from multiple executions and a single execution. For both cases, two categories of algorithms are implemented: state-of-art tree based algorithms and evolution-based algorithms.
@@ -53,7 +43,16 @@ Execute 'mvn install:install-file -Dfile=<path-to-file> -aDgroupId=net.sf
     -DartifactId=javaml -Dversion=0.1.7 -Dpackaging=jar' in command line
 
 
-, where <path-to-file> is the path to the .jar file in both cases.
+* Gurobi
+
+Download Gurobi.jar at https://www.gurobi.com/registration/download-reg. It's free for academic use.
+
+Execute 'mvn install:install-file -Dfile=<path-to-file> -aDgroupId=com.gurobi.www 
+    -DartifactId=gurobi -Dversion=6.5 -Dpackaging=jar' in command line
+
+
+, where <path-to-file> is the path to the .jar file in all cases.
+
 
 
 ### Guidelines ###
