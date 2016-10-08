@@ -62,12 +62,51 @@ public class NumberUtil {
         }
     }
     
-    public static String doubleArrayToString(double[] arr){
+    public static String ArrayToString(double[] arr){
     	List<Double> da = new ArrayList<>();
     	for(int i=0; i<arr.length; i++){
     		da.add(arr[i]);
     	}
     	return da.toString();
+    }
+    
+    public static String twoDArrayToString(double[][] arr){
+    	List<String> da = new ArrayList<>();
+    	for(int i=0; i<arr.length; i++){
+    		da.add(ArrayToString(arr[i]));
+    	}
+    	return da.toString();
+    }
+    
+    public static String ArrayToString(int[] arr){
+    	List<Integer> da = new ArrayList<>();
+    	for(int i=0; i<arr.length; i++){
+    		da.add(arr[i]);
+    	}
+    	return da.toString();
+    }
+    
+    public static String twoDArrayToString(int[][] arr){
+    	List<String> da = new ArrayList<>();
+    	for(int i=0; i<arr.length; i++){
+    		da.add(ArrayToString(arr[i]));
+    	}
+    	return da.toString();
+    }
+    
+    public static int[] getRowSums(int[][] arr){
+    	int n = arr.length;
+    	int[] rowsums = new int[n];
+    	
+		for(int i=0; i<n; i++){
+			int rowsum = 0;
+			int[] row = arr[i];
+			for(int j=0; j<n; j++){
+				rowsum += row[j];
+			}
+			rowsums[i] = rowsum;
+		}
+		return rowsums;
     }
     
     public static double[] getRowSums(double[][] arr){

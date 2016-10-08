@@ -274,7 +274,7 @@ public class RandomMarkovChain {
 	public String toString(){
 		List<String> str = new ArrayList<String>();
 		for(int i=0; i<transitionMatrix.length; i++){
-			str.add(NumberUtil.doubleArrayToString(transitionMatrix[i]));
+			str.add(NumberUtil.ArrayToString(transitionMatrix[i]));
 		}
 		return str.toString();
 	}

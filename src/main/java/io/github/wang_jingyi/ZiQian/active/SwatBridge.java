@@ -29,4 +29,13 @@ public class SwatBridge {
 		return input;
 	}
 	
+	public SwatStatePool getSsp() {
+		return ssp;
+	}
+
+	public SwatSensorAbstraction getSsa() {
+		return ssa;
+	}
+
+	
 }

@@ -211,7 +211,7 @@ public class Refiner implements DataCollector, Divider{
 		svm_log.append("variables involved in the classifier: \n");
 		svm_log.append(allVars.toString() + "\n");
 		svm_log.append("weights of the classifier: \n");
-		svm_log.append(NumberUtil.doubleArrayToString(svm.getWeights()));
+		svm_log.append(NumberUtil.ArrayToString(svm.getWeights()));
 		FileUtil.writeStringToFile(Config.OUTPUT_MODEL_PATH+"/" + Config.MODEL_NAME + (AlgoProfile.iterationCount+1)+"_classifier.txt", svm_log.toString());
 		
 		
@@ -265,7 +265,7 @@ public class Refiner implements DataCollector, Divider{
 		}
 
 
-		System.out.println("weights of the classifier: " + NumberUtil.doubleArrayToString(svm.getWeights()));
+		System.out.println("weights of the classifier: " + NumberUtil.ArrayToString(svm.getWeights()));
 
 		int rightCount = 0;
 		int sumCount = 0;

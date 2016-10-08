@@ -16,4 +16,19 @@ public class JavaTest {
 		System.out.println("test: " + list1.equals(list2));
 	}
 
+	
+	@Test
+	public void testArray(){
+		int[] a = new int[1];
+		a[0] = 1;
+		a[0] ++;
+		System.out.println("a[0]: " + a[0]);
+	}
+	
+	@Test
+	public void testSplit(){
+		String a = "a a";
+		String[] aa = a.split(" ");
+		System.out.println("aa length: " + aa.length);
+	}
 }

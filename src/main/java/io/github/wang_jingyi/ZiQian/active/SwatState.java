@@ -44,6 +44,9 @@ public class SwatState {
 		return ssp.getSwatStateMap().get(this);
 	}
 	
-	
+	@Override
+	public String toString() {
+		return "SwatState [sensorValues=" + sensorValues + "]";
+	}
 	
 }
