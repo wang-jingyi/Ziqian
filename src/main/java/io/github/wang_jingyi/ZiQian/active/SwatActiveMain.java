@@ -11,9 +11,7 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
-@SuppressWarnings("restriction")
 public class SwatActiveMain {
-	
 	
 	public static void main(String[] args) throws FileNotFoundException{
 		

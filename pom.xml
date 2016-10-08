@@ -6,7 +6,7 @@
 	<artifactId>ZiQian</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
-	
+
 	<name>ziqian</name>
 	<url>http://maven.apache.org</url>
 
@@ -69,6 +69,12 @@
 			<groupId>org.uncommons.watchmaker</groupId>
 			<artifactId>watchmaker-framework</artifactId>
 			<version>0.7.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.gurobi.www</groupId>
+			<artifactId>gurobi</artifactId>
+			<version>6.5</version>
 		</dependency>
 
 		<dependency>

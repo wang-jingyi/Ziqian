@@ -1,20 +1,14 @@
 package io.github.wang_jingyi.ZiQian.active;
 
-import gurobi.GRB;
-import gurobi.GRBEnv;
-import gurobi.GRBException;
-import gurobi.GRBLinExpr;
-import gurobi.GRBModel;
-import gurobi.GRBVar;
+import gurobi.*;
 import io.github.wang_jingyi.ZiQian.utils.IntegerUtil;
 
-import java.util.ArrayList;
+import java.util.ArrayList;	
 import java.util.List;
 
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
 
-@SuppressWarnings("restriction")
 public class InitialDistributionOptimizer implements InitialDistGetter{
 
 	private int nodeNumber;
