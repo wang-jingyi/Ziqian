@@ -27,7 +27,7 @@ The following external tools is not included in maven repository and have to be 
 
 * PRISM
 
-Download PRISM at http://www.prismmodelchecker.org/download.php
+Download PRISM (jar file) at http://www.prismmodelchecker.org/download.php
 
 Execute 'mvn install:install-file -Dfile=<path-to-file> -DgroupId=oxford.modelchecker 
     -DartifactId=prism -Dversion=4.2.1 -Dpackaging=jar' in command line
@@ -36,7 +36,7 @@ Execute 'mvn install:install-file -Dfile=<path-to-file> -DgroupId=oxford.modelch
 
 * javaml
 
-Download javaml at https://sourceforge.net/projects/java-ml/files/
+Download javaml (jar file) at https://sourceforge.net/projects/java-ml/files/
 
 
 Execute 'mvn install:install-file -Dfile=<path-to-file> -aDgroupId=net.sf 
@@ -45,7 +45,7 @@ Execute 'mvn install:install-file -Dfile=<path-to-file> -aDgroupId=net.sf
 
 * Gurobi
 
-Download Gurobi.jar at https://www.gurobi.com/registration/download-reg. It's free for academic use.
+Download Gurobi (jar file) at https://www.gurobi.com/registration/download-reg. It's free for academic use.
 
 Execute 'mvn install:install-file -Dfile=<path-to-file> -aDgroupId=com.gurobi.www 
     -DartifactId=gurobi -Dversion=6.5 -Dpackaging=jar' in command line
