@@ -4,16 +4,16 @@
 
 * In the first stage, ZiQian supports learning from multiple executions and a single execution. For both cases, two categories of algorithms are implemented: state-of-art tree based algorithms and evolution-based algorithms.
 * In the second stage, ZiQian integrates predicate abstraction to the learning framework. ZiQian starts from the coarsest abstraction and iteratively refine it by learning a new predicate by SVM.
-* In the next stage, we are planning to adopt active learning in the framework.
+* In the third stage, ZiQian supports active learning for probabilistic models, where 'active' means we compute an optimal initial distribution for new samples to better estimate the model.
 
 ZiQian has been evaluated by multiple PRISM benchmark systems, random generated DTMCs, probabilistic boolean networks, as well as a real world water purification system testbed in SUTD. The experimental results prove that the theory and ZiQian work smoothly.     
 
 ### What is this repository for? ###
 
-* This repository is maintained for ZiQian and contains conducted evaluation of multiple systems of submitted research papers. 
+* This repository is maintained for the tool ZiQian and the evaluation results of multiple systems of submitted research papers is hosted in another neighborhood repository called ziqian_evaluation. 
 
 
-* The current version supports the first two stages described above.
+### The current version supports the all three stages described above. Our next plan is to apply our research into the real world Singapore water treatment system testbed to build a complete environment model from system logs fully automatically. ###
 
 ### How do I set up? ###
 
