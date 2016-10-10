@@ -1,9 +1,9 @@
 package io.github.wang_jingyi.ZiQian.active;
 
-
+import java.util.List;
 
 public interface Estimator {
 	
-	public MarkovChain estimate(int[][] frequencyMatrix);
+	public MarkovChain estimate(List<List<Integer>> frequencyMatrix);
 
 }

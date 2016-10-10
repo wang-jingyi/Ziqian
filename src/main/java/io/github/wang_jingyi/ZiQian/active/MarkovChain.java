@@ -1,31 +1,42 @@
 package io.github.wang_jingyi.ZiQian.active;
 
+import io.github.wang_jingyi.ZiQian.utils.ListUtil;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class MarkovChain {
 
 	private int nodeNumber;
-	private double[][] transitionMatrix;
+	private List<List<Double>> transitionMatrix;
 
+	public MarkovChain(int nn) {
+		this.nodeNumber = nn;
+		for(int i=0; i<nodeNumber; i++){
+			List<Double> tmi = new ArrayList<Double>();
+			for(int j=0; j<nodeNumber; j++){
+				tmi.add(0.0);
+			}
+			transitionMatrix.add(tmi);
+		}
+	}
+
+	public List<List<Double>> getTransitionMatrix() {
+		return transitionMatrix;
+	}
+	
 	public int getNodeNumber() {
 		return nodeNumber;
 	}
 
-	public double[][] getTransitionMatrix() {
-		return transitionMatrix;
-	}
-
-	public MarkovChain(int nn) {
-		this.nodeNumber = nn;
-		this.transitionMatrix = new double[nn][nn];
-	}
-
-	public MarkovChain(double[][] matrix) {
-		this.nodeNumber = matrix.length;
+	public MarkovChain(List<List<Double>> matrix) {
+		this.nodeNumber = matrix.size();
 		this.transitionMatrix = matrix;
 	}
 	
-	public static int nextState(double[] dis){
+	public static int nextState(List<Double> disl){
+		double[] dis = ListUtil.listToArray(disl);
 		double[] accdis = new double[dis.length];
 		double acc = 0;
 		for(int i=0; i<dis.length; i++){
@@ -50,7 +61,7 @@ public class MarkovChain {
 	}
 
 	public int nextState(int currentState){
-		double[] dis = transitionMatrix[currentState];
+		List<Double> dis = transitionMatrix.get(currentState);
 		return nextState(dis);
 	}
 

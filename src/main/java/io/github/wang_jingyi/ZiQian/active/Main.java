@@ -56,7 +56,7 @@ public class Main {
 
 
 			double[][] matrix = rmc.getTransitionMatrix();
-			MarkovChain mc = new MarkovChain(matrix);
+			MarkovChain mc = new MarkovChain(ListUtil.TwoDDoubleArrayToList(matrix));
 			int sampleLength = sn;
 
 			RMCReachability rmcr = new RMCReachability(rmc,boundedStep);
@@ -66,9 +66,9 @@ public class Main {
 
 			// define estimator, initial distribution getter
 			Estimator estimator = new LaplaceEstimator();
-			Sampler sampler = new MarkovChainSampler(new MarkovChain(rmc.getTransitionMatrix()));
+			Sampler sampler = new MarkovChainSampler(new MarkovChain(ListUtil.TwoDDoubleArrayToList(rmc.getTransitionMatrix())));
 			InitialDistGetter idoidg = new InitialDistributionOptimizer(mc.getNodeNumber(), validInitStates, sn);
-			InitialDistGetter uniformidg = new UniformInitialDistribution(mc.getNodeNumber(), validInitStates);
+			InitialDistGetter uniformidg = new UniformInitialDistribution(validInitStates);
 
 			for(int numSample : sampleSize){
 
@@ -76,11 +76,13 @@ public class Main {
 				Samples idoSample = IterSampling(mc, validInitStates, sampleLength, numSample, estimator, sampler, idoidg);
 				Samples randomSample = IterSampling(mc, validInitStates, sampleLength, numSample, estimator, sampler, uniformidg);
 
-				idomse.add(MetricComputing.calculateMSE(mc.getTransitionMatrix(), idoSample.getEstimatedTransitionMatrix()));
-				rsmse.add(MetricComputing.calculateMSE(mc.getTransitionMatrix(),randomSample.getEstimatedTransitionMatrix()));
+				idomse.add(MetricComputing.calculateMSE(ListUtil.TwoDDoublelistToArray(mc.getTransitionMatrix()), 
+						ListUtil.TwoDDoublelistToArray(idoSample.getEstimatedTransitionMatrix())));
+				rsmse.add(MetricComputing.calculateMSE(ListUtil.TwoDDoublelistToArray(mc.getTransitionMatrix()),
+						ListUtil.TwoDDoublelistToArray(randomSample.getEstimatedTransitionMatrix())));
 
-				List<Double> idoReachProbs = rmcr.computeEstReachability(idoSample.getEstimatedTransitionMatrix());
-				List<Double> randomReachProbs = rmcr.computeEstReachability(randomSample.getEstimatedTransitionMatrix());
+				List<Double> idoReachProbs = rmcr.computeEstReachability(ListUtil.TwoDDoublelistToArray(idoSample.getEstimatedTransitionMatrix()));
+				List<Double> randomReachProbs = rmcr.computeEstReachability(ListUtil.TwoDDoublelistToArray(randomSample.getEstimatedTransitionMatrix()));
 
 				List<Double> idoDiff = ListUtil.listABSDiff(rmcr.getReachProbs(), idoReachProbs);
 				List<Double> randomDiff = ListUtil.listABSDiff(rmcr.getReachProbs(), randomReachProbs);

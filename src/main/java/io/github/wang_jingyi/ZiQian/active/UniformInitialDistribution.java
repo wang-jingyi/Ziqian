@@ -1,23 +1,22 @@
 package io.github.wang_jingyi.ZiQian.active;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class UniformInitialDistribution implements InitialDistGetter {
 
-	private int stateNumber;
 	private List<Integer> validInitialStates;
 	
-	public UniformInitialDistribution(int sn, List<Integer> validInitialStates) {
-		this.stateNumber = sn;
+	public UniformInitialDistribution(List<Integer> validInitialStates) {
 		this.validInitialStates = validInitialStates;
 	}
 	
 	@Override
-	public double[] getInitialDistribution(int[][] frequencyMatrix, double[][] origEstimation) {
+	public List<Double> getInitialDistribution(List<List<Integer>> frequencyMatrix, List<List<Double>> origEstimation) {
 		double p = (double) 1 / validInitialStates.size();
-		double[] id = new double[stateNumber];
-		for(int i : validInitialStates){
-			id[i] = p;
+		List<Double> id = new ArrayList<Double>();
+		for(@SuppressWarnings("unused") int i : validInitialStates){
+			id.add(p);
 		}
 		return id;
 	}

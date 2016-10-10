@@ -1,7 +1,6 @@
 package io.github.wang_jingyi.ZiQian.active;
 
 import io.github.wang_jingyi.ZiQian.run.GlobalVars;
-import io.github.wang_jingyi.ZiQian.utils.NumberUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,8 +8,8 @@ import java.util.List;
 public class Samples {
 
 	private int pathLength;
-	private double[][] estimatedTransitionMatrix;
-	private int[][] frequencyMatrix;
+	private List<List<Double>> estimatedTransitionMatrix;
+	private List<List<Integer>> frequencyMatrix;
 	private Estimator estimator;
 	private Sampler sampler;
 	private InitialDistGetter idg;
@@ -21,17 +20,19 @@ public class Samples {
 		this.estimator = estimator;
 		this.sampler = sampler;
 		this.idg = idg;
-		this.frequencyMatrix = new int[nodeNumber][nodeNumber];
-		this.estimatedTransitionMatrix = new double[nodeNumber][nodeNumber];
 		for(int i=0; i<nodeNumber; i++){ // if no estimation is given, treat as uniform
+			List<Integer> fmi = new ArrayList<Integer>();
+			List<Double> eti = new ArrayList<Double>();
 			for(int j=0; j<nodeNumber; j++){
-				this.frequencyMatrix[i][j] = 1;
-				this.estimatedTransitionMatrix[i][j] = (double) 1 / nodeNumber; 
+				fmi.add(0);
+				eti.add((double) 1 / nodeNumber);
 			}
+			frequencyMatrix.add(fmi);
+			estimatedTransitionMatrix.add(eti);
 		}
 	}
 	
-	public Samples(int pathLength, int[][] currentFrequencyMatrix, Estimator estimator, Sampler sampler,
+	public Samples(int pathLength, List<List<Integer>> currentFrequencyMatrix, Estimator estimator, Sampler sampler,
 			InitialDistGetter idg){
 		this.frequencyMatrix = currentFrequencyMatrix;
 		this.pathLength = pathLength;
@@ -39,7 +40,7 @@ public class Samples {
 		this.sampler = sampler;
 		this.idg = idg;
 		this.frequencyMatrix = currentFrequencyMatrix;
-		this.estimatedTransitionMatrix = estimator.estimate(currentFrequencyMatrix).getTransitionMatrix();
+		this.estimatedTransitionMatrix = estimator.estimate(frequencyMatrix).getTransitionMatrix();
 	}
 	
 
@@ -48,12 +49,37 @@ public class Samples {
 				idg.getInitialDistribution(frequencyMatrix, estimatedTransitionMatrix), pathLength);
 		
 		if(GlobalVars.newStateNumber!=0){ // update matrixes when there are new states
+			
 			System.out.println("adding " + GlobalVars.newStateNumber + " new states and updating matrix...");
-			int stateNumber = frequencyMatrix.length + GlobalVars.newStateNumber;
-			int[][] newfrequencyMatrix = new int[stateNumber][stateNumber];
-			System.arraycopy(frequencyMatrix, 0, newfrequencyMatrix, 0, frequencyMatrix.length);
-			frequencyMatrix = newfrequencyMatrix;
-			estimatedTransitionMatrix = new double[stateNumber][stateNumber];
+			
+			int stateNumber = frequencyMatrix.size() + GlobalVars.newStateNumber;
+			
+			for(List<Integer> fmi : frequencyMatrix){ // update each list
+				for(int i=0; i<GlobalVars.newStateNumber; i++){
+					fmi.add(0); 
+				}
+			}
+			for(int i=0; i<GlobalVars.newStateNumber; i++){ // update row for new state
+				List<Integer> newfmi = new ArrayList<Integer>();
+				for(int j=0; j<stateNumber; j++){
+					newfmi.add(0); 
+				}
+				frequencyMatrix.add(newfmi);
+			}
+			
+			
+			for(List<Double> estmi : estimatedTransitionMatrix){
+				for(int i=0; i<GlobalVars.newStateNumber; i++){
+					estmi.add(0.0);
+				}
+			}
+			for(int i=0; i<GlobalVars.newStateNumber; i++){ // update row for new state
+				List<Double> newtmi = new ArrayList<Double>();
+				for(int j=0; j<stateNumber; j++){
+					newtmi.add(0.0); 
+				}
+				estimatedTransitionMatrix.add(newtmi);
+			}
 			
 			// update valid initial states
 			List<Integer> newValidInitialStates = new ArrayList<Integer>();
@@ -66,7 +92,7 @@ public class Samples {
 		for(int i=0; i<asample.size()-1; i++){
 			int start = asample.get(i);
 			int end = asample.get(i+1);
-			frequencyMatrix[start][end] ++;
+			frequencyMatrix.get(start).get(end);
 		}
 		bayesianEstimation();
 	}
@@ -82,19 +108,20 @@ public class Samples {
 		return pathLength;
 	}
 
-	public double[][] getEstimatedTransitionMatrix() {
+	
+	public List<List<Double>> getEstimatedTransitionMatrix() {
 		return estimatedTransitionMatrix;
 	}
 
-	public int[][] getFrequencyMatrix() {
+	public List<List<Integer>> getFrequencyMatrix() {
 		return frequencyMatrix;
 	}
-	
+
 	@Override
 	public String toString() {
 		return "Samples [pathLength=" + pathLength
 				+ ", estimatedTransitionMatrix="
-				+ NumberUtil.twoDArrayToString(estimatedTransitionMatrix)
-				+ ", frequencyMatrix=" + NumberUtil.twoDArrayToString(frequencyMatrix) + "]";
+				+ estimatedTransitionMatrix
+				+ ", frequencyMatrix=" + frequencyMatrix + "]";
 	}
 }

@@ -13,6 +13,14 @@ public class ListUtil {
 		return arr;
 	}
 	
+	public static List<Double> arrayToList(double[] arr){
+		List<Double> ls = new ArrayList<Double>();
+		for(int i=0; i<arr.length; i++){
+			ls.add(arr[i]);
+		}
+		return ls;
+	}
+	
 	public static List<Double> listABSDiff(List<Double> list1, List<Double> list2){
 		int len = list1.size();
 		List<Double> res = new ArrayList<Double>();
@@ -29,6 +37,54 @@ public class ListUtil {
 			sum += list.get(i);
 		}
 		return sum/len;
+	}
+	
+	public static List<List<Double>> TwoDDoubleArrayToList(double[][] arr){
+		List<List<Double>> ls = new ArrayList<List<Double>>();
+		for(int i=0; i<arr.length; i++){
+			List<Double> l = new ArrayList<Double>();
+			for(int j=0; j<arr[0].length; j++){
+				l.add(arr[i][j]);
+			}
+			ls.add(l);
+		}
+		return ls;
+	}
+	
+	public static double[][] TwoDDoublelistToArray(List<List<Double>> ls){
+		int rm = ls.size();
+		int cm = ls.get(0).size();
+		double[][] arr = new double[rm][cm];
+		for(int i=0; i<ls.size(); i++){
+			for(int j=0; j<ls.get(0).size(); j++){
+				arr[i][j] = ls.get(i).get(j);
+			}
+		}
+		return arr;
+	}
+	
+	public static int[][] TwoDIntlistToArray(List<List<Integer>> ls){
+		int rm = ls.size();
+		int cm = ls.get(0).size();
+		int[][] arr = new int[rm][cm];
+		for(int i=0; i<ls.size(); i++){
+			for(int j=0; j<ls.get(0).size(); j++){
+				arr[i][j] = ls.get(i).get(j);
+			}
+		}
+		return arr;
+	}
+	
+	public static List<List<Integer>> TwoDArrayToList(int[][] arr){
+		List<List<Integer>> ls = new ArrayList<List<Integer>>();
+		for(int i=0; i<arr.length; i++){
+			List<Integer> l = new ArrayList<Integer>();
+			for(int j=0; j<arr[0].length; j++){
+				l.add(arr[i][j]);
+			}
+			ls.add(l);
+		}
+		return ls;
 	}
 
 }

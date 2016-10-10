@@ -15,14 +15,16 @@ public class SwatSampler implements Sampler {
 	private SwatBridge bridge;
 	private String tracePath;
 	private int fileCount = 0;
+	private int sampleTime = 5; // in minute
 	
-	public SwatSampler(SwatBridge bridge, String tracePath) {
+	public SwatSampler(SwatBridge bridge, String tracePath, int sampleTime) {
 		this.bridge = bridge;
 		this.tracePath = tracePath;
+		this.sampleTime = sampleTime;
 	}
 
 	@Override
-	public List<Integer> newSample(double[] initDistribution, int sampleLength) {
+	public List<Integer> newSample(List<Double> initDistribution, int sampleLength) {
 		List<Integer> newTrace = new ArrayList<Integer>();
 		int startState = MarkovChain.nextState(initDistribution);
 		double[] initConfig = bridge.generateInput(startState);
@@ -42,7 +44,7 @@ public class SwatSampler implements Sampler {
 		}
 		
 		// acquire abstract trace using SwatAbstraction
-		SwatSimulation.simulate(Config.SWAT_SAMPLE_STEP, Config.SWAT_RECORD_STEP, Config.SWAT_RUNNING_TIME, tracePath, fileCount);
+		SwatSimulation.simulate(Config.SWAT_SAMPLE_STEP, Config.SWAT_RECORD_STEP, sampleTime, tracePath, fileCount);
 		fileCount ++;
 		String newTracePath = tracePath + "/path_" + fileCount +".txt";
 		

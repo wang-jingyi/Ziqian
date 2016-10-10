@@ -5,6 +5,7 @@ import io.github.wang_jingyi.ZiQian.run.Config;
 import io.github.wang_jingyi.ZiQian.run.GlobalVars;
 import io.github.wang_jingyi.ZiQian.run.PlatformDependent;
 import io.github.wang_jingyi.ZiQian.utils.FileUtil;
+import io.github.wang_jingyi.ZiQian.utils.ListUtil;
 import io.github.wang_jingyi.ZiQian.utils.NumberUtil;
 
 import java.io.FileNotFoundException;
@@ -37,6 +38,7 @@ public class SwatActiveMain {
 		
 		SwatStatePool ssp = new SwatStatePool(sts);
 		ssp.buildPool();
+		System.out.println("number of states: " + ssp.getStateNumber());
 		
 		List<List<Integer>> abstractTraces = new ArrayList<List<Integer>>();
 		for(int i=0; i<sts.size(); i++){
@@ -59,12 +61,12 @@ public class SwatActiveMain {
 			validInitDist.add((double)1/ssp.getStateNumber());
 		}
 		Estimator estimator = new LaplaceEstimator();
-		Sampler sampler = new SwatSampler(new SwatBridge(ssp, ssa), PlatformDependent.MODEL_ROOT + Config.modelPath + "/new_sample");
+		Sampler sampler = new SwatSampler(new SwatBridge(ssp, ssa), PlatformDependent.MODEL_ROOT + Config.modelPath + "/new_sample", 1);
 		InitialDistGetter idoidg = new InitialDistributionOptimizer(ssp.getStateNumber(), validInitStates, pathLength);
 //		InitialDistGetter uniformidg = new UniformInitialDistribution(ssp.getStateNumber(), validInitStates);
 		
 		try {
-			Samples idosample = IterSampling(frequencyMatrix, pathLength, sampleNumber, estimator, sampler, idoidg);
+			Samples idosample = IterSampling(ListUtil.TwoDArrayToList(frequencyMatrix), pathLength, sampleNumber, estimator, sampler, idoidg);
 //			Samples uniformsample = IterSampling(frequencyMatrix, validInitStates, pathLength, sampleNumber, estimator, sampler, uniformidg);
 			System.out.println(idosample.toString());
 //			System.out.println(uniformsample.toString());
@@ -75,7 +77,7 @@ public class SwatActiveMain {
 	
 	} 
 	
-	public static Samples IterSampling(int[][] currentFrequencyMatrix, int sampleLength, int numSample, Estimator estimator, 
+	public static Samples IterSampling(List<List<Integer>> currentFrequencyMatrix, int sampleLength, int numSample, Estimator estimator, 
 			Sampler sampler, InitialDistGetter idg) throws GRBException{
 		Samples sample = new Samples(sampleLength, currentFrequencyMatrix, estimator, sampler, idg);
 		for(int i=1; i<=numSample; i++){

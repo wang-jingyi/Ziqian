@@ -4,7 +4,7 @@ import java.util.List;
 
 public interface InitialDistGetter {
 	
-	public double[] getInitialDistribution(int[][] frequencyMatrix, double[][] origEstimation);
+	public List<Double> getInitialDistribution(List<List<Integer>> frequencyMatrix, List<List<Double>> origEstimation);
 	public void setValidInitialStates(List<Integer> validInitialStates);
 	
 }

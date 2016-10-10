@@ -2,6 +2,7 @@ package io.github.wang_jingyi.ZiQian.active;
 
 import gurobi.*;
 import io.github.wang_jingyi.ZiQian.utils.IntegerUtil;
+import io.github.wang_jingyi.ZiQian.utils.ListUtil;
 
 import java.util.ArrayList;	
 import java.util.List;
@@ -37,12 +38,12 @@ public class InitialDistributionOptimizer implements InitialDistGetter{
 	}
 
 	@Override
-	public double[] getInitialDistribution(int[][] frequencyMatrix, double[][] origEstimation){
+	public List<Double> getInitialDistribution(List<List<Integer>> frequencyMatrix, List<List<Double>> origEstimation){
 		
-		RealMatrix A = accumulatedMatrix(pathLength, origEstimation);
+		RealMatrix A = accumulatedMatrix(pathLength, ListUtil.TwoDDoublelistToArray(origEstimation));
 		RealMatrix AT = A.transpose();
 
-		int mini = MetricComputing.calculateMinFreqState(frequencyMatrix); // get i: arg min mi
+		int mini = MetricComputing.calculateMinFreqState(ListUtil.TwoDIntlistToArray(frequencyMatrix)); // get i: arg min mi
 		double[] ATI = AT.getRow(mini); // the i-th row
 
 		GRBEnv env;
@@ -106,7 +107,7 @@ public class InitialDistributionOptimizer implements InitialDistGetter{
 		} catch (GRBException e) {
 			e.printStackTrace();
 		}
-		return optimalDistribution;
+		return ListUtil.arrayToList(optimalDistribution);
 	}
 
 	@Override
