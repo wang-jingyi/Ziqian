@@ -39,7 +39,7 @@ Execute 'mvn install:install-file -Dfile=<path-to-file> -DgroupId=oxford.modelch
 Download javaml (jar file) at https://sourceforge.net/projects/java-ml/files/
 
 
-Execute 'mvn install:install-file -Dfile=<path-to-file> -aDgroupId=net.sf 
+Execute 'mvn install:install-file -Dfile=<path-to-file> -DgroupId=net.sf 
     -DartifactId=javaml -Dversion=0.1.7 -Dpackaging=jar' in command line
 
 
@@ -51,7 +51,7 @@ Execute 'mvn install:install-file -Dfile=<path-to-file> -aDgroupId=com.gurobi.ww
     -DartifactId=gurobi -Dversion=6.5 -Dpackaging=jar' in command line
 
 
-, where <path-to-file> is the path to the .jar file in all cases.
+, where <path-to-file> is the path to the .jar file (located in ext folder) in all cases.
 
 
 
