@@ -47,7 +47,7 @@ Execute 'mvn install:install-file -Dfile=<path-to-file> -DgroupId=net.sf
 
 Download Gurobi (jar file) at https://www.gurobi.com/registration/download-reg. It's free for academic use.
 
-Execute 'mvn install:install-file -Dfile=<path-to-file> -aDgroupId=com.gurobi.www 
+Execute 'mvn install:install-file -Dfile=<path-to-file> -DgroupId=com.gurobi.www 
     -DartifactId=gurobi -Dversion=6.5 -Dpackaging=jar' in command line
 
 
