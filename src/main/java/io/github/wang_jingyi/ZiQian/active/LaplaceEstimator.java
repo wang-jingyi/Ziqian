@@ -1,7 +1,7 @@
 package io.github.wang_jingyi.ZiQian.active;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.apache.commons.math3.linear.MatrixUtils;
+import org.apache.commons.math3.linear.RealMatrix;
 
 
 
@@ -10,33 +10,30 @@ public class LaplaceEstimator implements Estimator {
 
 
 	@Override
-	public MarkovChain estimate(List<List<Integer>> frequencyMatrix) {
-
-		int nodeNumber = frequencyMatrix.size();
-		List<List<Double>> esttm = new ArrayList<List<Double>>();
+	public RealMatrix estimate(RealMatrix frequencyMatrix) {
 		
-
-		int[] rowsums = new int[nodeNumber];
+		int nodeNumber = frequencyMatrix.getRowDimension();
+		
+		RealMatrix estrm = MatrixUtils.createRealMatrix(nodeNumber, nodeNumber);
+		
+		double[] rowsums = new double[nodeNumber];
 		for(int i=0; i<nodeNumber; i++){
 			int rowsum = 0;
-			List<Integer> row = frequencyMatrix.get(i);
+			double[] row = frequencyMatrix.getRow(i);
 			for(int j=0; j<nodeNumber; j++){
-				rowsum += row.get(j);
+				rowsum += row[j];
 			}
 			rowsums[i] = rowsum;
 		}
 
 		for(int i=0; i<nodeNumber; i++){
-			List<Double> esttmi = new ArrayList<Double>();
 			for(int j=0; j<nodeNumber; j++){
-				double fre = frequencyMatrix.get(i).get(j);
-				double p = (fre + 1) / (nodeNumber + rowsums[i]);
-				esttmi.add(p);
+				double fre = frequencyMatrix.getEntry(i, j);
+				double p = (1+fre) / (nodeNumber+rowsums[i]);
+				estrm.setEntry(i, j, p);
 			}
-			esttm.add(esttmi);
 		}
-
-		return new MarkovChain(esttm);
+		return estrm;
 	}
 
 }

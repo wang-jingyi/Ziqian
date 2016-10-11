@@ -1,7 +1,8 @@
 package io.github.wang_jingyi.ZiQian.active;
 
-import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.commons.math3.linear.RealMatrix;
 
 public class UniformInitialDistribution implements InitialDistGetter {
 
@@ -12,11 +13,11 @@ public class UniformInitialDistribution implements InitialDistGetter {
 	}
 	
 	@Override
-	public List<Double> getInitialDistribution(List<List<Integer>> frequencyMatrix, List<List<Double>> origEstimation) {
+	public double[] getInitialDistribution(RealMatrix frequencyMatrix, RealMatrix origEstimation) {
 		double p = (double) 1 / validInitialStates.size();
-		List<Double> id = new ArrayList<Double>();
-		for(@SuppressWarnings("unused") int i : validInitialStates){
-			id.add(p);
+		double[] id = new double[validInitialStates.size()];
+		for(int i : validInitialStates){
+			id[i] = p;
 		}
 		return id;
 	}

@@ -1,7 +1,6 @@
 package io.github.wang_jingyi.ZiQian.active;
 
 import io.github.wang_jingyi.ZiQian.utils.FileUtil;
-import io.github.wang_jingyi.ZiQian.utils.NumberUtil;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -11,11 +10,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import org.apache.commons.math3.linear.MatrixUtils;
+import org.apache.commons.math3.linear.RealMatrix;
+
 public class RandomMarkovChain {
 
 	private int numOfState; // number of states in the dtmc
 	private double density; // percentage of edges
-	private double[][] transitionMatrix; // transition matrix of the dtmc
+	private RealMatrix transitionMatrix; // transition matrix of the dtmc
 	private boolean[][] edges; // edges of the dtmc 
 	private List<List<Integer>> edgeIndexes; // indexes of next state
 	private List<Integer> initStates;
@@ -38,7 +40,7 @@ public class RandomMarkovChain {
 		this.numOfState = n;
 		this.density = density;
 		this.rmcName = rmcName;
-		this.transitionMatrix = new double[numOfState][numOfState];
+		this.transitionMatrix = MatrixUtils.createRealMatrix(n, n);
 		this.edges = new boolean[numOfState][numOfState];
 		this.edgeIndexes = new ArrayList<>();
 		this.validStateIndex = new ArrayList<Integer>();
@@ -57,7 +59,7 @@ public class RandomMarkovChain {
 		this.rareTrans = rareTrans;
 		this.rareTransLevel = rareTransLevel;
 		this.rareTransNum = rareTransNum;
-		this.transitionMatrix = new double[numOfState][numOfState];
+		this.transitionMatrix = MatrixUtils.createRealMatrix(n, n);
 		this.edges = new boolean[numOfState][numOfState];
 		this.edgeIndexes = new ArrayList<>();
 		this.validStateIndex = new ArrayList<Integer>();
@@ -105,13 +107,13 @@ public class RandomMarkovChain {
 			for(int j=0; j<edgeNum; j++){
 				TransitionPoint currenttp = new TransitionPoint(i, edges.get(j));
 				if(j==edgeNum-1){
-					transitionMatrix[i][edges.get(edgeNum-1)] = 1 - sumcr;
+					transitionMatrix.getRow(i)[edges.get(edgeNum-1)] = 1 - sumcr;
 					sumcr = 1;
 				}
 				else if(rts.containsKey(currenttp)){
 					int mul = 1 + rnd.nextInt(9);
 					double rt = mul * rareTransLevel;
-					transitionMatrix[i][edges.get(j)]= rt;
+					transitionMatrix.getRow(i)[edges.get(j)]= rt;
 					rts.put(currenttp,rt);
 					sumcr += rt;
 					tmp -= rt;
@@ -121,7 +123,7 @@ public class RandomMarkovChain {
 					cr = tmp * cr;
 					sumcr += cr;
 					tmp -= cr;
-					transitionMatrix[i][edges.get(j)] = cr;
+					transitionMatrix.getRow(i)[edges.get(j)] = cr;
 				}
 			}
 		}
@@ -132,7 +134,7 @@ public class RandomMarkovChain {
 	public void generateRMCFree(){
 		generateEdgesWithDensity();
 		for(int i=0; i<numOfState; i++){
-			transitionMatrix[i] = generateRandomDistribution(i);
+			transitionMatrix.setRow(i, generateRandomDistribution(i));
 		}
 	}
 
@@ -247,7 +249,7 @@ public class RandomMarkovChain {
 		return sim;
 	}
 
-	public double[][] getTransitionMatrix() {
+	public RealMatrix getTransitionMatrix() {
 		return transitionMatrix;
 	}
 
@@ -256,7 +258,7 @@ public class RandomMarkovChain {
 	}
 
 	private int nextState(int currentState){
-		double[] dis = transitionMatrix[currentState];
+		double[] dis = transitionMatrix.getRow(currentState);
 		List<Integer> edgeInd = edgeIndexes.get(currentState);
 		double rn = rnd.nextDouble();
 		double lb = 0;
@@ -271,12 +273,15 @@ public class RandomMarkovChain {
 		return -1;
 	}
 
-	public String toString(){
-		List<String> str = new ArrayList<String>();
-		for(int i=0; i<transitionMatrix.length; i++){
-			str.add(NumberUtil.ArrayToString(transitionMatrix[i]));
-		}
-		return str.toString();
+
+
+	@Override
+	public String toString() {
+		return "RandomMarkovChain [numOfState=" + numOfState + ", density="
+				+ density + ", transitionMatrix=" + transitionMatrix
+				+ ", rmcName=" + rmcName + "]";
 	}
+	
+	
 	
 }

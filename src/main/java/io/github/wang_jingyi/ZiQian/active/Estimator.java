@@ -1,9 +1,9 @@
 package io.github.wang_jingyi.ZiQian.active;
 
-import java.util.List;
+import org.apache.commons.math3.linear.RealMatrix;
 
-public interface Estimator {
+public interface Estimator{
 	
-	public MarkovChain estimate(List<List<Integer>> frequencyMatrix);
+	public RealMatrix estimate(RealMatrix frequencyMatrix);
 
 }

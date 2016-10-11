@@ -1,7 +1,6 @@
 package io.github.wang_jingyi.ZiQian.active;
 
 import io.github.wang_jingyi.ZiQian.run.Config;
-import io.github.wang_jingyi.ZiQian.run.GlobalVars;
 import io.github.wang_jingyi.ZiQian.swat.SwatSimulation;
 import io.github.wang_jingyi.ZiQian.utils.FileUtil;
 
@@ -24,7 +23,7 @@ public class SwatSampler implements Sampler {
 	}
 
 	@Override
-	public List<Integer> newSample(List<Double> initDistribution, int sampleLength) {
+	public List<Integer> newSample(double[] initDistribution, int sampleLength) {
 		List<Integer> newTrace = new ArrayList<Integer>();
 		int startState = MarkovChain.nextState(initDistribution);
 		double[] initConfig = bridge.generateInput(startState);
@@ -56,17 +55,7 @@ public class SwatSampler implements Sampler {
 			e.printStackTrace();
 		}
 		for(SwatState ss : st.getTrace()){
-			if(bridge.getSsp().getSwatStateMap().containsKey(ss)){
-				newTrace.add(bridge.getSsp().getSwatStateMap().get(ss));
-			}
-			else{ // new state occurs, update state pool
-				System.out.println("new state, updatistate pool...");
-				GlobalVars.newStateNumber ++;
-				int stateIndex = bridge.getSsp().getStateNumber();
-				bridge.getSsp().getSwatStateMap().put(ss, stateIndex);
-				bridge.getSsp().getReSwatStateMap().put(stateIndex, ss);
-				bridge.getSsp().setStateNumber(++stateIndex);
-			}
+				newTrace.add(bridge.getSsa().swatStateIndex(ss.getSensorValues()));
 		}
  		return newTrace;
 	}

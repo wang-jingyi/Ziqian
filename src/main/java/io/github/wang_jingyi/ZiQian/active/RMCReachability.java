@@ -9,6 +9,8 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.math3.linear.RealMatrix;
+
 public class RMCReachability {
 	
 	private RandomMarkovChain rmc;
@@ -26,7 +28,7 @@ public class RMCReachability {
 	
 	private void generatePrismFiles() throws FileNotFoundException{
 		FileUtil.createDir(filePath);
-		PrismUtil.MCToPrism(rmc.getTransitionMatrix(), rmc.getRmcName(), filePath);
+		PrismUtil.MCToPrism(rmc.getTransitionMatrix().getData(), rmc.getRmcName(), filePath);
 		rmc.WriteRMCPropertyList(filePath, boundedStep);
 	}
 	
@@ -44,9 +46,9 @@ public class RMCReachability {
 		return reachProbs;
 	}
 
-	public List<Double> computeEstReachability(double[][] estTransitionMatrix) throws FileNotFoundException{
+	public List<Double> computeEstReachability(RealMatrix estTransitionMatrix) throws FileNotFoundException{
 		List<Double> estReachProbs = new ArrayList<Double>();
-		PrismUtil.MCToPrism(estTransitionMatrix, rmc.getRmcName()+"_learn", filePath);
+		PrismUtil.MCToPrism(estTransitionMatrix.getData(), rmc.getRmcName()+"_learn", filePath);
 
 		String pmPath = Config.PROJECT_ROOT + "/active/rmc/" + rmc.getRmcName() +"/" + rmc.getRmcName() + "_learn.pm";
 		String propPath = Config.PROJECT_ROOT + "/active/rmc/" + rmc.getRmcName() +"/" + rmc.getRmcName() + ".pctl";

@@ -5,12 +5,13 @@ import io.github.wang_jingyi.ZiQian.run.Config;
 import io.github.wang_jingyi.ZiQian.run.GlobalVars;
 import io.github.wang_jingyi.ZiQian.run.PlatformDependent;
 import io.github.wang_jingyi.ZiQian.utils.FileUtil;
-import io.github.wang_jingyi.ZiQian.utils.ListUtil;
 import io.github.wang_jingyi.ZiQian.utils.NumberUtil;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.commons.math3.linear.RealMatrix;
 
 public class SwatActiveMain {
 	
@@ -24,7 +25,15 @@ public class SwatActiveMain {
 		ssa.addSensor("LS601", new Interval(200, 8000), 1000);
 		ssa.addSensor("LS602", new Interval(200, 1200), 100);
 		
-		System.out.println("collecting traces, build state pool...");
+		ALConfig.stateNumber = ssa.getStateNumber(); // update state number according to sensor abstraction
+		 
+		System.out.println("number of states: " + ALConfig.stateNumber);
+		if(ALConfig.stateNumber>1000){
+			System.out.println("building sparse matrix...");
+			ALConfig.sparse = true;
+		}
+		
+		System.out.println("collecting traces");
 		// original traces
 		List<SwatTrace> sts = new ArrayList<SwatTrace>();
 		for(String s : FileUtil.filesInDir(PlatformDependent.MODEL_ROOT + "/swat/10,5/paths")){
@@ -33,53 +42,54 @@ public class SwatActiveMain {
 			sts.add(st);
 		}
 		
+		
 		System.out.println("max sensor values in the trace: " + NumberUtil.ArrayToString(GlobalVars.maxSensorValues));
 		System.out.println("min sensor values in the trace: " + NumberUtil.ArrayToString(GlobalVars.minSensorValues));
 		
-		SwatStatePool ssp = new SwatStatePool(sts);
-		ssp.buildPool();
-		System.out.println("number of states: " + ssp.getStateNumber());
+//		SwatStatePool ssp = new SwatStatePool(sts);
+//		ssp.buildPool();
+//		System.out.println("number of states: " + ssp.getStateNumber());
 		
 		List<List<Integer>> abstractTraces = new ArrayList<List<Integer>>();
 		for(int i=0; i<sts.size(); i++){
 			List<SwatState> ssl = sts.get(i).getTrace();
 			List<Integer> at = new ArrayList<Integer>();
 			for(SwatState ss : ssl){
-				at.add(ssp.getSwatStateMap().get(ss));
+				List<Integer> sensorValues = ss.getSensorValues();
+				at.add(ssa.swatStateIndex(sensorValues));
 			}
 			abstractTraces.add(at);
 		}
 		
-		int[][] frequencyMatrix = SampleStatisticGetter.getFrequencyMatrix(abstractTraces, ssp.getStateNumber());
-		int pathLength = ssp.getStateNumber();
-		int sampleNumber = 10;
+		RealMatrix frequencyMatrix = Samples.getFrequencyMatrix(abstractTraces, ALConfig.stateNumber);
+		int pathLength = ALConfig.pathLength;
+		int sampleNumber = ALConfig.newSampleNumber;
 		
 		List<Integer> validInitStates = new ArrayList<>();
 		List<Double> validInitDist = new ArrayList<Double>();
-		for(int i=0; i<ssp.getStateNumber(); i++){
+		for(int i=0; i<ALConfig.stateNumber; i++){
 			validInitStates.add(i);
-			validInitDist.add((double)1/ssp.getStateNumber());
+			validInitDist.add((double)1/ALConfig.stateNumber);
 		}
 		Estimator estimator = new LaplaceEstimator();
-		Sampler sampler = new SwatSampler(new SwatBridge(ssp, ssa), PlatformDependent.MODEL_ROOT + Config.modelPath + "/new_sample", 1);
-		InitialDistGetter idoidg = new InitialDistributionOptimizer(ssp.getStateNumber(), validInitStates, pathLength);
-//		InitialDistGetter uniformidg = new UniformInitialDistribution(ssp.getStateNumber(), validInitStates);
+		Sampler sampler = new SwatSampler(new SwatBridge(ssa), PlatformDependent.MODEL_ROOT + Config.modelPath + "/new_sample", 1);
+		InitialDistGetter idoidg = new InitialDistributionOptimizer(ALConfig.stateNumber, validInitStates, pathLength);
+		InitialDistGetter uniformidg = new UniformInitialDistribution(validInitStates);
 		
 		try {
-			Samples idosample = IterSampling(ListUtil.TwoDArrayToList(frequencyMatrix), pathLength, sampleNumber, estimator, sampler, idoidg);
-//			Samples uniformsample = IterSampling(frequencyMatrix, validInitStates, pathLength, sampleNumber, estimator, sampler, uniformidg);
+			Samples idosample = IterSampling(frequencyMatrix, pathLength, sampleNumber, estimator, sampler, idoidg);
+			Samples uniformsample = IterSampling(frequencyMatrix, pathLength, sampleNumber, estimator, sampler, uniformidg);
 			System.out.println(idosample.toString());
-//			System.out.println(uniformsample.toString());
+			System.out.println(uniformsample.toString());
 		} catch (GRBException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	
 	} 
 	
-	public static Samples IterSampling(List<List<Integer>> currentFrequencyMatrix, int sampleLength, int numSample, Estimator estimator, 
+	public static Samples IterSampling(RealMatrix currentFrequencyMatrix, int sampleLength, int numSample, Estimator estimator, 
 			Sampler sampler, InitialDistGetter idg) throws GRBException{
-		Samples sample = new Samples(sampleLength, currentFrequencyMatrix, estimator, sampler, idg);
+		Samples sample = new Samples(currentFrequencyMatrix, estimator, sampler, idg);
 		for(int i=1; i<=numSample; i++){
 			System.out.println("getting a new sample, number: " + i);
 			sample.newSample();

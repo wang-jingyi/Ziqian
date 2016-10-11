@@ -12,7 +12,7 @@ public class MarkovChainSampler implements Sampler {
 	}
 
 	@Override
-	public List<Integer> newSample(List<Double> initDistribution, int sampleLength) {
+	public List<Integer> newSample(double[] initDistribution, int sampleLength) {
 		int startIndex = MarkovChain.nextState(initDistribution);
 		return samplePath(sampleLength, startIndex);
 	}

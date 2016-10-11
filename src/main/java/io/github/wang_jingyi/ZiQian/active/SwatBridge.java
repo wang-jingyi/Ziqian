@@ -4,21 +4,18 @@ import java.util.Random;
 
 public class SwatBridge {
 	
-	private SwatStatePool ssp;
 	private SwatSensorAbstraction ssa;
 	
 	
-	public SwatBridge(SwatStatePool ssp, SwatSensorAbstraction ssa) {
-		this.ssp = ssp;
+	public SwatBridge(SwatSensorAbstraction ssa) {
 		this.ssa = ssa;
 	}
-	
 	
 	// give state index, generate a set of sensor values as input
 	public double[] generateInput(int stateIndex){
 		int sensorNum = ssa.getSensors().size();
 		double[] input = new double[sensorNum];
-		SwatState ss = ssp.getReSwatStateMap().get(stateIndex);
+		SwatState ss = new SwatState(ssa.swatStateAbstractValue(stateIndex));
 		for(int i=0; i<sensorNum; i++){
 			int sensorIndex = ss.getSensorValues().get(i);
 			Random rnd = new Random();
@@ -27,10 +24,6 @@ public class SwatBridge {
 			input[i] = sv;
 		}
 		return input;
-	}
-	
-	public SwatStatePool getSsp() {
-		return ssp;
 	}
 
 	public SwatSensorAbstraction getSsa() {

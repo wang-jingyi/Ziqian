@@ -1,119 +1,79 @@
 package io.github.wang_jingyi.ZiQian.active;
 
-import io.github.wang_jingyi.ZiQian.run.GlobalVars;
-
-import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.commons.math3.linear.MatrixUtils;
+import org.apache.commons.math3.linear.OpenMapRealMatrix;
+import org.apache.commons.math3.linear.RealMatrix;
 
 public class Samples {
 
-	private int pathLength;
-	private List<List<Double>> estimatedTransitionMatrix;
-	private List<List<Integer>> frequencyMatrix;
+	private RealMatrix estimatedTransitionMatrix;
+	private RealMatrix frequencyMatrix;
 	private Estimator estimator;
 	private Sampler sampler;
 	private InitialDistGetter idg;
-	
+	private int pathLength = 10;
 
-	public Samples(int nodeNumber, int pathLength, Estimator estimator, Sampler sampler, InitialDistGetter idg){
-		this.pathLength = pathLength;
+	public Samples(Estimator estimator, Sampler sampler, InitialDistGetter idg){
 		this.estimator = estimator;
 		this.sampler = sampler;
 		this.idg = idg;
-		for(int i=0; i<nodeNumber; i++){ // if no estimation is given, treat as uniform
-			List<Integer> fmi = new ArrayList<Integer>();
-			List<Double> eti = new ArrayList<Double>();
-			for(int j=0; j<nodeNumber; j++){
-				fmi.add(0);
-				eti.add((double) 1 / nodeNumber);
-			}
-			frequencyMatrix.add(fmi);
-			estimatedTransitionMatrix.add(eti);
+		int stateNumber = ALConfig.stateNumber;
+		if(ALConfig.sparse){
+			this.frequencyMatrix = new OpenMapRealMatrix(stateNumber, stateNumber);
+			this.estimatedTransitionMatrix = new OpenMapRealMatrix(stateNumber, stateNumber);
+		}
+		else{
+			this.frequencyMatrix = MatrixUtils.createRealMatrix(stateNumber, stateNumber);
+			this.estimatedTransitionMatrix = MatrixUtils.createRealMatrix(stateNumber, stateNumber);
 		}
 	}
-	
-	public Samples(int pathLength, List<List<Integer>> currentFrequencyMatrix, Estimator estimator, Sampler sampler,
+
+	public Samples(RealMatrix currentFrequencyMatrix, Estimator estimator, Sampler sampler,
 			InitialDistGetter idg){
 		this.frequencyMatrix = currentFrequencyMatrix;
-		this.pathLength = pathLength;
 		this.estimator = estimator;
 		this.sampler = sampler;
 		this.idg = idg;
-		this.frequencyMatrix = currentFrequencyMatrix;
-		this.estimatedTransitionMatrix = estimator.estimate(frequencyMatrix).getTransitionMatrix();
+		this.estimatedTransitionMatrix = estimator.estimate(frequencyMatrix);
 	}
-	
+
 
 	public void newSample(){
 		List<Integer> asample = sampler.newSample(
 				idg.getInitialDistribution(frequencyMatrix, estimatedTransitionMatrix), pathLength);
-		
-		if(GlobalVars.newStateNumber!=0){ // update matrixes when there are new states
-			
-			System.out.println("adding " + GlobalVars.newStateNumber + " new states and updating matrix...");
-			
-			int stateNumber = frequencyMatrix.size() + GlobalVars.newStateNumber;
-			
-			for(List<Integer> fmi : frequencyMatrix){ // update each list
-				for(int i=0; i<GlobalVars.newStateNumber; i++){
-					fmi.add(0); 
-				}
-			}
-			for(int i=0; i<GlobalVars.newStateNumber; i++){ // update row for new state
-				List<Integer> newfmi = new ArrayList<Integer>();
-				for(int j=0; j<stateNumber; j++){
-					newfmi.add(0); 
-				}
-				frequencyMatrix.add(newfmi);
-			}
-			
-			
-			for(List<Double> estmi : estimatedTransitionMatrix){
-				for(int i=0; i<GlobalVars.newStateNumber; i++){
-					estmi.add(0.0);
-				}
-			}
-			for(int i=0; i<GlobalVars.newStateNumber; i++){ // update row for new state
-				List<Double> newtmi = new ArrayList<Double>();
-				for(int j=0; j<stateNumber; j++){
-					newtmi.add(0.0); 
-				}
-				estimatedTransitionMatrix.add(newtmi);
-			}
-			
-			// update valid initial states
-			List<Integer> newValidInitialStates = new ArrayList<Integer>();
-			for(int i=0; i<stateNumber; i++){
-				newValidInitialStates.add(i);
-			}
-			idg.setValidInitialStates(newValidInitialStates);
-			GlobalVars.newStateNumber = 0 ;
-		}
+
 		for(int i=0; i<asample.size()-1; i++){
 			int start = asample.get(i);
 			int end = asample.get(i+1);
-			frequencyMatrix.get(start).get(end);
+			double cr = frequencyMatrix.getEntry(start, end);
+			cr++;
+			frequencyMatrix.setEntry(start, end, cr);
 		}
-		bayesianEstimation();
+		estimator.estimate(frequencyMatrix);
 	}
 
+	public static RealMatrix getFrequencyMatrix(List<List<Integer>> traces, int stateNumber){
 
-
-	private void bayesianEstimation(){
-		MarkovChain mc = estimator.estimate(frequencyMatrix);
-		estimatedTransitionMatrix = mc.getTransitionMatrix();
+		RealMatrix freqMatrix = MatrixUtils.createRealMatrix(stateNumber, stateNumber);
+		for(List<Integer> trace : traces){
+			for(int i=0; i<trace.size()-1; i++){
+				int start = trace.get(i);
+				int end = trace.get(i+1);
+				double cr = freqMatrix.getEntry(start, end);
+				cr++;
+				freqMatrix.setEntry(start, end, cr);
+			}
+		}
+		return freqMatrix;
 	}
-
-	public int getPathLength() {
-		return pathLength;
-	}
-
 	
-	public List<List<Double>> getEstimatedTransitionMatrix() {
+	public RealMatrix getEstimatedTransitionMatrix() {
 		return estimatedTransitionMatrix;
 	}
 
-	public List<List<Integer>> getFrequencyMatrix() {
+	public RealMatrix getFrequencyMatrix() {
 		return frequencyMatrix;
 	}
 

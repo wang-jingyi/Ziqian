@@ -7,6 +7,8 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.math3.linear.RealMatrix;
+
 public class Main {
 
 	public static void main(String[] args) throws GRBException, FileNotFoundException{
@@ -55,8 +57,8 @@ public class Main {
 
 
 
-			double[][] matrix = rmc.getTransitionMatrix();
-			MarkovChain mc = new MarkovChain(ListUtil.TwoDDoubleArrayToList(matrix));
+			RealMatrix matrix = rmc.getTransitionMatrix();
+			MarkovChain mc = new MarkovChain(matrix);
 			int sampleLength = sn;
 
 			RMCReachability rmcr = new RMCReachability(rmc,boundedStep);
@@ -66,7 +68,7 @@ public class Main {
 
 			// define estimator, initial distribution getter
 			Estimator estimator = new LaplaceEstimator();
-			Sampler sampler = new MarkovChainSampler(new MarkovChain(ListUtil.TwoDDoubleArrayToList(rmc.getTransitionMatrix())));
+			Sampler sampler = new MarkovChainSampler(new MarkovChain(rmc.getTransitionMatrix()));
 			InitialDistGetter idoidg = new InitialDistributionOptimizer(mc.getNodeNumber(), validInitStates, sn);
 			InitialDistGetter uniformidg = new UniformInitialDistribution(validInitStates);
 
@@ -76,13 +78,11 @@ public class Main {
 				Samples idoSample = IterSampling(mc, validInitStates, sampleLength, numSample, estimator, sampler, idoidg);
 				Samples randomSample = IterSampling(mc, validInitStates, sampleLength, numSample, estimator, sampler, uniformidg);
 
-				idomse.add(MetricComputing.calculateMSE(ListUtil.TwoDDoublelistToArray(mc.getTransitionMatrix()), 
-						ListUtil.TwoDDoublelistToArray(idoSample.getEstimatedTransitionMatrix())));
-				rsmse.add(MetricComputing.calculateMSE(ListUtil.TwoDDoublelistToArray(mc.getTransitionMatrix()),
-						ListUtil.TwoDDoublelistToArray(randomSample.getEstimatedTransitionMatrix())));
+				idomse.add(MetricComputing.calculateMSE(mc.getTransitionMatrix(), idoSample.getEstimatedTransitionMatrix()));
+				rsmse.add(MetricComputing.calculateMSE(mc.getTransitionMatrix(),randomSample.getEstimatedTransitionMatrix()));
 
-				List<Double> idoReachProbs = rmcr.computeEstReachability(ListUtil.TwoDDoublelistToArray(idoSample.getEstimatedTransitionMatrix()));
-				List<Double> randomReachProbs = rmcr.computeEstReachability(ListUtil.TwoDDoublelistToArray(randomSample.getEstimatedTransitionMatrix()));
+				List<Double> idoReachProbs = rmcr.computeEstReachability(idoSample.getEstimatedTransitionMatrix());
+				List<Double> randomReachProbs = rmcr.computeEstReachability(randomSample.getEstimatedTransitionMatrix());
 
 				List<Double> idoDiff = ListUtil.listABSDiff(rmcr.getReachProbs(), idoReachProbs);
 				List<Double> randomDiff = ListUtil.listABSDiff(rmcr.getReachProbs(), randomReachProbs);
@@ -106,7 +106,7 @@ public class Main {
 
 	public static Samples IterSampling(MarkovChain mc, List<Integer> validInitStates, int sampleLength, int numSample, Estimator estimator, 
 			Sampler sampler, InitialDistGetter idg) throws GRBException{
-		Samples sample = new Samples(mc.getNodeNumber(), sampleLength, estimator, sampler, idg);
+		Samples sample = new Samples(estimator, sampler, idg);
 		for(int i=0; i<numSample; i++){
 			sample.newSample();
 		}

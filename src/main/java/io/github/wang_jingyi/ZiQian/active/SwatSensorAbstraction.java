@@ -10,8 +10,10 @@ public class SwatSensorAbstraction {
 	private List<String> sensors; // sensor name
 	private List<Interval> ranges; // sensor value range
 	private List<Integer> denominators; // denominator of range
+	private List<Integer> splitStateNumber;
 	private List<Map<Interval, Integer>> sensorEncodings;
 	private List<Map<Integer, Interval>> sensorDecodings;
+	private int stateNumber;
 	
 	public SwatSensorAbstraction() {
 		this.sensors = new ArrayList<String>();
@@ -19,6 +21,8 @@ public class SwatSensorAbstraction {
 		this.sensorDecodings = new ArrayList<Map<Integer,Interval>>();
 		this.ranges = new ArrayList<Interval>();
 		this.denominators = new ArrayList<Integer>();
+		this.splitStateNumber = new ArrayList<Integer>();
+		this.stateNumber = 1;
 	}
 	
 	@Override
@@ -56,8 +60,46 @@ public class SwatSensorAbstraction {
 		
 		sensorEncodings.add(sensorEncode);
 		sensorDecodings.add(sensorDecode);
+		splitStateNumber.add(partitionNumber+2);
+		stateNumber = stateNumber * (partitionNumber + 2);
 	}
 	
+	public int getStateNumber() {
+		return stateNumber;
+	}
+	
+	public int swatStateIndex(List<Integer> abstractValue){ // index starts from 0
+		int index = 1;
+		for(int i=0; i<abstractValue.size(); i++){
+			index = index * (abstractValue.get(i)+1);
+		}
+		return index - 1;
+	}
+	
+	public List<Integer> swatStateAbstractValue(int stateIndex){
+		int pd = stateIndex + 1;
+		List<Integer> abstractValues = new ArrayList<Integer>();
+		List<Integer> divs = new ArrayList<Integer>();
+		int div = 1;
+		for(int i=0; i<sensors.size()-1; i++){
+			div = div * splitStateNumber.get(i);
+			divs.add(div);
+		}
+		
+		int divInd = divs.size()-1;
+		for(int i=0; i<sensors.size(); i++){
+			if(i==sensors.size()-1){ // if last one
+				abstractValues.add(0, pd);
+				continue;
+			}
+			int divNum = divs.get(divInd);
+			abstractValues.add(0, pd%divNum);
+			pd = pd/divNum;
+			divInd--;
+		}
+		return abstractValues;
+	}
+
 	public SwatState swatAbstraction(double[] sensorValues){
 		List<Integer> ss = new ArrayList<Integer>();
 		for(int i=0; i<sensorValues.length; i++){

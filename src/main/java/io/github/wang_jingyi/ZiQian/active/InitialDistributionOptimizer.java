@@ -1,10 +1,14 @@
 package io.github.wang_jingyi.ZiQian.active;
 
-import gurobi.*;
+import gurobi.GRB;
+import gurobi.GRBEnv;
+import gurobi.GRBException;
+import gurobi.GRBLinExpr;
+import gurobi.GRBModel;
+import gurobi.GRBVar;
 import io.github.wang_jingyi.ZiQian.utils.IntegerUtil;
-import io.github.wang_jingyi.ZiQian.utils.ListUtil;
 
-import java.util.ArrayList;	
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.math3.linear.MatrixUtils;
@@ -24,11 +28,12 @@ public class InitialDistributionOptimizer implements InitialDistGetter{
 	}
 
 	// l is the length of the path samples, calculate accumulated matrix A
-	private  RealMatrix accumulatedMatrix(int l, double[][] origEstimation){
+	private  RealMatrix accumulatedMatrix(int l, RealMatrix origEstimation){
+		
 		RealMatrix identityMatrix = MatrixUtils.createRealIdentityMatrix(nodeNumber); // I
-		RealMatrix estimationMatrix = MatrixUtils.createRealMatrix(origEstimation); // P
+		RealMatrix estimationMatrix = origEstimation.copy(); // P
 
-		RealMatrix multipliedMatrix = MatrixUtils.createRealMatrix(origEstimation); // P
+		RealMatrix multipliedMatrix = origEstimation.copy(); // P
 		RealMatrix accumulatedMatrix = identityMatrix.add(estimationMatrix);
 		for(int i=2; i<=l-1; i++){
 			multipliedMatrix = multipliedMatrix.multiply(estimationMatrix);
@@ -38,12 +43,13 @@ public class InitialDistributionOptimizer implements InitialDistGetter{
 	}
 
 	@Override
-	public List<Double> getInitialDistribution(List<List<Integer>> frequencyMatrix, List<List<Double>> origEstimation){
+	public double[] getInitialDistribution(RealMatrix frequencyMatrix, 
+			RealMatrix origEstimation){
 		
-		RealMatrix A = accumulatedMatrix(pathLength, ListUtil.TwoDDoublelistToArray(origEstimation));
+		RealMatrix A = accumulatedMatrix(pathLength, origEstimation);
 		RealMatrix AT = A.transpose();
 
-		int mini = MetricComputing.calculateMinFreqState(ListUtil.TwoDIntlistToArray(frequencyMatrix)); // get i: arg min mi
+		int mini = MetricComputing.calculateMinFreqState(frequencyMatrix); // get i: arg min mi
 		double[] ATI = AT.getRow(mini); // the i-th row
 
 		GRBEnv env;
@@ -107,7 +113,7 @@ public class InitialDistributionOptimizer implements InitialDistGetter{
 		} catch (GRBException e) {
 			e.printStackTrace();
 		}
-		return ListUtil.arrayToList(optimalDistribution);
+		return optimalDistribution;
 	}
 
 	@Override
