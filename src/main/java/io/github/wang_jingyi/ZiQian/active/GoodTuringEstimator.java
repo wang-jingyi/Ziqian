@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.math3.linear.MatrixUtils;
+import org.apache.commons.math3.linear.OpenMapRealMatrix;
 import org.apache.commons.math3.linear.RealMatrix;
 
 
@@ -15,7 +16,8 @@ public class GoodTuringEstimator implements Estimator {
 
 		int nodeNumber = frequencyMatrix.getRowDimension();
 
-		RealMatrix estrm = MatrixUtils.createRealMatrix(nodeNumber, nodeNumber);
+		RealMatrix estrm = ALConfig.sparse? new OpenMapRealMatrix(nodeNumber, nodeNumber) : 
+			MatrixUtils.createRealMatrix(nodeNumber, nodeNumber);
 
 		double[] rowsums = new double[nodeNumber];
 		for(int i=0; i<nodeNumber; i++){
@@ -31,6 +33,7 @@ public class GoodTuringEstimator implements Estimator {
 			double[] goodTuringEstimation = goodTuringEstimate(frequencyMatrix.getRow(i));
 			for(int j=0; j<nodeNumber; j++){
 				double p = goodTuringEstimation[j];
+				if(p==0){continue;}
 				estrm.setEntry(i, j, p);
 			}
 		}

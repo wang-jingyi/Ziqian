@@ -1,6 +1,7 @@
 package io.github.wang_jingyi.ZiQian.active;
 
 import io.github.wang_jingyi.ZiQian.run.Config;
+import io.github.wang_jingyi.ZiQian.run.PlatformDependent;
 import io.github.wang_jingyi.ZiQian.utils.ExternalCaller;
 import io.github.wang_jingyi.ZiQian.utils.FileUtil;
 import io.github.wang_jingyi.ZiQian.utils.PrismUtil;
@@ -22,7 +23,7 @@ public class RMCReachability {
 		this.rmc = rmc;
 		this.reachProbs = new ArrayList<Double>();
 		this.boundedStep = boundedStep;
-		this.filePath = Config.PROJECT_ROOT + "/active/rmc/" + rmc.getRmcName();
+		this.filePath = PlatformDependent.MODEL_ROOT + "/active/rmc/" + rmc.getRmcName();
 		generatePrismFiles();
 	}
 	
@@ -33,8 +34,8 @@ public class RMCReachability {
 	}
 	
 	public void computeRMCReachability(){
-		String pmPath = Config.PROJECT_ROOT + "/active/rmc/" + rmc.getRmcName() +"/" + rmc.getRmcName() + ".pm";
-		String propPath = Config.PROJECT_ROOT + "/active/rmc/" + rmc.getRmcName() +"/" + rmc.getRmcName() + ".pctl";
+		String pmPath = PlatformDependent.MODEL_ROOT + "/active/rmc/" + rmc.getRmcName() +"/" + rmc.getRmcName() + ".pm";
+		String propPath = PlatformDependent.MODEL_ROOT + "/active/rmc/" + rmc.getRmcName() +"/" + rmc.getRmcName() + ".pctl";
 		
 		for(int i=rmc.getNumOfState()/2+1; i<=rmc.getNumOfState(); i++){
 			reachProbs.add(PrismUtil.extractResultFromCommandOutput(ExternalCaller.executeCommand(new String[]{Config.PRISM_PATH
@@ -50,8 +51,8 @@ public class RMCReachability {
 		List<Double> estReachProbs = new ArrayList<Double>();
 		PrismUtil.MCToPrism(estTransitionMatrix.getData(), rmc.getRmcName()+"_learn", filePath);
 
-		String pmPath = Config.PROJECT_ROOT + "/active/rmc/" + rmc.getRmcName() +"/" + rmc.getRmcName() + "_learn.pm";
-		String propPath = Config.PROJECT_ROOT + "/active/rmc/" + rmc.getRmcName() +"/" + rmc.getRmcName() + ".pctl";
+		String pmPath = PlatformDependent.MODEL_ROOT + "/active/rmc/" + rmc.getRmcName() +"/" + rmc.getRmcName() + "_learn.pm";
+		String propPath = PlatformDependent.MODEL_ROOT + "/active/rmc/" + rmc.getRmcName() +"/" + rmc.getRmcName() + ".pctl";
 		for(int i=rmc.getNumOfState()/2+1; i<=rmc.getNumOfState(); i++){
 			estReachProbs.add(PrismUtil.extractResultFromCommandOutput(ExternalCaller.executeCommand(new String[]{Config.PRISM_PATH
 					, pmPath, propPath, "-prop", String.valueOf(i)})));

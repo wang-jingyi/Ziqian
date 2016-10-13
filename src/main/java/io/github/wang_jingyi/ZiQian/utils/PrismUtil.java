@@ -40,34 +40,30 @@ public class PrismUtil {
 
 
 	public static double extractResultFromCommandOutput(String output){
-//		int length = output.length();
-//		output = output.substring(length*9/10, length);
-		Pattern pattern = Pattern.compile("(Result: \\d.\\d+)");
-		Matcher matcher = pattern.matcher(output);
+		try{
+			Pattern pattern = Pattern.compile("(Result: \\d.\\d+)");
+			Matcher matcher = pattern.matcher(output);
 
-		Pattern pattern1 = Pattern.compile("(Result: \\d.\\d+E-\\d+)");
-		Matcher matcher1 = pattern1.matcher(output);
+			Pattern pattern1 = Pattern.compile("(Result: \\d.\\d+E-\\d+)");
+			Matcher matcher1 = pattern1.matcher(output);
 
-		if(matcher1.find()){
-			String greped = matcher1.group(0);
-			String[] strs = greped.split(" ");
-			double result = Double.valueOf(strs[1]);
-			return result;
-		}
+			if(matcher1.find()){
+				String greped = matcher1.group(0);
+				String[] strs = greped.split(" ");
+				double result = Double.valueOf(strs[1]);
+				return result;
+			}
 
-		if (matcher.find())
-		{
-			System.out.println(matcher.group(0));
-			String greped = matcher.group(0);
-			String[] strs = greped.split(" ");
-			double result = Double.valueOf(strs[1]);
-			return result;
-		}
+			if (matcher.find())
+			{
+				System.out.println(matcher.group(0));
+				String greped = matcher.group(0);
+				String[] strs = greped.split(" ");
+				double result = Double.valueOf(strs[1]);
+				return result;
+			}
+		}catch(Exception e){e.printStackTrace();}
 		
-		else{
-			System.out.println("no result found from terminal output");
-			System.exit(0);
-		}
 		return 0.0;
 	}
 

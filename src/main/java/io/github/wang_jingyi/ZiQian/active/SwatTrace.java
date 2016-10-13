@@ -21,28 +21,30 @@ public class SwatTrace {
 	// trace collection
 	public void collectTraceFromPath(SwatSensorAbstraction ssa) throws FileNotFoundException{
 		File file = new File(tracePath);
-		Scanner sc = new Scanner(file);
-		sc.nextLine();
-		while(sc.hasNextLine()){
-			double[] sensorValues = new double[ssa.getSensors().size()];
-			String str = sc.nextLine();
-			String[] ss = str.split(" ");
-			if(ss.length!=sensorValues.length){
-				continue;
-			}
-			for(int i=0; i<sensorValues.length; i++){
-				sensorValues[i] = Double.valueOf(ss[i]);
-				if(sensorValues[i]>GlobalVars.maxSensorValues[i]){
-					GlobalVars.maxSensorValues[i] = sensorValues[i];
+		try{
+			Scanner sc = new Scanner(file);
+			sc.nextLine();
+			while(sc.hasNextLine()){
+				double[] sensorValues = new double[ssa.getSensors().size()];
+				String str = sc.nextLine();
+				String[] ss = str.split(" ");
+				if(ss.length!=sensorValues.length){
+					continue;
 				}
-				
-				if(sensorValues[i]<GlobalVars.minSensorValues[i]){
-					GlobalVars.minSensorValues[i] = sensorValues[i];
+				for(int i=0; i<sensorValues.length; i++){
+					sensorValues[i] = Double.valueOf(ss[i]);
+					if(sensorValues[i]>GlobalVars.maxSensorValues[i]){
+						GlobalVars.maxSensorValues[i] = sensorValues[i];
+					}
+					
+					if(sensorValues[i]<GlobalVars.minSensorValues[i]){
+						GlobalVars.minSensorValues[i] = sensorValues[i];
+					}
 				}
+				st.add(ssa.swatAbstraction(sensorValues));
 			}
-			st.add(ssa.swatAbstraction(sensorValues));
-		}
-		sc.close();
+			sc.close();
+		}catch(Exception e){e.printStackTrace();}
 	}
 	
 	public List<SwatState> getTrace() {

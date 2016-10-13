@@ -51,10 +51,10 @@ public class SwatSensorAbstraction {
 			start = end;
 		}
 		
-		Interval startIntv = new Interval(Integer.MIN_VALUE, range.start);
+		Interval startIntv = new Interval(0, range.start);
 		sensorEncode.put(startIntv, 0);
 		sensorDecode.put(0, startIntv);
-		Interval endIntv = new Interval(range.end, Integer.MAX_VALUE);
+		Interval endIntv = new Interval(range.end, 10000);
 		sensorEncode.put(endIntv, partitionNumber+1);
 		sensorDecode.put(partitionNumber+1, endIntv);
 		
@@ -76,30 +76,26 @@ public class SwatSensorAbstraction {
 		return index - 1;
 	}
 	
-	public List<Integer> swatStateAbstractValue(int stateIndex){
-		int pd = stateIndex + 1;
+public List<Integer> swatStateAbstractValue(int stateIndex){ // to debug
+
+	int pd = stateIndex;
 		List<Integer> abstractValues = new ArrayList<Integer>();
-		List<Integer> divs = new ArrayList<Integer>();
-		int div = 1;
-		for(int i=0; i<sensors.size()-1; i++){
-			div = div * splitStateNumber.get(i);
-			divs.add(div);
-		}
 		
-		int divInd = divs.size()-1;
-		for(int i=0; i<sensors.size(); i++){
-			if(i==sensors.size()-1){ // if last one
+		int sensorSize = sensors.size();
+		int divIndex = sensorSize-1; // start from the last digit
+		
+		for(int i=0; i<sensorSize; i++){
+			if(i==sensorSize-1){ // if last one
 				abstractValues.add(0, pd);
 				continue;
 			}
-			int divNum = divs.get(divInd);
-			abstractValues.add(0, pd%divNum);
-			pd = pd/divNum;
-			divInd--;
+			int div = splitStateNumber.get(divIndex);
+			abstractValues.add(0, pd%div);
+			divIndex--;
+			pd = pd/div;
 		}
 		return abstractValues;
 	}
-
 	public SwatState swatAbstraction(double[] sensorValues){
 		List<Integer> ss = new ArrayList<Integer>();
 		for(int i=0; i<sensorValues.length; i++){

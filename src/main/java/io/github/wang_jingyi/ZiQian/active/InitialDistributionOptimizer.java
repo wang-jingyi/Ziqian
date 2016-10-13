@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.math3.linear.MatrixUtils;
+import org.apache.commons.math3.linear.OpenMapRealMatrix;
 import org.apache.commons.math3.linear.RealMatrix;
 
 public class InitialDistributionOptimizer implements InitialDistGetter{
@@ -29,11 +30,16 @@ public class InitialDistributionOptimizer implements InitialDistGetter{
 
 	// l is the length of the path samples, calculate accumulated matrix A
 	private  RealMatrix accumulatedMatrix(int l, RealMatrix origEstimation){
+		int nodeNumber = origEstimation.getRowDimension();
+		RealMatrix identityMatrix = ALConfig.sparse? new OpenMapRealMatrix(nodeNumber, nodeNumber) :
+		 MatrixUtils.createRealIdentityMatrix(origEstimation.getRowDimension()); // 
 		
-		RealMatrix identityMatrix = MatrixUtils.createRealIdentityMatrix(nodeNumber); // I
-		RealMatrix estimationMatrix = origEstimation.copy(); // P
-
-		RealMatrix multipliedMatrix = origEstimation.copy(); // P
+		if(ALConfig.sparse){
+			assert origEstimation instanceof OpenMapRealMatrix : "too large matrix, use sparse matrix";
+		}
+		
+		RealMatrix estimationMatrix = origEstimation.copy(); // 
+		RealMatrix multipliedMatrix = origEstimation.copy(); //
 		RealMatrix accumulatedMatrix = identityMatrix.add(estimationMatrix);
 		for(int i=2; i<=l-1; i++){
 			multipliedMatrix = multipliedMatrix.multiply(estimationMatrix);

@@ -56,19 +56,21 @@ public class Samples {
 
 	public static RealMatrix getFrequencyMatrix(List<List<Integer>> traces, int stateNumber){
 
-		RealMatrix freqMatrix = MatrixUtils.createRealMatrix(stateNumber, stateNumber);
-		for(List<Integer> trace : traces){
-			for(int i=0; i<trace.size()-1; i++){
-				int start = trace.get(i);
-				int end = trace.get(i+1);
-				double cr = freqMatrix.getEntry(start, end);
-				cr++;
-				freqMatrix.setEntry(start, end, cr);
-			}
-		}
-		return freqMatrix;
+		RealMatrix freqMatrix = ALConfig.sparse ? 
+				new OpenMapRealMatrix(stateNumber, stateNumber) : MatrixUtils.createRealMatrix(stateNumber, stateNumber);
+
+				for(List<Integer> trace : traces){
+					for(int i=0; i<trace.size()-1; i++){
+						int start = trace.get(i);
+						int end = trace.get(i+1);
+						double cr = freqMatrix.getEntry(start, end);
+						cr++;
+						freqMatrix.setEntry(start, end, cr);
+					}
+				}
+				return freqMatrix;
 	}
-	
+
 	public RealMatrix getEstimatedTransitionMatrix() {
 		return estimatedTransitionMatrix;
 	}

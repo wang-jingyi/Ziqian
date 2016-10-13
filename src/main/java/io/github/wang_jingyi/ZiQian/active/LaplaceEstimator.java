@@ -1,6 +1,7 @@
 package io.github.wang_jingyi.ZiQian.active;
 
 import org.apache.commons.math3.linear.MatrixUtils;
+import org.apache.commons.math3.linear.OpenMapRealMatrix;
 import org.apache.commons.math3.linear.RealMatrix;
 
 
@@ -14,7 +15,8 @@ public class LaplaceEstimator implements Estimator {
 		
 		int nodeNumber = frequencyMatrix.getRowDimension();
 		
-		RealMatrix estrm = MatrixUtils.createRealMatrix(nodeNumber, nodeNumber);
+		RealMatrix estrm = ALConfig.sparse? new OpenMapRealMatrix(nodeNumber, nodeNumber) : 
+			MatrixUtils.createRealMatrix(nodeNumber, nodeNumber);
 		
 		double[] rowsums = new double[nodeNumber];
 		for(int i=0; i<nodeNumber; i++){
@@ -29,6 +31,7 @@ public class LaplaceEstimator implements Estimator {
 		for(int i=0; i<nodeNumber; i++){
 			for(int j=0; j<nodeNumber; j++){
 				double fre = frequencyMatrix.getEntry(i, j);
+				if(fre==0){continue;}
 				double p = (1+fre) / (nodeNumber+rowsums[i]);
 				estrm.setEntry(i, j, p);
 			}

@@ -21,8 +21,13 @@ public class Main {
 		//													{0, 0, 0, 0, 0, 0, 1}};
 		//		RandomMarkovChain rmc = new RandomMarkovChain(16, 0.8, "test");
 
-		int[] stateNumber = new int[]{8,16,32};
-		int[] sampleSize = new int[]{5000,10000,50000,100000,200000};
+		int[] stateNumber = new int[]{8
+//				,16,32
+				};
+		
+		int[] sampleSize = new int[]{5000
+//				,10000,50000,100000,200000
+				};
 		double density = 0.8;
 
 
@@ -33,8 +38,9 @@ public class Main {
 
 
 		for(int sn : stateNumber){
+			ALConfig.stateNumber = sn;
 			int boundedStep = 10;
-			RandomMarkovChain rmc = new RandomMarkovChain(sn, density, "rmc_" + sn); 
+			RandomMarkovChain rmc = new RandomMarkovChain(sn, density, "rmc_test_" + sn); 
 			rmc.generateRMC();
 			System.out.println("current random model: " + rmc.toString());
 			System.out.println("current number of states: " + sn);
@@ -89,7 +95,9 @@ public class Main {
 
 				idoreach.add(ListUtil.listMean(idoDiff));
 				rsreach.add(ListUtil.listMean(randomDiff));
+				
 			}
+			
 			idoMSEResults.add(idomse);
 			rsMSEResults.add(rsmse);
 			idoReachResults.add(idoreach);

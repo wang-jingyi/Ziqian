@@ -19,13 +19,14 @@ public class SwatActiveMain {
 		
 		System.out.println("Add sensors, define abstractions...");
 		SwatSensorAbstraction ssa = new SwatSensorAbstraction();
-		ssa.addSensor("LIT101", new Interval(200, 1100), 100);
-		ssa.addSensor("LIT301", new Interval(200, 1000), 100);
-		ssa.addSensor("LIT401", new Interval(200, 1100), 100);
-		ssa.addSensor("LS601", new Interval(200, 8000), 1000);
-		ssa.addSensor("LS602", new Interval(200, 1200), 100);
+		ssa.addSensor("LIT101", new Interval(200, 1100), 500);
+		ssa.addSensor("LIT301", new Interval(200, 1000), 500);
+		ssa.addSensor("LIT401", new Interval(200, 1100), 500);
+		ssa.addSensor("LS601", new Interval(200, 8000), 5000);
+		ssa.addSensor("LS602", new Interval(200, 1200), 500);
 		
 		ALConfig.stateNumber = ssa.getStateNumber(); // update state number according to sensor abstraction
+		String swatPathsRoot = PlatformDependent.MODEL_ROOT + "/model/" + Config.modelPath;
 		 
 		System.out.println("number of states: " + ALConfig.stateNumber);
 		if(ALConfig.stateNumber>1000){
@@ -33,10 +34,10 @@ public class SwatActiveMain {
 			ALConfig.sparse = true;
 		}
 		
-		System.out.println("collecting traces");
+		System.out.println("collecting initial training traces");
 		// original traces
 		List<SwatTrace> sts = new ArrayList<SwatTrace>();
-		for(String s : FileUtil.filesInDir(PlatformDependent.MODEL_ROOT + "/swat/10,5/paths")){
+		for(String s : FileUtil.filesInDir(swatPathsRoot)){
 			SwatTrace st = new SwatTrace(s);
 			st.collectTraceFromPath(ssa);
 			sts.add(st);
@@ -72,7 +73,8 @@ public class SwatActiveMain {
 			validInitDist.add((double)1/ALConfig.stateNumber);
 		}
 		Estimator estimator = new LaplaceEstimator();
-		Sampler sampler = new SwatSampler(new SwatBridge(ssa), PlatformDependent.MODEL_ROOT + Config.modelPath + "/new_sample", 1);
+		Sampler sampler = new SwatSampler(new SwatBridge(ssa), PlatformDependent.MODEL_ROOT + "/model/" + 
+				Config.modelPath + "/new_sample", 1);
 		InitialDistGetter idoidg = new InitialDistributionOptimizer(ALConfig.stateNumber, validInitStates, pathLength);
 		InitialDistGetter uniformidg = new UniformInitialDistribution(validInitStates);
 		
