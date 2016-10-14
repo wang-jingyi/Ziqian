@@ -12,21 +12,21 @@ import org.apache.commons.math3.linear.RealMatrix;
 public class Main {
 
 	public static void main(String[] args) throws GRBException, FileNotFoundException{
-		//				double[][] matrix = new double[][]{{0.9, 0.1, 0, 0, 0, 0, 0},
-		//													{0, 0, 0.5, 0.1, 0, 0, 0.4},
-		//													{0, 0, 0, 0, 0.9, 0.1, 0},
-		//													{0, 0, 0, 0, 0.8, 0.2, 0},
-		//													{0.9, 0.1, 0, 0, 0, 0, 0},
-		//													{0.5, 0.1, 0, 0, 0, 0, 0.4},
-		//													{0, 0, 0, 0, 0, 0, 1}};
-		//		RandomMarkovChain rmc = new RandomMarkovChain(16, 0.8, "test");
+//						double[][] matrix = new double[][]{{0.9, 0.1, 0, 0, 0, 0, 0},
+//															{0, 0, 0.5, 0.1, 0, 0, 0.4},
+//															{0, 0, 0, 0, 0.9, 0.1, 0},
+//															{0, 0, 0, 0, 0.8, 0.2, 0},
+//															{0.9, 0.1, 0, 0, 0, 0, 0},
+//															{0.5, 0.1, 0, 0, 0, 0, 0.4},
+//															{0, 0, 0, 0, 0, 0, 1}};
+//				RandomMarkovChain rmc = new RandomMarkovChain(16, 0.8, "test");
 
 		int[] stateNumber = new int[]{8
 //				,16,32
 				};
 		
 		int[] sampleSize = new int[]{5000
-//				,10000,50000,100000,200000
+				,10000,50000,100000,200000
 				};
 		double density = 0.8;
 
@@ -39,7 +39,9 @@ public class Main {
 
 		for(int sn : stateNumber){
 			ALConfig.stateNumber = sn;
-			int boundedStep = 10;
+			ALConfig.pathLength = sn/2;
+			
+			int boundedStep = ALConfig.pathLength;
 			RandomMarkovChain rmc = new RandomMarkovChain(sn, density, "rmc_test_" + sn); 
 			rmc.generateRMC();
 			System.out.println("current random model: " + rmc.toString());
@@ -53,7 +55,7 @@ public class Main {
 			List<Integer> validInitStates = new ArrayList<>();
 			List<Double> validInitDist = new ArrayList<Double>();
 
-			for(int i=0; i<rmc.getNumOfState()/2; i++){
+			for(int i=0; i<rmc.getNumOfState()/2; i++){ // add first half set as initial states
 				validInitStates.add(i);
 				validInitDist.add((double)1/rmc.getNumOfState());
 			}
@@ -65,7 +67,7 @@ public class Main {
 
 			RealMatrix matrix = rmc.getTransitionMatrix();
 			MarkovChain mc = new MarkovChain(matrix);
-			int sampleLength = sn;
+			
 
 			RMCReachability rmcr = new RMCReachability(rmc,boundedStep);
 			rmcr.computeRMCReachability();
@@ -81,14 +83,14 @@ public class Main {
 			for(int numSample : sampleSize){
 
 				System.out.println("current sample size: " + numSample);
-				Samples idoSample = IterSampling(mc, validInitStates, sampleLength, numSample, estimator, sampler, idoidg);
-				Samples randomSample = IterSampling(mc, validInitStates, sampleLength, numSample, estimator, sampler, uniformidg);
+				Samples idoSample = IterSampling(mc, validInitStates, ALConfig.pathLength, numSample, estimator, sampler, idoidg);
+				Samples randomSample = IterSampling(mc, validInitStates, ALConfig.pathLength, numSample, estimator, sampler, uniformidg);
 
 				idomse.add(MetricComputing.calculateMSE(mc.getTransitionMatrix(), idoSample.getEstimatedTransitionMatrix()));
 				rsmse.add(MetricComputing.calculateMSE(mc.getTransitionMatrix(),randomSample.getEstimatedTransitionMatrix()));
 
-				List<Double> idoReachProbs = rmcr.computeEstReachability(idoSample.getEstimatedTransitionMatrix());
-				List<Double> randomReachProbs = rmcr.computeEstReachability(randomSample.getEstimatedTransitionMatrix());
+				List<Double> idoReachProbs = rmcr.computeEstReachability(idoSample.getEstimatedTransitionMatrix(), "ido");
+				List<Double> randomReachProbs = rmcr.computeEstReachability(randomSample.getEstimatedTransitionMatrix(), "rs");
 
 				List<Double> idoDiff = ListUtil.listABSDiff(rmcr.getReachProbs(), idoReachProbs);
 				List<Double> randomDiff = ListUtil.listABSDiff(rmcr.getReachProbs(), randomReachProbs);
@@ -114,7 +116,7 @@ public class Main {
 
 	public static Samples IterSampling(MarkovChain mc, List<Integer> validInitStates, int sampleLength, int numSample, Estimator estimator, 
 			Sampler sampler, InitialDistGetter idg) throws GRBException{
-		Samples sample = new Samples(estimator, sampler, idg);
+		Samples sample = new Samples(ALConfig.pathLength, estimator, sampler, idg);
 		for(int i=0; i<numSample; i++){
 			sample.newSample();
 		}

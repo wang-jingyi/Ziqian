@@ -47,11 +47,12 @@ public class RMCReachability {
 		return reachProbs;
 	}
 
-	public List<Double> computeEstReachability(RealMatrix estTransitionMatrix) throws FileNotFoundException{
+	public List<Double> computeEstReachability(RealMatrix estTransitionMatrix, String method) throws FileNotFoundException{
 		List<Double> estReachProbs = new ArrayList<Double>();
-		PrismUtil.MCToPrism(estTransitionMatrix.getData(), rmc.getRmcName()+"_learn", filePath);
+		PrismUtil.MCToPrism(estTransitionMatrix.getData(), rmc.getRmcName()+ "_" + method + "_learn", filePath);
 
-		String pmPath = PlatformDependent.MODEL_ROOT + "/active/rmc/" + rmc.getRmcName() +"/" + rmc.getRmcName() + "_learn.pm";
+		String pmPath = PlatformDependent.MODEL_ROOT + "/active/rmc/" + rmc.getRmcName() +"/" + rmc.getRmcName() 
+				+ "_" + method + "_learn.pm";
 		String propPath = PlatformDependent.MODEL_ROOT + "/active/rmc/" + rmc.getRmcName() +"/" + rmc.getRmcName() + ".pctl";
 		for(int i=rmc.getNumOfState()/2+1; i<=rmc.getNumOfState(); i++){
 			estReachProbs.add(PrismUtil.extractResultFromCommandOutput(ExternalCaller.executeCommand(new String[]{Config.PRISM_PATH

@@ -13,9 +13,10 @@ public class Samples {
 	private Estimator estimator;
 	private Sampler sampler;
 	private InitialDistGetter idg;
-	private int pathLength = 10;
+	private int pathLength;
 
-	public Samples(Estimator estimator, Sampler sampler, InitialDistGetter idg){
+	public Samples(int pathLength, Estimator estimator, Sampler sampler, InitialDistGetter idg){
+		this.pathLength = pathLength;
 		this.estimator = estimator;
 		this.sampler = sampler;
 		this.idg = idg;
@@ -51,7 +52,7 @@ public class Samples {
 			cr++;
 			frequencyMatrix.setEntry(start, end, cr);
 		}
-		estimator.estimate(frequencyMatrix);
+		estimatedTransitionMatrix = estimator.estimate(frequencyMatrix);
 	}
 
 	public static RealMatrix getFrequencyMatrix(List<List<Integer>> traces, int stateNumber){

@@ -33,7 +33,7 @@ public class GoodTuringEstimator implements Estimator {
 			double[] goodTuringEstimation = goodTuringEstimate(frequencyMatrix.getRow(i));
 			for(int j=0; j<nodeNumber; j++){
 				double p = goodTuringEstimation[j];
-				if(p==0){continue;}
+//				if(p==0){continue;}
 				estrm.setEntry(i, j, p);
 			}
 		}

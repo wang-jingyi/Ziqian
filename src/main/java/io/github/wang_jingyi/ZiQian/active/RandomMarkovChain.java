@@ -21,13 +21,12 @@ public class RandomMarkovChain {
 	private boolean[][] edges; // edges of the dtmc 
 	private List<List<Integer>> edgeIndexes; // indexes of next state
 	private List<Integer> initStates;
-	public String getRmcName() {
-		return rmcName;
-	}
+	
 
 	private List<Integer> validStateIndex;
 
 	private boolean rareTrans = false; // whether we set rare transitions
+	private boolean rareState = false; // whether exists a rare state
 	private double rareTransLevel = 0.0; // the level of rareness
 
 	private int rareTransNum = 0; // number of rare transitions under a rare level
@@ -47,6 +46,21 @@ public class RandomMarkovChain {
 		this.initStates = new ArrayList<Integer>();
 		this.rnd = new Random();
 
+	}
+	
+	public RandomMarkovChain(int n, double density,String rmcName, boolean rareState, 
+			double rareTransLevel) {
+		this.numOfState = n;
+		this.density = density;
+		this.rmcName = rmcName;
+		this.rareState = rareState;
+		this.rareTransLevel = rareTransLevel;
+		this.transitionMatrix = MatrixUtils.createRealMatrix(n, n);
+		this.edges = new boolean[numOfState][numOfState];
+		this.edgeIndexes = new ArrayList<>();
+		this.validStateIndex = new ArrayList<Integer>();
+		this.initStates = new ArrayList<Integer>();
+		this.rnd = new Random();
 	}
 
 
@@ -80,13 +94,95 @@ public class RandomMarkovChain {
 		if(rareTrans){
 			generateRMCWithRareTransitions();
 		}
+		else if(rareState){
+			generateRMCWithRareStates();
+			System.out.println("created");
+		}
 		else{
 			generateRMCFree();
 		}
 	}
 	
+	private void generateRMCWithRareStates(){
+		
+		int stateToRareState = rnd.nextInt(numOfState-1); // the only state that has the rare transition to the rare state
+		
+		for (int outerIndex = 0; outerIndex < edges.length-1; outerIndex++) { // rows except last row
+			List<Integer> ind = new ArrayList<>();
+			if(outerIndex!=stateToRareState){
+				for (int innerIndex = 0; innerIndex < edges[outerIndex].length-1; innerIndex++) {
+					if (rnd.nextDouble() < density) {
+						edges[outerIndex][innerIndex] = true;
+						ind.add(innerIndex);
+					} else {
+						edges[outerIndex][innerIndex] = false;
+					}
+				}
+				edges[outerIndex][edges[outerIndex].length-1] = false;
+			}
+			else{
+				for (int innerIndex = 0; innerIndex < edges[outerIndex].length-1; innerIndex++) {
+					if (rnd.nextDouble() < density) {
+						edges[outerIndex][innerIndex] = true;
+						ind.add(innerIndex);
+					} else {
+						edges[outerIndex][innerIndex] = false;
+					}
+				}
+				ind.add(edges[outerIndex].length-1);
+				edges[outerIndex][edges[outerIndex].length-1] = true;
+			}
+			edgeIndexes.add(ind);
+		}
+		
+		// last row
+		int lastRowIndex = edges.length-1;
+		edges[lastRowIndex][edges.length-1] = true;
+		List<Integer> lastRow = new ArrayList<Integer>();
+		lastRow.add(edges.length-1);
+		edgeIndexes.add(lastRow);
+		
+		for(int i=0; i<numOfState; i++){
+			double tmp = 1;
+			double sumcr = 0;
+			int edgeNum = edgeIndexes.get(i).size();
+			List<Integer> edges = edgeIndexes.get(i);
+			
+			if(i==stateToRareState){
+				for(int j=edgeNum-1; j>=0; j--){
+					if(j==edgeNum-1){
+						double cr = (1 + rnd.nextInt(9)) * rareTransLevel;
+						transitionMatrix.setEntry(i, edges.get(j), cr);
+						sumcr += cr;
+						tmp -= cr;
+					}
+					else if(j==0){
+						transitionMatrix.setEntry(i, edges.get(j), 1-sumcr);
+						sumcr = 1;
+					}
+					else{
+						double cr = rnd.nextDouble();
+						cr = tmp * cr;
+						sumcr += cr;
+						tmp -= cr;
+						transitionMatrix.setEntry(i, edges.get(j), cr);
+					}
+				}
+			}
+			
+			else if(i==this.edges.length-1){
+				transitionMatrix.setEntry(i, edges.get(0), 1);
+			}
+			
+			else{
+				transitionMatrix.setRow(i, generateRandomDistribution(i));
+			}
+		}
+
+	}
 	
-	public void generateRMCWithRareTransitions(){
+	
+	private void generateRMCWithRareTransitions(){
 		generateEdgesWithDensity();
 		while(rts.size()<rareTransNum){
 			int row = rnd.nextInt(numOfState); // random row
@@ -107,13 +203,13 @@ public class RandomMarkovChain {
 			for(int j=0; j<edgeNum; j++){
 				TransitionPoint currenttp = new TransitionPoint(i, edges.get(j));
 				if(j==edgeNum-1){
-					transitionMatrix.getRow(i)[edges.get(edgeNum-1)] = 1 - sumcr;
+					transitionMatrix.setEntry(i, edges.get(edgeNum-1), 1 - sumcr);
 					sumcr = 1;
 				}
 				else if(rts.containsKey(currenttp)){
 					int mul = 1 + rnd.nextInt(9);
 					double rt = mul * rareTransLevel;
-					transitionMatrix.getRow(i)[edges.get(j)]= rt;
+					transitionMatrix.setEntry(i, edges.get(j), rt);
 					rts.put(currenttp,rt);
 					sumcr += rt;
 					tmp -= rt;
@@ -123,7 +219,7 @@ public class RandomMarkovChain {
 					cr = tmp * cr;
 					sumcr += cr;
 					tmp -= cr;
-					transitionMatrix.getRow(i)[edges.get(j)] = cr;
+					transitionMatrix.setEntry(i, edges.get(j), cr);
 				}
 			}
 		}
@@ -131,7 +227,7 @@ public class RandomMarkovChain {
 	}
 
 
-	public void generateRMCFree(){
+	private void generateRMCFree(){
 		generateEdgesWithDensity();
 		for(int i=0; i<numOfState; i++){
 			transitionMatrix.setRow(i, generateRandomDistribution(i));
@@ -255,6 +351,10 @@ public class RandomMarkovChain {
 
 	public int getNumOfState() {
 		return numOfState;
+	}
+	
+	public String getRmcName() {
+		return rmcName;
 	}
 
 	private int nextState(int currentState){

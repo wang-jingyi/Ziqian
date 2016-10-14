@@ -31,7 +31,7 @@ public class LaplaceEstimator implements Estimator {
 		for(int i=0; i<nodeNumber; i++){
 			for(int j=0; j<nodeNumber; j++){
 				double fre = frequencyMatrix.getEntry(i, j);
-				if(fre==0){continue;}
+//				if(fre==0.0){continue;}
 				double p = (1+fre) / (nodeNumber+rowsums[i]);
 				estrm.setEntry(i, j, p);
 			}
