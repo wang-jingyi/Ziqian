@@ -1,12 +1,20 @@
 package io.github.wang_jingyi.ZiQian.active;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class SwatSensorAbstraction {
+public class SwatSensorAbstraction implements Serializable{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -5123348284829960146L;
+	/**
+	 * 
+	 */
 	private List<String> sensors; // sensor name
 	private List<Interval> ranges; // sensor value range
 	private List<Integer> denominators; // denominator of range
@@ -43,8 +51,14 @@ public class SwatSensorAbstraction {
 		
 		int start = range.start;
 		int partitionNumber = (range.end-range.start)/denominator;
+		if((range.end-range.start)%denominator!=0){
+			partitionNumber ++;
+		}
 		for(int i=1; i<=partitionNumber; i++){
 			int end = start + denominator;
+			if(end>range.end){
+				end = range.end;
+			}
 			Interval currentIntv = new Interval(start, end);
 			sensorEncode.put(currentIntv, i);
 			sensorDecode.put(i, currentIntv);
@@ -96,6 +110,7 @@ public List<Integer> swatStateAbstractValue(int stateIndex){ // to debug
 		}
 		return abstractValues;
 	}
+
 	public SwatState swatAbstraction(double[] sensorValues){
 		List<Integer> ss = new ArrayList<Integer>();
 		for(int i=0; i<sensorValues.length; i++){
@@ -104,7 +119,7 @@ public List<Integer> swatStateAbstractValue(int stateIndex){ // to debug
 				continue;
 			}
 			if(sensorValues[i]>ranges.get(i).end){ // end interval
-				ss.add((int) ((sensorValues[i]-ranges.get(i).start)/denominators.get(i))+1);
+				ss.add(splitStateNumber.get(i)-1);
 				continue;
 			}
 			ss.add((int) ((sensorValues[i]-ranges.get(i).start)/denominators.get(i))+1);

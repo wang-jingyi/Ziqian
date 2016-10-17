@@ -12,23 +12,26 @@ import org.apache.commons.math3.linear.RealMatrix;
 public class Main {
 
 	public static void main(String[] args) throws GRBException, FileNotFoundException{
-//						double[][] matrix = new double[][]{{0.9, 0.1, 0, 0, 0, 0, 0},
-//															{0, 0, 0.5, 0.1, 0, 0, 0.4},
-//															{0, 0, 0, 0, 0.9, 0.1, 0},
-//															{0, 0, 0, 0, 0.8, 0.2, 0},
-//															{0.9, 0.1, 0, 0, 0, 0, 0},
-//															{0.5, 0.1, 0, 0, 0, 0, 0.4},
-//															{0, 0, 0, 0, 0, 0, 1}};
-//				RandomMarkovChain rmc = new RandomMarkovChain(16, 0.8, "test");
+		//						double[][] matrix = new double[][]{{0.9, 0.1, 0, 0, 0, 0, 0},
+		//															{0, 0, 0.5, 0.1, 0, 0, 0.4},
+		//															{0, 0, 0, 0, 0.9, 0.1, 0},
+		//															{0, 0, 0, 0, 0.8, 0.2, 0},
+		//															{0.9, 0.1, 0, 0, 0, 0, 0},
+		//															{0.5, 0.1, 0, 0, 0, 0, 0.4},
+		//															{0, 0, 0, 0, 0, 0, 1}};
+		//				RandomMarkovChain rmc = new RandomMarkovChain(16, 0.8, "test");
 
 		int[] stateNumber = new int[]{8
-//				,16,32
-				};
-		
-		int[] sampleSize = new int[]{5000
-				,10000,50000,100000,200000
-				};
+								,16,32
+		};
+
+		int[] sampleSize = new int[]{1000,2000,3000,4000,5000,
+				6000,7000,8000,9000
+				,10000
+//				,50000,100000,200000
+		};
 		double density = 0.8;
+		int repeatTime = 10;
 
 
 		List<List<Double>> idoMSEResults = new ArrayList<List<Double>>();
@@ -38,68 +41,73 @@ public class Main {
 
 
 		for(int sn : stateNumber){
-			ALConfig.stateNumber = sn;
-			ALConfig.pathLength = sn/2;
 			
-			int boundedStep = ALConfig.pathLength;
-			RandomMarkovChain rmc = new RandomMarkovChain(sn, density, "rmc_test_" + sn); 
-			rmc.generateRMC();
-			System.out.println("current random model: " + rmc.toString());
 			System.out.println("current number of states: " + sn);
 
+			ALConfig.stateNumber = sn;
+			ALConfig.pathLength = sn/2;
+
+			int boundedStep = ALConfig.pathLength;
+			
 			List<Double> idomse = new ArrayList<Double>();
 			List<Double> rsmse = new ArrayList<Double>();
 			List<Double> idoreach = new ArrayList<Double>();
 			List<Double> rsreach = new ArrayList<Double>();
-
-			List<Integer> validInitStates = new ArrayList<>();
-			List<Double> validInitDist = new ArrayList<Double>();
-
-			for(int i=0; i<rmc.getNumOfState()/2; i++){ // add first half set as initial states
-				validInitStates.add(i);
-				validInitDist.add((double)1/rmc.getNumOfState());
-			}
-
-			rmc.setInitStates(validInitStates);
-			rmc.getValidRMC();
-
-
-
-			RealMatrix matrix = rmc.getTransitionMatrix();
-			MarkovChain mc = new MarkovChain(matrix);
-			
-
-			RMCReachability rmcr = new RMCReachability(rmc,boundedStep);
-			rmcr.computeRMCReachability();
-			
-			
-
-			// define estimator, initial distribution getter
-			Estimator estimator = new LaplaceEstimator();
-			Sampler sampler = new MarkovChainSampler(new MarkovChain(rmc.getTransitionMatrix()));
-			InitialDistGetter idoidg = new InitialDistributionOptimizer(mc.getNodeNumber(), validInitStates, sn);
-			InitialDistGetter uniformidg = new UniformInitialDistribution(validInitStates);
-
 			for(int numSample : sampleSize){
-
-				System.out.println("current sample size: " + numSample);
-				Samples idoSample = IterSampling(mc, validInitStates, ALConfig.pathLength, numSample, estimator, sampler, idoidg);
-				Samples randomSample = IterSampling(mc, validInitStates, ALConfig.pathLength, numSample, estimator, sampler, uniformidg);
-
-				idomse.add(MetricComputing.calculateMSE(mc.getTransitionMatrix(), idoSample.getEstimatedTransitionMatrix()));
-				rsmse.add(MetricComputing.calculateMSE(mc.getTransitionMatrix(),randomSample.getEstimatedTransitionMatrix()));
-
-				List<Double> idoReachProbs = rmcr.computeEstReachability(idoSample.getEstimatedTransitionMatrix(), "ido");
-				List<Double> randomReachProbs = rmcr.computeEstReachability(randomSample.getEstimatedTransitionMatrix(), "rs");
-
-				List<Double> idoDiff = ListUtil.listABSDiff(rmcr.getReachProbs(), idoReachProbs);
-				List<Double> randomDiff = ListUtil.listABSDiff(rmcr.getReachProbs(), randomReachProbs);
-
-				idoreach.add(ListUtil.listMean(idoDiff));
-				rsreach.add(ListUtil.listMean(randomDiff));
 				
+				double imse = 0, rmse = 0, ireach = 0, rreach = 0;
+				
+				for(int time=0; time<repeatTime; time++){
+					
+					RandomMarkovChain rmc = new RandomMarkovChain(sn, density, "rmc_test_" + sn); 
+					rmc.generateRMC();
+					System.out.println("current random model: " +  rmc.toString());
+					
+					// set initial states
+					List<Integer> validInitStates = new ArrayList<>();
+					List<Double> validInitDist = new ArrayList<Double>();
+					for(int i=0; i<rmc.getNumOfState()/2; i++){ // add first half set as initial states
+						validInitStates.add(i);
+						validInitDist.add((double)1/rmc.getNumOfState());
+					}
+					rmc.setInitStates(validInitStates);
+					rmc.getValidRMC();
+					
+					RealMatrix matrix = rmc.getTransitionMatrix();
+					MarkovChain mc = new MarkovChain(matrix);
+
+					RMCReachability rmcr = new RMCReachability(rmc,boundedStep);
+					rmcr.computeRMCReachability();
+
+					// define estimator, initial distribution getter
+					Estimator estimator = new LaplaceEstimator();
+					Sampler sampler = new MarkovChainSampler(new MarkovChain(rmc.getTransitionMatrix()));
+					InitialDistGetter idoidg = new InitialDistributionOptimizer(mc.getNodeNumber(), validInitStates, sn);
+					InitialDistGetter uniformidg = new UniformInitialDistribution(validInitStates);
+					
+
+					System.out.println("current sample size: " + numSample);
+					Samples idoSample = IterSampling(mc, validInitStates, ALConfig.pathLength, numSample, estimator, sampler, idoidg);
+					Samples randomSample = IterSampling(mc, validInitStates, ALConfig.pathLength, numSample, estimator, sampler, uniformidg);
+
+					imse += MetricComputing.calculateMSE(mc.getTransitionMatrix(), idoSample.getEstimatedTransitionMatrix());
+					rmse += MetricComputing.calculateMSE(mc.getTransitionMatrix(),randomSample.getEstimatedTransitionMatrix());
+
+					List<Double> idoReachProbs = rmcr.computeEstReachability(idoSample.getEstimatedTransitionMatrix(), "ido");
+					List<Double> randomReachProbs = rmcr.computeEstReachability(randomSample.getEstimatedTransitionMatrix(), "rs");
+
+					List<Double> idoDiff = ListUtil.listABSDiff(rmcr.getReachProbs(), idoReachProbs);
+					List<Double> randomDiff = ListUtil.listABSDiff(rmcr.getReachProbs(), randomReachProbs);
+
+					ireach += ListUtil.listMean(idoDiff);
+					rreach += ListUtil.listMean(randomDiff);
+				}
+				idomse.add(imse/repeatTime);
+				rsmse.add(rmse/repeatTime);
+				idoreach.add(ireach/repeatTime);
+				rsreach.add(rreach/repeatTime);
 			}
-			
+
 			idoMSEResults.add(idomse);
 			rsMSEResults.add(rsmse);
 			idoReachResults.add(idoreach);
@@ -109,7 +117,7 @@ public class Main {
 			System.out.println("rsMSE current progress: " + rsMSEResults);
 			System.out.println("idoReach current progress: " + idoReachResults);
 			System.out.println("rsReach current progress: " + rsReachResults);
-			
+
 		}
 
 	}

@@ -1,6 +1,7 @@
 package io.github.wang_jingyi.ZiQian.utils;
 
 import java.io.FileNotFoundException;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,6 +32,54 @@ public class PrismUtil {
 					sb.append(" + " + tm[i][j] + " :(s'=" + (j+1) + ")");
 					continue;
 				}
+			}
+			sb.append(";\n");
+		}
+		sb.append("endmodule \n\n");
+		FileUtil.writeStringToFile(filePath+"/"+fileName+".pm", sb.toString());
+	}
+	
+	public static void MCToPrism(double[][] tm, List<Integer> initialStates, String fileName, String filePath) throws FileNotFoundException{
+		StringBuilder sb = new StringBuilder();
+		sb.append("dtmc" + " \n \n");
+		int numOfState = tm.length;
+
+		// module
+		sb.append("module rmc" + "\n");
+		sb.append("s:[0.." + numOfState + "] init 0; \n"); //
+		
+		sb.append("[]s=0 -> ");
+		double up = (double)1/initialStates.size();
+		boolean flag = true;
+		for(int is : initialStates){
+			if(flag){
+				sb.append( up +":(s'=" + (is+1) + ")");
+				flag = false;
+				continue;
+			}
+			sb.append(" + " + up + " :(s'=" + (is+1) + ")");
+		}
+		sb.append(";\n");
+		
+		// state transitions
+		for(int i=0; i<numOfState; i++){
+			sb.append("[]s=" + (i+1) + " -> ");
+			boolean first = true;
+			boolean noNext = true;
+			for(int j=0; j<numOfState; j++){
+				if(tm[i][j]!=0.0 && first){
+					sb.append(tm[i][j]+ " :(s'=" + (j+1) + ")");
+					first = false;
+					noNext = false;
+					continue;
+				}
+				if(tm[i][j]!=0.0 && !first){
+					noNext = false;
+					sb.append(" + " + tm[i][j] + " :(s'=" + (j+1) + ")");
+				}
+			}
+			if(noNext){
+				sb.append(1.0 + " :(s'=" + (i+1) + ")");
 			}
 			sb.append(";\n");
 		}

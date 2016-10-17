@@ -23,16 +23,32 @@ public class SwatTrace {
 		File file = new File(tracePath);
 		try{
 			Scanner sc = new Scanner(file);
-			sc.nextLine();
+			String sensors = sc.nextLine();
+			String[] ss = sensors.split(" ");
+			
+			
+			if(!ALConfig.sensorIndexAdded){
+				for(String s : ssa.getSensors()){
+					for(int i=0; i<ss.length; i++){
+						if(ss[i].equals(s)){
+							ALConfig.sensorIndex.add(i);
+						}
+					}
+				}
+				ALConfig.sensorIndexAdded = true;
+			}
+			
+			assert ALConfig.sensorIndex.size()==ssa.getSensors().size() : "unknown sensors added";
+			
 			while(sc.hasNextLine()){
 				double[] sensorValues = new double[ssa.getSensors().size()];
 				String str = sc.nextLine();
-				String[] ss = str.split(" ");
-				if(ss.length!=sensorValues.length){
+				String[] svs = str.split(" ");
+				if(svs.length!=ss.length){ // incomplete data
 					continue;
 				}
 				for(int i=0; i<sensorValues.length; i++){
-					sensorValues[i] = Double.valueOf(ss[i]);
+					sensorValues[i] = Double.valueOf(svs[ALConfig.sensorIndex.get(i)]);
 					if(sensorValues[i]>GlobalVars.maxSensorValues[i]){
 						GlobalVars.maxSensorValues[i] = sensorValues[i];
 					}
@@ -41,7 +57,7 @@ public class SwatTrace {
 						GlobalVars.minSensorValues[i] = sensorValues[i];
 					}
 				}
-				st.add(ssa.swatAbstraction(sensorValues));
+ 				st.add(ssa.swatAbstraction(sensorValues));
 			}
 			sc.close();
 		}catch(Exception e){e.printStackTrace();}

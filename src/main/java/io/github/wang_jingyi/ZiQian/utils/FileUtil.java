@@ -1,6 +1,7 @@
 package io.github.wang_jingyi.ZiQian.utils;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -52,6 +53,33 @@ public class FileUtil {
 		PrintWriter out = new PrintWriter(filepath);
 		out.println(str);
 		out.close();
+	}
+
+	public static void appendStringToFile(String filepath, String str) throws FileNotFoundException{
+
+		File file =new File(filepath);
+
+		//if file doesnt exists, then create it
+		if(!file.exists()){
+			try {
+				file.createNewFile();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+		//true = append file
+		try {
+			FileWriter fw = new FileWriter(filepath, true);
+		    BufferedWriter bw = new BufferedWriter(fw);
+		    PrintWriter out = new PrintWriter(bw);
+		    out.println(str);
+		    out.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public static void writeAlphabetToCSV(String filepath, List<String> alphabet) throws IOException{

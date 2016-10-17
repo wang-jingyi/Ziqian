@@ -1,7 +1,13 @@
 package io.github.wang_jingyi.ZiQian.active;
 
-public class Interval {
+import java.io.Serializable;
+
+public class Interval implements Serializable{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7417585182624900729L;
 	public int start;
 	public int end;
 	Interval() { start = 0; end = 0; }

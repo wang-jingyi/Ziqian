@@ -96,7 +96,7 @@ public class RandomMarkovChain {
 		}
 		else if(rareState){
 			generateRMCWithRareStates();
-			System.out.println("created");
+//			System.out.println("created");
 		}
 		else{
 			generateRMCFree();

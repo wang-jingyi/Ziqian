@@ -43,7 +43,9 @@ public class Samples {
 
 	public void newSample(){
 		List<Integer> asample = sampler.newSample(
-				idg.getInitialDistribution(frequencyMatrix, estimatedTransitionMatrix), pathLength);
+				idg.getInitialDistribution(frequencyMatrix, estimatedTransitionMatrix), ALConfig.pathLength);
+		
+		System.out.println("sampled new trace: " + asample);
 
 		for(int i=0; i<asample.size()-1; i++){
 			int start = asample.get(i);
