@@ -54,7 +54,7 @@ public class MetricComputing {
 		} 
 		int minFreqState = 0;
 		for(int i=1; i<rowsums.length; i++){
-			if(rowsums[i]<rowsums[minFreqState]){
+			if(rowsums[i]<rowsums[minFreqState]){ // only those states 
 				minFreqState = i;
 			}
 		}

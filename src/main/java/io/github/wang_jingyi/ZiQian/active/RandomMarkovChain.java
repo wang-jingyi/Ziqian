@@ -305,22 +305,6 @@ public class RandomMarkovChain {
 		return dis;
 	}
 
-	// write property list to check
-	public void WriteRMCPropertyList(String filePath, int boundedStep) throws FileNotFoundException{
-		StringBuilder sb = new StringBuilder();
-		for(int i=1; i<=numOfState; i++){
-			sb.append("P=? [ true U<="+ boundedStep +" s=" + i + " ];\n");
-		}
-		FileUtil.writeStringToFile(filePath+"/"+rmcName+".pctl", sb.toString());
-	}
-
-	public void writeLearnPropertyList(String filePath, int boundedStep) throws FileNotFoundException{
-		StringBuilder sb = new StringBuilder();
-		for(int i=1; i<=numOfState; i++){
-			sb.append("P=? [ true U<=" + boundedStep + " \"rmc" + i + "\" ]\n");
-		}
-		FileUtil.writeStringToFile(filePath+"/"+rmcName+"_learn.pctl", sb.toString());
-	}
 
 	//	// write simulation into path
 	public void writeSimulationPath(String filePath,int steps) throws FileNotFoundException{

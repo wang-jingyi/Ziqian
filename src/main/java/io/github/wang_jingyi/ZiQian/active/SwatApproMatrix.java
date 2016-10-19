@@ -19,10 +19,10 @@ public class SwatApproMatrix {
 		System.out.println("Add sensors, define abstractions...");
 		SwatSensorAbstraction ssa = new SwatSensorAbstraction();
 //		ssa.addSensor("LIT101", new Interval(200, 1100), 500);
-		ssa.addSensor("LIT301", new Interval(200, 1000), 100);
-		ssa.addSensor("LIT401", new Interval(200, 1000), 100);
+		ssa.addSensor("LIT301", new Interval(200, 1000), 500);
+		ssa.addSensor("LIT401", new Interval(200, 1000), 500);
 //		ssa.addSensor("LS601", new Interval(200, 8000), 5000);
-		ssa.addSensor("LS602", new Interval(200, 1000), 100);
+		ssa.addSensor("LS602", new Interval(200, 1000), 500);
 		
 		ALConfig.stateNumber = ssa.getStateNumber(); // update state number according to sensor abstraction
 		List<String> swatPathRoot = new ArrayList<String>();

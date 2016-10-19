@@ -1,6 +1,7 @@
 package io.github.wang_jingyi.ZiQian.active;
 
 import gurobi.GRBException;
+import io.github.wang_jingyi.ZiQian.run.PlatformDependent;
 import io.github.wang_jingyi.ZiQian.utils.ListUtil;
 
 import java.io.FileNotFoundException;
@@ -21,14 +22,16 @@ public class Main {
 		//															{0, 0, 0, 0, 0, 0, 1}};
 		//				RandomMarkovChain rmc = new RandomMarkovChain(16, 0.8, "test");
 
-		int[] stateNumber = new int[]{8
-								,16,32
+		int[] stateNumber = new int[]{ 48
+//				8
+//								,16,32
 		};
 
-		int[] sampleSize = new int[]{1000,2000,3000,4000,5000,
-				6000,7000,8000,9000
+		int[] sampleSize = new int[]{  5000
+//				1000,2000,3000,4000,5000,
+//				6000,7000,8000,9000
 				,10000
-//				,50000,100000,200000
+				,50000,100000,200000
 		};
 		double density = 0.8;
 		int repeatTime = 10;
@@ -73,11 +76,17 @@ public class Main {
 					rmc.setInitStates(validInitStates);
 					rmc.getValidRMC();
 					
+					List<Integer> targetStates = new ArrayList<Integer>();
+					for(int i=rmc.getNumOfState()/2; i<rmc.getNumOfState(); i++){
+						targetStates.add(i);
+					}
+					
 					RealMatrix matrix = rmc.getTransitionMatrix();
 					MarkovChain mc = new MarkovChain(matrix);
 
-					RMCReachability rmcr = new RMCReachability(rmc,boundedStep);
-					rmcr.computeRMCReachability();
+					Reachability rmcr = new Reachability(rmc.getTransitionMatrix(), validInitStates, 
+							PlatformDependent.MODEL_ROOT+"/active/rmc", rmc.getRmcName(), boundedStep);
+					List<Double> actualReach = rmcr.computeReachability(targetStates);
 
 					// define estimator, initial distribution getter
 					Estimator estimator = new LaplaceEstimator();
@@ -92,12 +101,17 @@ public class Main {
 
 					imse += MetricComputing.calculateMSE(mc.getTransitionMatrix(), idoSample.getEstimatedTransitionMatrix());
 					rmse += MetricComputing.calculateMSE(mc.getTransitionMatrix(),randomSample.getEstimatedTransitionMatrix());
+					
+					Reachability idormcr = new Reachability(idoSample.getEstimatedTransitionMatrix(), validInitStates, 
+							PlatformDependent.MODEL_ROOT + "/active/rmc", rmc.getRmcName()+"_ido", boundedStep);
+					List<Double> idoReachProbs = idormcr.computeReachability(targetStates);
+					Reachability rsrmcr = new Reachability(idoSample.getEstimatedTransitionMatrix(), validInitStates, 
+							PlatformDependent.MODEL_ROOT + "/active/rmc", rmc.getRmcName()+"_rs", boundedStep);
+					List<Double> randomReachProbs = rsrmcr.computeReachability(targetStates);
+					
 
-					List<Double> idoReachProbs = rmcr.computeEstReachability(idoSample.getEstimatedTransitionMatrix(), "ido");
-					List<Double> randomReachProbs = rmcr.computeEstReachability(randomSample.getEstimatedTransitionMatrix(), "rs");
-
-					List<Double> idoDiff = ListUtil.listABSDiff(rmcr.getReachProbs(), idoReachProbs);
-					List<Double> randomDiff = ListUtil.listABSDiff(rmcr.getReachProbs(), randomReachProbs);
+					List<Double> idoDiff = ListUtil.listABSDiff(actualReach, idoReachProbs);
+					List<Double> randomDiff = ListUtil.listABSDiff(actualReach, randomReachProbs);
 
 					ireach += ListUtil.listMean(idoDiff);
 					rreach += ListUtil.listMean(randomDiff);

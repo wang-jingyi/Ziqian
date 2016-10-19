@@ -1,6 +1,7 @@
 package io.github.wang_jingyi.ZiQian.active;
 
 import gurobi.GRBException;
+import io.github.wang_jingyi.ZiQian.run.PlatformDependent;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -46,10 +47,17 @@ public class RMCRareReachMain {
 		try {
 			Samples idoSample = Main.IterSampling(mc, validInitStates, ALConfig.pathLength, ALConfig.newSampleNumber, estimator, sampler, idoidg);
 			Samples randomSample = Main.IterSampling(mc, validInitStates, ALConfig.pathLength, ALConfig.newSampleNumber, estimator, sampler, uniformidg);
-			RMCReachability rmcr = new RMCReachability(rmc,boundedStep);
-			double realRareReach = rmcr.computeRMCReachability(ALConfig.stateNumber);
-			double idoestRareReach = rmcr.computeEstReachability(idoSample.getEstimatedTransitionMatrix(), "ido", ALConfig.stateNumber);
-			double rsestRareReach = rmcr.computeEstReachability(randomSample.getEstimatedTransitionMatrix(), "rs", ALConfig.stateNumber);
+			
+			Reachability rmcr = new Reachability(rmc.getTransitionMatrix(), validInitStates, PlatformDependent.MODEL_ROOT+"/active/rmc",
+					rmc.getRmcName(), boundedStep);
+			double realRareReach = rmcr.computeReachability(ALConfig.stateNumber);
+			
+			Reachability idormcr = new Reachability(idoSample.getEstimatedTransitionMatrix(), validInitStates, 
+					PlatformDependent.MODEL_ROOT + "/active/rmc", rmc.getRmcName()+"_ido", boundedStep);
+			double idoestRareReach = idormcr.computeReachability(ALConfig.stateNumber);
+			Reachability rsrmcr = new Reachability(randomSample.getEstimatedTransitionMatrix(), validInitStates, 
+					PlatformDependent.MODEL_ROOT + "/active/rmc", rmc.getRmcName()+"_rs", boundedStep);
+			double rsestRareReach = rsrmcr.computeReachability(ALConfig.stateNumber);
 			
 			System.out.println("real rare state reachability: " + realRareReach);
 			System.out.println("ido rare state reachability: " + idoestRareReach);

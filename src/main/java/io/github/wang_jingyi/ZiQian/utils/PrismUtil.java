@@ -38,8 +38,8 @@ public class PrismUtil {
 		sb.append("endmodule \n\n");
 		FileUtil.writeStringToFile(filePath+"/"+fileName+".pm", sb.toString());
 	}
-	
-	public static void MCToPrism(double[][] tm, List<Integer> initialStates, String fileName, String filePath) throws FileNotFoundException{
+
+	public static void MCToPrism(double[][] tm, List<Integer> initialStates, String fileName, String dirPath) throws FileNotFoundException{
 		StringBuilder sb = new StringBuilder();
 		sb.append("dtmc" + " \n \n");
 		int numOfState = tm.length;
@@ -47,7 +47,7 @@ public class PrismUtil {
 		// module
 		sb.append("module rmc" + "\n");
 		sb.append("s:[0.." + numOfState + "] init 0; \n"); //
-		
+
 		sb.append("[]s=0 -> ");
 		double up = (double)1/initialStates.size();
 		boolean flag = true;
@@ -60,7 +60,7 @@ public class PrismUtil {
 			sb.append(" + " + up + " :(s'=" + (is+1) + ")");
 		}
 		sb.append(";\n");
-		
+
 		// state transitions
 		for(int i=0; i<numOfState; i++){
 			sb.append("[]s=" + (i+1) + " -> ");
@@ -84,9 +84,26 @@ public class PrismUtil {
 			sb.append(";\n");
 		}
 		sb.append("endmodule \n\n");
-		FileUtil.writeStringToFile(filePath+"/"+fileName+".pm", sb.toString());
+		FileUtil.writeStringToFile(dirPath+"/"+fileName+".pm", sb.toString());
 	}
 
+
+	// write property list to check
+	public static void WriteRMCPropertyList(String dirPath, String fileName, int stateNumber, int boundedStep) throws FileNotFoundException{
+		StringBuilder sb = new StringBuilder();
+		for(int i=1; i<=stateNumber; i++){
+			sb.append("P=? [ true U<="+ boundedStep +" s=" + i + " ];\n");
+		}
+		FileUtil.writeStringToFile(dirPath+"/"+fileName+".pctl", sb.toString());
+	}
+
+	public static void writeLearnPropertyList(String dirPath, String fileName, int stateNumber, int boundedStep) throws FileNotFoundException{
+		StringBuilder sb = new StringBuilder();
+		for(int i=1; i<=stateNumber; i++){
+			sb.append("P=? [ true U<=" + boundedStep + " \"rmc" + i + "\" ]\n");
+		}
+		FileUtil.writeStringToFile(dirPath+"/"+fileName+"_learn.pctl", sb.toString());
+	}
 
 	public static double extractResultFromCommandOutput(String output){
 		try{
@@ -112,7 +129,7 @@ public class PrismUtil {
 				return result;
 			}
 		}catch(Exception e){e.printStackTrace();}
-		
+
 		return 0.0;
 	}
 
