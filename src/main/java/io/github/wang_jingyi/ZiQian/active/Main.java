@@ -84,9 +84,9 @@ public class Main {
 					RealMatrix matrix = rmc.getTransitionMatrix();
 					MarkovChain mc = new MarkovChain(matrix);
 
-					Reachability rmcr = new Reachability(rmc.getTransitionMatrix(), validInitStates, 
+					Reachability rmcr = new Reachability(rmc.getTransitionMatrix(), validInitStates, targetStates,
 							PlatformDependent.MODEL_ROOT+"/active/rmc", rmc.getRmcName(), boundedStep);
-					List<Double> actualReach = rmcr.computeReachability(targetStates);
+					List<Double> actualReach = rmcr.computeReachability();
 
 					// define estimator, initial distribution getter
 					Estimator estimator = new LaplaceEstimator();
@@ -102,12 +102,12 @@ public class Main {
 					imse += MetricComputing.calculateMSE(mc.getTransitionMatrix(), idoSample.getEstimatedTransitionMatrix());
 					rmse += MetricComputing.calculateMSE(mc.getTransitionMatrix(),randomSample.getEstimatedTransitionMatrix());
 					
-					Reachability idormcr = new Reachability(idoSample.getEstimatedTransitionMatrix(), validInitStates, 
+					Reachability idormcr = new Reachability(idoSample.getEstimatedTransitionMatrix(), validInitStates, targetStates,
 							PlatformDependent.MODEL_ROOT + "/active/rmc", rmc.getRmcName()+"_ido", boundedStep);
-					List<Double> idoReachProbs = idormcr.computeReachability(targetStates);
-					Reachability rsrmcr = new Reachability(idoSample.getEstimatedTransitionMatrix(), validInitStates, 
+					List<Double> idoReachProbs = idormcr.computeReachability();
+					Reachability rsrmcr = new Reachability(idoSample.getEstimatedTransitionMatrix(), validInitStates, targetStates,
 							PlatformDependent.MODEL_ROOT + "/active/rmc", rmc.getRmcName()+"_rs", boundedStep);
-					List<Double> randomReachProbs = rsrmcr.computeReachability(targetStates);
+					List<Double> randomReachProbs = rsrmcr.computeReachability();
 					
 
 					List<Double> idoDiff = ListUtil.listABSDiff(actualReach, idoReachProbs);

@@ -5,6 +5,7 @@ import io.github.wang_jingyi.ZiQian.run.Config;
 import io.github.wang_jingyi.ZiQian.run.GlobalVars;
 import io.github.wang_jingyi.ZiQian.run.PlatformDependent;
 import io.github.wang_jingyi.ZiQian.utils.FileUtil;
+import io.github.wang_jingyi.ZiQian.utils.ListUtil;
 import io.github.wang_jingyi.ZiQian.utils.NumberUtil;
 
 import java.io.IOException;
@@ -15,18 +16,43 @@ import org.apache.commons.math3.linear.RealMatrix;
 
 public class SwatActiveMain {
 	
+	@SuppressWarnings("unchecked")
 	public static void main(String[] args) throws ClassNotFoundException, IOException{
 		
 		System.out.println("Add sensors, define abstractions...");
 		
+		StringBuilder logInfo = new StringBuilder();
+		
 		SwatSensorAbstraction ssa = (SwatSensorAbstraction) FileUtil.readObject(Config.PROJECT_ROOT + "/tmp/swat_ssa");
+		
+		logInfo.append("\n\n");
+		logInfo.append(ssa.toString());
+		logInfo.append("\n\n");
+		
+		logInfo.append("sample length: " + ALConfig.pathLength + " minutes \n");
+		logInfo.append("number of new sample: " + ALConfig.newSampleNumber + "\n");
+		
 		RealMatrix estExactMatrix = (RealMatrix) FileUtil.readObject(Config.PROJECT_ROOT + "/tmp/swat_est_matrix");
+		List<Double> swatReachProbs = (List<Double>) FileUtil.readObject(Config.PROJECT_ROOT + "/tmp/swat_reach");
+		
+		logInfo.append("reachability probs: " + swatReachProbs + "\n");
+		
+		List<Double> nonZeroSwatReachProbs = NumberUtil.nonZeroList(swatReachProbs);
+		System.out.println("non zero reachability probabilities: " + nonZeroSwatReachProbs);
+		
+		List<Integer> targetStates = new ArrayList<Integer>();
+		for(int i=0; i<swatReachProbs.size(); i++){
+			if(swatReachProbs.get(i)!=0){
+				targetStates.add(i);
+			}
+		}
 		
 		ALConfig.stateNumber = ssa.getStateNumber(); // update state number according to sensor abstraction
 		
-		String swatTrainPaths= PlatformDependent.MODEL_ROOT + "/model/" + Config.modelPath;
+		String swatTrainPaths= PlatformDependent.SWAT_SIMULATE_PATH + "/Jingyi_Data/10_5";
 		 
 		System.out.println("number of states: " + ALConfig.stateNumber);
+		
 		if(ALConfig.stateNumber>500){
 			System.out.println("building sparse matrix...");
 			ALConfig.sparse = true;
@@ -57,32 +83,69 @@ public class SwatActiveMain {
 		
 		RealMatrix frequencyMatrix = Samples.getFrequencyMatrix(abstractTraces, ALConfig.stateNumber);
 		
-		List<Integer> validInitStates = new ArrayList<>();
+		List<Integer> validInitStates = ssa.getInitialStates();
 		List<Double> validInitDist = new ArrayList<Double>();
 		for(int i=0; i<ALConfig.stateNumber; i++){
-			validInitStates.add(i);
-			validInitDist.add((double)1/ALConfig.stateNumber);
+			validInitDist.add((double)1/validInitStates.size());
 		}
-		Estimator estimator = new LaplaceEstimator();
-		Sampler sampler = new SwatSampler(new SwatBridge(ssa), PlatformDependent.MODEL_ROOT + "/model" + 
-				Config.modelPath + "/new_sample", ALConfig.pathLength);
+		
+		FileUtil.cleanDirectory(PlatformDependent.MODEL_ROOT + "/active/swat/new_sample_ido");//
+		FileUtil.cleanDirectory(PlatformDependent.MODEL_ROOT + "/active/swat/new_sample_rs");
+		
+		Estimator estimator = new EmpiricalFrequencyEstimator();
+		Sampler idosampler = new SwatSampler(new SwatBridge(ssa), 
+				PlatformDependent.MODEL_ROOT + "/active/swat/new_sample_ido", ALConfig.pathLength);
 		InitialDistGetter idoidg = new InitialDistributionOptimizer(ALConfig.stateNumber, validInitStates, ALConfig.pathLength);
+		Sampler rssampler = new SwatSampler(new SwatBridge(ssa), 
+				PlatformDependent.MODEL_ROOT + "/active/swat/new_sample_rs", ALConfig.pathLength);
 		InitialDistGetter uniformidg = new UniformInitialDistribution(validInitStates);
 		
 		try {
-			Samples idosample = IterSampling(frequencyMatrix, ALConfig.newSampleNumber, estimator, sampler, idoidg);
+			
+			Samples idosample = IterSampling(frequencyMatrix, ALConfig.newSampleNumber, estimator, idosampler, idoidg);
+			Reachability idoReach = new Reachability(idosample.getEstimatedTransitionMatrix(), validInitStates, targetStates,
+					PlatformDependent.MODEL_ROOT + "/active/swat", "swat_10_5_ido", ALConfig.boundedSteps);
+			List<Double> idoReachProbs = idoReach.computeReachability();
+			double idominfre = MetricComputing.calculateNonZeroMinFreq(idosample.getFrequencyMatrix());
+			double idomse = MetricComputing.calculateMSE(estExactMatrix, idosample.getEstimatedTransitionMatrix());
+			List<Double> idoDiff = ListUtil.listABSDiff(nonZeroSwatReachProbs, idoReachProbs);
+			double idoMeanDiff = ListUtil.listMean(idoDiff);
+			FileUtil.writeObject(Config.TMP_PATH + "/swat_ido_reach_probs", idoReachProbs);
+			
+			logInfo.append("ido min frequency: " + idominfre + "\n");
+			logInfo.append("ido mse: " + idomse + "\n");
+			logInfo.append("ido reachability probs: " + idoReachProbs + "\n");
+			logInfo.append("ido reachability average diff: " + idoMeanDiff + "\n");
 			
 			ALConfig.ido = false;
 			
-			Samples uniformsample = IterSampling(frequencyMatrix, ALConfig.newSampleNumber, estimator, sampler, uniformidg);
+			Samples uniformsample = IterSampling(frequencyMatrix, ALConfig.newSampleNumber, estimator, rssampler, uniformidg);
+			Reachability rsReach = new Reachability(uniformsample.getEstimatedTransitionMatrix(), validInitStates, targetStates,
+					PlatformDependent.MODEL_ROOT + "/active/swat", "swat_10_5_rs", ALConfig.boundedSteps);
+			List<Double> rsReachProbs = rsReach.computeReachability();
+			FileUtil.writeObject(Config.TMP_PATH + "/swat_rs_reach_probs", rsReachProbs);
+			double rsminfre = MetricComputing.calculateNonZeroMinFreq(uniformsample.getFrequencyMatrix());
+			double rsmse = MetricComputing.calculateMSE(estExactMatrix, uniformsample.getEstimatedTransitionMatrix());
+			List<Double> rsDiff = ListUtil.listABSDiff(nonZeroSwatReachProbs, rsReachProbs);
+			double rsMeanDiff = ListUtil.listMean(rsDiff);
+			logInfo.append("random sampling min frequency: " + rsminfre + "\n");
+			logInfo.append("random sampling mse: " + rsmse + "\n");
+			logInfo.append("random sampling reachability probs: " + rsReachProbs + "\n");
+			logInfo.append("random sampling reachability average diff: " + rsMeanDiff + "\n");
 			
-			System.out.println("ido mse: " + MetricComputing.calculateMSE(estExactMatrix, idosample.getEstimatedTransitionMatrix()));
-			System.out.println("rs mse: " + MetricComputing.calculateMSE(estExactMatrix, uniformsample.getEstimatedTransitionMatrix()));
+			
+			System.out.println("ido min fre: " + idominfre + "\n");
+			System.out.println("rs min fre: " + rsminfre + "\n");
+			System.out.println("ido mse: " + idomse + "\n");
+			System.out.println("rs mse: " + rsmse + "\n");
+			System.out.println("ido reach: " + idoMeanDiff + "\n"); // only average on non-zero differences
+			System.out.println("rs reach: " + rsMeanDiff + "\n");
+			
+			FileUtil.appendStringToFile(Config.TMP_PATH + "/swat_logs", logInfo.toString());
 			
 		} catch (GRBException e) {
 			e.printStackTrace();
 		}
-		
 	
 	} 
 	

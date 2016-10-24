@@ -30,7 +30,22 @@ public class ListUtil {
 		return res;
 	}
 	
-	public static double listMean(List<Double> list){
+	public static double listMeanNonZero(List<Double> list){ // only consider non-zero values
+		int len = list.size();
+		double sum = 0.0;
+		for(int i=0; i<len; i++){
+			if(list.get(i)==0){
+				len--;
+			}
+			sum += list.get(i);
+		}
+		if(len==0){
+			return 0;
+		}
+		return sum/len;
+	}
+	
+	public static double listMean(List<Double> list){ // only consider non-zero values
 		int len = list.size();
 		double sum = 0.0;
 		for(int i=0; i<len; i++){

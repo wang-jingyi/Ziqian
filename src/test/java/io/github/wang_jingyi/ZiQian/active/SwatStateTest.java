@@ -22,5 +22,17 @@ public class SwatStateTest {
 		ssm.put(ss1, 1);
 		System.out.println(ssm.containsKey(ss2));
 	}
-
+	
+	@Test
+	public void testTargetState(){
+		outBinary(3);
+	}
+	
+	
+	public void outBinary(int value){
+		   for (int i = 0; i < Math.pow(2, value); i++) {
+		       System.out.println(String.format("%4s", Integer.toBinaryString(i)).replace(' ', '0'));
+		   }
+		}
+	
 }

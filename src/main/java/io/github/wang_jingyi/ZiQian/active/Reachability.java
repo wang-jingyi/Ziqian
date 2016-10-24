@@ -15,13 +15,16 @@ public class Reachability {
 
 	private RealMatrix transitionMatrix;
 	private List<Integer> initialStates;
+	private List<Integer> targetStates;
 	private String dirPath;
 	private String fileName;
 	private int boundedStep;
 
-	public Reachability(RealMatrix tm, List<Integer> is, String dirPath, String fileName, int boundedStep) throws FileNotFoundException {
+	public Reachability(RealMatrix tm, List<Integer> is, List<Integer> targetStates, 
+			String dirPath, String fileName, int boundedStep) throws FileNotFoundException {
 		this.transitionMatrix = tm;
 		this.initialStates = is;
+		this.targetStates = targetStates;
 		this.dirPath= dirPath;
 		this.fileName = fileName;
 		this.boundedStep = boundedStep;
@@ -31,7 +34,7 @@ public class Reachability {
 	private void generatePrismFiles() throws FileNotFoundException{
 		FileUtil.createDir(dirPath);
 		PrismUtil.MCToPrism(transitionMatrix.getData(), initialStates, fileName, dirPath);
-		PrismUtil.WriteRMCPropertyList(dirPath, fileName, transitionMatrix.getRowDimension(), boundedStep);
+		PrismUtil.WritePropertyList(targetStates, dirPath, fileName, transitionMatrix.getRowDimension(), boundedStep);
 	}
 
 	public double computeReachability(int i){
@@ -43,13 +46,13 @@ public class Reachability {
 		return reachp;
 	}
 	
-	public List<Double> computeReachability(List<Integer> targetStates){
+	public List<Double> computeReachability(){
 		List<Double> reachProbs = new ArrayList<Double>();
 		String pmPath = dirPath + "/" + fileName +".pm";
 		String propPath = dirPath + "/" + fileName +".pctl";
-		for(int i : targetStates){
+		for(int i=1; i<=targetStates.size(); i++){
 			reachProbs.add(PrismUtil.extractResultFromCommandOutput(ExternalCaller.executeCommand(new String[]{Config.PRISM_PATH
-					, pmPath, propPath, "-prop", String.valueOf(i+1)})));
+					, pmPath, propPath, "-prop", String.valueOf(i)})));
 		}
 		return reachProbs;
 	}

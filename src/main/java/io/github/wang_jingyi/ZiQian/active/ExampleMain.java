@@ -95,9 +95,9 @@ public class ExampleMain {
 		List<Double> idoreach = new ArrayList<Double>();
 		List<Double> rsreach = new ArrayList<Double>();
 		
-		Reachability reach = new Reachability(MatrixUtils.createRealMatrix(matrix), validInitStates, 
+		Reachability reach = new Reachability(MatrixUtils.createRealMatrix(matrix), validInitStates, targetStates,
 				PlatformDependent.MODEL_ROOT + "/active/" + modelName, modelName , ALConfig.stateNumber);
-		List<Double> actualReach = reach.computeReachability(targetStates);
+		List<Double> actualReach = reach.computeReachability();
 
 		for(int ss : sampleSize){
 			ALConfig.newSampleNumber = ss;
@@ -116,12 +116,12 @@ public class ExampleMain {
 					im += MetricComputing.calculateMSE(MatrixUtils.createRealMatrix(matrix), idosample.getEstimatedTransitionMatrix());
 					rm += MetricComputing.calculateMSE(MatrixUtils.createRealMatrix(matrix), rdsample.getEstimatedTransitionMatrix());
 					
-					Reachability ircompute = new Reachability(idosample.getEstimatedTransitionMatrix(), validInitStates, 
+					Reachability ircompute = new Reachability(idosample.getEstimatedTransitionMatrix(), validInitStates, targetStates,
 							PlatformDependent.MODEL_ROOT + "/active/"+ modelName, modelName + "_ido", ALConfig.stateNumber);
-					List<Double> idoReach = ircompute.computeReachability(targetStates);
-					Reachability rscompute = new Reachability(rdsample.getEstimatedTransitionMatrix(), validInitStates, 
+					List<Double> idoReach = ircompute.computeReachability();
+					Reachability rscompute = new Reachability(rdsample.getEstimatedTransitionMatrix(), validInitStates, targetStates,
 							PlatformDependent.MODEL_ROOT + "/active/" + modelName, modelName + "_rs", ALConfig.stateNumber);
-					List<Double> rsReach= rscompute.computeReachability(targetStates);
+					List<Double> rsReach= rscompute.computeReachability();
 					
 					System.out.println("actual reach: " + actualReach);
 					System.out.println("ido reach: " + idoReach);

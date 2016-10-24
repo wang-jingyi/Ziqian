@@ -16,7 +16,7 @@ public class UniformInitialDistribution implements InitialDistGetter {
 	public double[] getInitialDistribution(RealMatrix frequencyMatrix, RealMatrix origEstimation) {
 		double p = (double) 1 / validInitialStates.size();
 		double[] id = new double[validInitialStates.size()];
-		for(int i : validInitialStates){
+		for(int i=0; i<validInitialStates.size(); i++){
 			id[i] = p;
 		}
 		return id;

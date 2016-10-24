@@ -16,8 +16,6 @@ public class SwatSensorAbstractionTest {
 	
 	@Test
 	public void testIndexToValue(){
-		int index = 4;
-		System.out.println(swatStateAbstractValue(index));
 	}
 	
 	public List<Integer> swatStateAbstractValue(int stateIndex){ // to debug

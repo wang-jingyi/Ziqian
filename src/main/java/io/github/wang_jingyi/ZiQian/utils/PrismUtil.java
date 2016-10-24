@@ -87,6 +87,15 @@ public class PrismUtil {
 		FileUtil.writeStringToFile(dirPath+"/"+fileName+".pm", sb.toString());
 	}
 
+	// write property list to check with target states
+	public static void WritePropertyList(List<Integer> targetStates, String dirPath, String fileName, int stateNumber, int boundedStep) throws FileNotFoundException{
+		StringBuilder sb = new StringBuilder();
+		for(int i : targetStates){
+			sb.append("P=? [ true U<="+ boundedStep +" s=" + (i+1) + " ];\n");
+		}
+		FileUtil.writeStringToFile(dirPath+"/"+fileName+".pctl", sb.toString());
+	}
+
 
 	// write property list to check
 	public static void WriteRMCPropertyList(String dirPath, String fileName, int stateNumber, int boundedStep) throws FileNotFoundException{

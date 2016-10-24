@@ -15,14 +15,19 @@ import org.apache.commons.math3.linear.RealMatrix;
 
 public class SwatApproMatrix {
 	
-	public static void main(String[] args){
+	public static void main(String[] args) throws FileNotFoundException{
+		
 		System.out.println("Add sensors, define abstractions...");
 		SwatSensorAbstraction ssa = new SwatSensorAbstraction();
 //		ssa.addSensor("LIT101", new Interval(200, 1100), 500);
-		ssa.addSensor("LIT301", new Interval(200, 1000), 500);
-		ssa.addSensor("LIT401", new Interval(200, 1000), 500);
+		ssa.addSensor("LIT301", new Interval(200, 1000), 100);
+		ssa.addSensor("LIT401", new Interval(200, 1000), 100);
 //		ssa.addSensor("LS601", new Interval(200, 8000), 5000);
-		ssa.addSensor("LS602", new Interval(200, 1000), 500);
+		ssa.addSensor("LS602", new Interval(200, 1000), 100);
+		ssa.computeInitialStates();
+		ssa.computeTargetStates();
+		
+		
 		
 		ALConfig.stateNumber = ssa.getStateNumber(); // update state number according to sensor abstraction
 		List<String> swatPathRoot = new ArrayList<String>();
@@ -30,6 +35,7 @@ public class SwatApproMatrix {
 		swatPathRoot.add(PlatformDependent.SWAT_SIMULATE_PATH + "/Jingyi_Data_1/10_5");
 		swatPathRoot.add(PlatformDependent.SWAT_SIMULATE_PATH + "/Jingyi_Data_2/10_5");
 		swatPathRoot.add(PlatformDependent.SWAT_SIMULATE_PATH + "/Jingyi_Data_3/10_5");
+		swatPathRoot.add(PlatformDependent.SWAT_SIMULATE_PATH + "/Jingyi_Data_5/10_5");
 		
 		 
 		System.out.println("number of states: " + ALConfig.stateNumber);
@@ -69,14 +75,20 @@ public class SwatApproMatrix {
 		}
 		
 		RealMatrix frequencyMatrix = Samples.getFrequencyMatrix(abstractTraces, ALConfig.stateNumber);
-		Estimator estimator = new LaplaceEstimator();
-//		estimator estimator = new EmpiricalFrequencyEstimator();
-//		estimator estimator = new GoodTuringEstimator();
+//		Estimator estimator = new LaplaceEstimator();
+		Estimator estimator = new EmpiricalFrequencyEstimator();
+//		Estimator estimator = new GoodTuringEstimator();
 		RealMatrix estTransMatrix = estimator.estimate(frequencyMatrix);
+		
+		Reachability swatReach = new Reachability(estTransMatrix, ssa.getInitialStates(), ssa.getTargetStates(),
+				PlatformDependent.MODEL_ROOT + "/active/swat", "swat_10_5", ALConfig.boundedSteps);
+		List<Double> reachs = swatReach.computeReachability();
+		
 		try {
 			FileUtil.writeObject(Config.PROJECT_ROOT + "/tmp/swat_ssa", ssa);
 			FileUtil.writeObject(Config.PROJECT_ROOT + "/tmp/swat_fre_matrix", frequencyMatrix);
 			FileUtil.writeObject(Config.PROJECT_ROOT + "/tmp/swat_est_matrix", estTransMatrix);
+			FileUtil.writeObject(Config.PROJECT_ROOT + "/tmp/swat_reach", reachs);
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

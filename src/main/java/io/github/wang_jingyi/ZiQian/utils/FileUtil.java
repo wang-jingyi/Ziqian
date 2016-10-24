@@ -19,6 +19,9 @@ public class FileUtil {
 
 	public static void cleanDirectory(String path){
 		File dir = new File(path);
+		if(!dir.exists()){
+			return;
+		}
 		for(File file : dir.listFiles()){
 			file.delete();
 		}

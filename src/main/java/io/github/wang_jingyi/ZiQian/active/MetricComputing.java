@@ -19,7 +19,7 @@ public class MetricComputing {
 	}
 
 	public static double calculateMinFreq(RealMatrix frequencyMatrix){
-		
+
 		int nodeNumber = frequencyMatrix.getRowDimension();
 		double[] rowsums = new double[nodeNumber];
 		for(int i=0; i<nodeNumber; i++){
@@ -30,7 +30,7 @@ public class MetricComputing {
 			}
 			rowsums[i] = rowsum;
 		} 
-		
+
 		double minFreq = Integer.MAX_VALUE;
 		for(int i=0; i<rowsums.length; i++){
 			if(rowsums[i]<minFreq){
@@ -40,8 +40,30 @@ public class MetricComputing {
 		return minFreq;
 	}
 
+	public static double calculateNonZeroMinFreq(RealMatrix frequencyMatrix){
+
+		int nodeNumber = frequencyMatrix.getRowDimension();
+		double[] rowsums = new double[nodeNumber];
+		for(int i=0; i<nodeNumber; i++){
+			int rowsum = 0;
+			double[] row = frequencyMatrix.getRow(i);
+			for(int j=0; j<nodeNumber; j++){
+				rowsum += row[j];
+			}
+			rowsums[i] = rowsum;
+		} 
+
+		double minFreq = Integer.MAX_VALUE;
+		for(int i=0; i<rowsums.length; i++){
+			if(rowsums[i]<minFreq && rowsums[i]!=0){
+				minFreq = rowsums[i];
+			}
+		}
+		return minFreq;
+	}
+
 	public static int calculateMinFreqState(RealMatrix frequencyMatrix){
-		
+
 		int nodeNumber = frequencyMatrix.getRowDimension();
 		double[] rowsums = new double[nodeNumber];
 		for(int i=0; i<nodeNumber; i++){
@@ -53,11 +75,14 @@ public class MetricComputing {
 			rowsums[i] = rowsum;
 		} 
 		int minFreqState = 0;
-		for(int i=1; i<rowsums.length; i++){
-			if(rowsums[i]<rowsums[minFreqState]){ // only those states 
+		double minNonZeroRowSum = Double.MAX_VALUE;
+		for(int i=0; i<rowsums.length; i++){
+			if(rowsums[i]<minNonZeroRowSum && rowsums[i]!=0){ // only those states 
 				minFreqState = i;
+				minNonZeroRowSum = rowsums[i];
 			}
 		}
+		System.out.println("minimum row sum: " + minNonZeroRowSum);
 		return minFreqState;
 	}
 }

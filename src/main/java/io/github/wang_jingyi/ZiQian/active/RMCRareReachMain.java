@@ -32,7 +32,11 @@ public class RMCRareReachMain {
 
 		rmc.setInitStates(validInitStates);
 		rmc.getValidRMC();
-
+		
+		List<Integer> targetStates = new ArrayList<Integer>();
+		for(int i=ALConfig.stateNumber/2; i<ALConfig.stateNumber; i++){
+			targetStates.add(i);
+		}
 
 
 		RealMatrix matrix = rmc.getTransitionMatrix();
@@ -48,14 +52,15 @@ public class RMCRareReachMain {
 			Samples idoSample = Main.IterSampling(mc, validInitStates, ALConfig.pathLength, ALConfig.newSampleNumber, estimator, sampler, idoidg);
 			Samples randomSample = Main.IterSampling(mc, validInitStates, ALConfig.pathLength, ALConfig.newSampleNumber, estimator, sampler, uniformidg);
 			
-			Reachability rmcr = new Reachability(rmc.getTransitionMatrix(), validInitStates, PlatformDependent.MODEL_ROOT+"/active/rmc",
+			Reachability rmcr = new Reachability(rmc.getTransitionMatrix(), validInitStates, targetStates,
+					PlatformDependent.MODEL_ROOT+"/active/rmc",
 					rmc.getRmcName(), boundedStep);
 			double realRareReach = rmcr.computeReachability(ALConfig.stateNumber);
 			
-			Reachability idormcr = new Reachability(idoSample.getEstimatedTransitionMatrix(), validInitStates, 
+			Reachability idormcr = new Reachability(idoSample.getEstimatedTransitionMatrix(), validInitStates, targetStates,
 					PlatformDependent.MODEL_ROOT + "/active/rmc", rmc.getRmcName()+"_ido", boundedStep);
 			double idoestRareReach = idormcr.computeReachability(ALConfig.stateNumber);
-			Reachability rsrmcr = new Reachability(randomSample.getEstimatedTransitionMatrix(), validInitStates, 
+			Reachability rsrmcr = new Reachability(randomSample.getEstimatedTransitionMatrix(), validInitStates, targetStates,
 					PlatformDependent.MODEL_ROOT + "/active/rmc", rmc.getRmcName()+"_rs", boundedStep);
 			double rsestRareReach = rsrmcr.computeReachability(ALConfig.stateNumber);
 			

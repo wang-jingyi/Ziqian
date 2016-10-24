@@ -132,5 +132,15 @@ public class NumberUtil {
     	}
     	return false;
     }
+    
+    public static List<Double> nonZeroList(List<Double> origList){
+    	List<Double> nzl = new ArrayList<Double>();
+    	for(double d : origList){
+    		if(d!=0){
+    			nzl.add(d);
+    		}
+    	}
+    	return nzl;
+    }
      
 }

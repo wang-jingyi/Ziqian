@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 public class SwatSensorAbstraction implements Serializable{
-	
+
 	/**
 	 * 
 	 */
@@ -18,11 +18,14 @@ public class SwatSensorAbstraction implements Serializable{
 	private List<String> sensors; // sensor name
 	private List<Interval> ranges; // sensor value range
 	private List<Integer> denominators; // denominator of range
+	private List<Integer> initialStates;
+	private List<Integer> targetStates;
+
 	private List<Integer> splitStateNumber;
 	private List<Map<Interval, Integer>> sensorEncodings;
 	private List<Map<Integer, Interval>> sensorDecodings;
 	private int stateNumber;
-	
+
 	public SwatSensorAbstraction() {
 		this.sensors = new ArrayList<String>();
 		this.sensorEncodings = new ArrayList<Map<Interval,Integer>>();
@@ -30,9 +33,11 @@ public class SwatSensorAbstraction implements Serializable{
 		this.ranges = new ArrayList<Interval>();
 		this.denominators = new ArrayList<Integer>();
 		this.splitStateNumber = new ArrayList<Integer>();
+		this.initialStates = new ArrayList<Integer>();
+		this.targetStates = new ArrayList<Integer>();
 		this.stateNumber = 1;
 	}
-	
+
 	@Override
 	public String toString() {
 		return "SwatSensorAbstraction [sensors=" + sensors + ", ranges="
@@ -45,10 +50,10 @@ public class SwatSensorAbstraction implements Serializable{
 		sensors.add(sensorName);
 		ranges.add(range);
 		denominators.add(denominator);
-		
+
 		Map<Interval, Integer> sensorEncode = new HashMap<Interval, Integer>();
 		Map<Integer, Interval> sensorDecode = new HashMap<Integer, Interval>();
-		
+
 		int start = range.start;
 		int partitionNumber = (range.end-range.start)/denominator;
 		if((range.end-range.start)%denominator!=0){
@@ -64,40 +69,82 @@ public class SwatSensorAbstraction implements Serializable{
 			sensorDecode.put(i, currentIntv);
 			start = end;
 		}
-		
+
 		Interval startIntv = new Interval(0, range.start);
 		sensorEncode.put(startIntv, 0);
 		sensorDecode.put(0, startIntv);
 		Interval endIntv = new Interval(range.end, 10000);
 		sensorEncode.put(endIntv, partitionNumber+1);
 		sensorDecode.put(partitionNumber+1, endIntv);
-		
+
 		sensorEncodings.add(sensorEncode);
 		sensorDecodings.add(sensorDecode);
 		splitStateNumber.add(partitionNumber+2);
 		stateNumber = stateNumber * (partitionNumber + 2);
 	}
-	
+
 	public int getStateNumber() {
 		return stateNumber;
 	}
 	
-	public int swatStateIndex(List<Integer> abstractValue){ // index starts from 0
-		int index = 1;
-		for(int i=0; i<abstractValue.size(); i++){
-			index = index * (abstractValue.get(i)+1);
+	public void computeInitialStates(){
+		for(int i=0; i<stateNumber; i++){
+			List<Integer> li = swatStateAbstractValue(i);
+			boolean flag = false;
+			for(int j=0; j<li.size(); j++){
+				if(li.get(j)==0 || li.get(j)==splitStateNumber.get(j)-1){ // underflow or overflow
+					flag = true;
+				}
+			}
+			if(!flag){
+				initialStates.add(i);
+			}
 		}
-		return index - 1;
+		System.out.println("initial states: " + initialStates);
+		System.out.println("initial states number: " + initialStates.size());
 	}
 	
-public List<Integer> swatStateAbstractValue(int stateIndex){ // to debug
+	public void computeTargetStates(){
+		for(int i=0; i<stateNumber; i++){
+			List<Integer> li = swatStateAbstractValue(i);
+			for(int j=0; j<li.size(); j++){
+				if(li.get(j)==0 || li.get(j)==splitStateNumber.get(j)-1){ // underflow or overflow
+					targetStates.add(i);
+					break;
+				}
+			}
+		}
 
-	int pd = stateIndex;
+		System.out.println("target states: " + targetStates);
+		System.out.println("targest states size: " + targetStates.size());
+	}
+	
+	public List<Integer> getInitialStates() {
+		return initialStates;
+	}
+	
+	public List<Integer> getTargetStates() {
+		return targetStates;
+	}
+
+	public int swatStateIndex(List<Integer> abstractValue){ // index starts from 0
+		int index = 0;
+		int po = sensors.size()-1;
+		for(int i=0; i<abstractValue.size()-1; i++){
+			index = (int) (index + abstractValue.get(i) * Math.pow(splitStateNumber.get(i+1), po));
+			po--;
+		}
+		return index + abstractValue.get(sensors.size()-1);
+	}
+
+	public List<Integer> swatStateAbstractValue(int stateIndex){ // to debug
+
+		int pd = stateIndex;
 		List<Integer> abstractValues = new ArrayList<Integer>();
-		
+
 		int sensorSize = sensors.size();
 		int divIndex = sensorSize-1; // start from the last digit
-		
+
 		for(int i=0; i<sensorSize; i++){
 			if(i==sensorSize-1){ // if last one
 				abstractValues.add(0, pd);
@@ -130,7 +177,7 @@ public List<Integer> swatStateAbstractValue(int stateIndex){ // to debug
 	public List<String> getSensors() {
 		return sensors;
 	}
-	
+
 	public List<Map<Interval, Integer>> getSensorEncodings() {
 		return sensorEncodings;
 	}
@@ -138,6 +185,6 @@ public List<Integer> swatStateAbstractValue(int stateIndex){ // to debug
 	public List<Map<Integer, Interval>> getSensorDecodings() {
 		return sensorDecodings;
 	}
-	
+
 
 }
