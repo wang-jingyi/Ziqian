@@ -12,13 +12,13 @@ import java.util.Random;
 public class SwatSampler implements Sampler {
 
 
-	private SwatBridge bridge;
+	private SwatSensorAbstraction ssa;
 	private String tracePath;
 	private int fileCount;
 	private int sampleTime; // in minute
 
-	public SwatSampler(SwatBridge bridge, String tracePath, int sampleTime) {
-		this.bridge = bridge;
+	public SwatSampler(SwatSensorAbstraction ssa, String tracePath, int sampleTime) {
+		this.ssa = ssa;
 		this.tracePath = tracePath;
 		this.sampleTime = sampleTime;
 	}
@@ -27,7 +27,7 @@ public class SwatSampler implements Sampler {
 	public List<Integer> newSample(double[] initDistribution, int sampleLength) {
 		List<Integer> newTrace = new ArrayList<Integer>();
 		int startState = MarkovChain.nextState(initDistribution);
-		double[] initConfig = bridge.generateInput(startState);
+		double[] initConfig = ssa.generateInput(startState);
 
 		double[] cpInitConfig = new double[ALConfig.totalSensorNumber];
 		for(int i=0; i<ALConfig.sensorIndex.size(); i++){
@@ -61,14 +61,14 @@ public class SwatSampler implements Sampler {
 
 		SwatTrace st = new SwatTrace(newTracePath);
 		try {
-			st.collectTraceFromPath(bridge.getSsa());
+			st.collectTraceFromPath(ssa);
 			fileCount ++;
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		for(SwatState ss : st.getTrace()){
-			newTrace.add(bridge.getSsa().swatStateIndex(ss.getSensorValues()));
+			newTrace.add(ssa.swatStateIndex(ss.getSensorValues()));
 		}
 
 

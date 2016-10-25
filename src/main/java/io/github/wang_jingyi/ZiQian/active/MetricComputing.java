@@ -1,5 +1,8 @@
 package io.github.wang_jingyi.ZiQian.active;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.math3.linear.RealMatrix;
 
 public class MetricComputing {
@@ -16,6 +19,52 @@ public class MetricComputing {
 		}
 		mse = mse/nodeNumber/nodeNumber;
 		return mse;
+	}
+	
+	public static List<Double> calculateTargetStateFreq(RealMatrix frequencyMatrix, List<Integer> targetStates){
+
+		int nodeNumber = frequencyMatrix.getRowDimension();
+		double[] rowsums = new double[nodeNumber];
+		for(int i=0; i<nodeNumber; i++){
+			int rowsum = 0;
+			double[] row = frequencyMatrix.getRow(i);
+			for(int j=0; j<nodeNumber; j++){
+				rowsum += row[j];
+			}
+			rowsums[i] = rowsum;
+		} 
+
+		List<Double> freqs = new ArrayList<Double>();
+		for(int i=0; i<targetStates.size(); i++){
+			int j = targetStates.get(i);
+			freqs.add(rowsums[j]);
+		}
+		return freqs;
+	}
+	
+	public static int calculateTargetStateMinFreq(RealMatrix frequencyMatrix, List<Integer> targetStates){
+
+		int nodeNumber = frequencyMatrix.getRowDimension();
+		double[] rowsums = new double[nodeNumber];
+		for(int i=0; i<nodeNumber; i++){
+			int rowsum = 0;
+			double[] row = frequencyMatrix.getRow(i);
+			for(int j=0; j<nodeNumber; j++){
+				rowsum += row[j];
+			}
+			rowsums[i] = rowsum;
+		} 
+
+		double minFre = Double.MAX_VALUE;
+		int min = -1;
+		for(int i=0; i<targetStates.size(); i++){
+			int j = targetStates.get(i);
+			if(rowsums[j]<minFre && rowsums[j]!=0){
+				minFre = rowsums[j];
+				min = j;
+			}
+		}
+		return min;
 	}
 
 	public static double calculateMinFreq(RealMatrix frequencyMatrix){

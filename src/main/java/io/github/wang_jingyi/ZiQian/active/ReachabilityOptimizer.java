@@ -11,51 +11,39 @@ import io.github.wang_jingyi.ZiQian.utils.IntegerUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.math3.linear.MatrixUtils;
-import org.apache.commons.math3.linear.OpenMapRealMatrix;
 import org.apache.commons.math3.linear.RealMatrix;
 
-public class InitialDistributionOptimizer implements InitialDistGetter{
+public class ReachabilityOptimizer implements InitialDistGetter{
 
 	private int nodeNumber;
 	private List<Integer> validInitialStates;
+	private List<Integer> targetStates;
 	private int pathLength;
 
-	public InitialDistributionOptimizer(int nodeNumber, List<Integer> validInitialStates, int pathLength) {
+	public ReachabilityOptimizer(int nodeNumber, List<Integer> validInitialStates, List<Integer> targetStates, int pathLength) {
 		this.nodeNumber = nodeNumber;
 		this.validInitialStates = validInitialStates;
+		this.targetStates = targetStates;
 		this.pathLength = pathLength;
 	}
 
-	// l is the length of the path samples, calculate accumulated matrix A
-	public static RealMatrix accumulatedMatrix(int l, RealMatrix origEstimation){
-		int nodeNumber = origEstimation.getRowDimension();
-		RealMatrix identityMatrix = ALConfig.sparse? new OpenMapRealMatrix(nodeNumber, nodeNumber) :
-			MatrixUtils.createRealIdentityMatrix(origEstimation.getRowDimension()); // 
-
-		if(ALConfig.sparse){
-			assert origEstimation instanceof OpenMapRealMatrix : "too large matrix, use sparse matrix";
-		}
-
-		RealMatrix estimationMatrix = origEstimation.copy(); // 
-		RealMatrix multipliedMatrix = origEstimation.copy(); //
-		RealMatrix accumulatedMatrix = identityMatrix.add(estimationMatrix);
-		for(int i=2; i<=l-1; i++){
-			multipliedMatrix = multipliedMatrix.multiply(estimationMatrix);
-			accumulatedMatrix = accumulatedMatrix.add(multipliedMatrix); 
-		}
-		return accumulatedMatrix;
-	}
 
 	@Override
-	public double[] getInitialDistribution(RealMatrix frequencyMatrix, 
-			RealMatrix origEstimation){
+	public double[] getInitialDistribution(RealMatrix frequencyMatrix,
+			RealMatrix origEstimation) {
 
-		RealMatrix A = accumulatedMatrix(pathLength, origEstimation);
+		RealMatrix A = InitialDistributionOptimizer.accumulatedMatrix(pathLength, origEstimation);
 		RealMatrix AT = A.transpose();
 
-		int mini = MetricComputing.calculateMinFreqState(frequencyMatrix); // get i: arg min mi
-		double[] ATI = AT.getRow(mini); // the i-th row
+		int min = MetricComputing.calculateTargetStateMinFreq(frequencyMatrix, targetStates);
+		double[] ATI = 
+				AT.getRow(min);
+//				new double[frequencyMatrix.getRowDimension()];
+//		for(int t : targetStates){ 
+//			for(int i=0; i<ATI.length; i++){
+//				ATI[i] += AT.getRow(t)[i]; // accumulate over all target states
+//			}
+//		}
 
 		GRBEnv env;
 		double[] optimalDistribution = new double[nodeNumber];
@@ -80,9 +68,7 @@ public class InitialDistributionOptimizer implements InitialDistGetter{
 
 			// set objective
 			model.setObjective(obj, GRB.MAXIMIZE);
-
-			//		System.out.println(model.getObjective());
-
+			System.out.println(model.getObjective());
 
 			// add constraints
 			model.addConstr(cst, GRB.EQUAL, 1.0, "valid distribution");
@@ -108,7 +94,7 @@ public class InitialDistributionOptimizer implements InitialDistGetter{
 				System.out.println(vars.get(i).get(GRB.StringAttr.VarName) + ": " + vars.get(i).get(GRB.DoubleAttr.X));
 			}
 
-			//		System.out.println("Obj: " + model.get(GRB.DoubleAttr.ObjVal));
+			System.out.println("Obj: " + model.get(GRB.DoubleAttr.ObjVal));
 
 			// Dispose of model and environment
 			model.dispose();
@@ -119,10 +105,12 @@ public class InitialDistributionOptimizer implements InitialDistGetter{
 		return optimalDistribution;
 	}
 
-
 	@Override
 	public void setValidInitialStates(List<Integer> validInitialStates) {
 		this.validInitialStates = validInitialStates;
 	}
+
+
+
 
 }

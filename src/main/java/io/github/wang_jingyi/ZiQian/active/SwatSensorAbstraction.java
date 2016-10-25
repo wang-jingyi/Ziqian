@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 public class SwatSensorAbstraction implements Serializable{
 
@@ -86,7 +87,7 @@ public class SwatSensorAbstraction implements Serializable{
 	public int getStateNumber() {
 		return stateNumber;
 	}
-	
+
 	public void computeInitialStates(){
 		for(int i=0; i<stateNumber; i++){
 			List<Integer> li = swatStateAbstractValue(i);
@@ -103,7 +104,7 @@ public class SwatSensorAbstraction implements Serializable{
 		System.out.println("initial states: " + initialStates);
 		System.out.println("initial states number: " + initialStates.size());
 	}
-	
+
 	public void computeTargetStates(){
 		for(int i=0; i<stateNumber; i++){
 			List<Integer> li = swatStateAbstractValue(i);
@@ -118,11 +119,11 @@ public class SwatSensorAbstraction implements Serializable{
 		System.out.println("target states: " + targetStates);
 		System.out.println("targest states size: " + targetStates.size());
 	}
-	
+
 	public List<Integer> getInitialStates() {
 		return initialStates;
 	}
-	
+
 	public List<Integer> getTargetStates() {
 		return targetStates;
 	}
@@ -172,6 +173,26 @@ public class SwatSensorAbstraction implements Serializable{
 			ss.add((int) ((sensorValues[i]-ranges.get(i).start)/denominators.get(i))+1);
 		}
 		return new SwatState(ss);
+	}
+
+	// give state index, generate a set of sensor values as input
+	public double[] generateInput(int stateIndex){
+
+		int sensorNum = sensors.size();
+		double[] input = new double[sensorNum];
+
+		SwatState ss = new SwatState(swatStateAbstractValue(stateIndex));
+		for(int i=0; i<sensorNum; i++){
+			int sensorIndex = ss.getSensorValues().get(i);
+			Random rnd = new Random();
+			Interval intv = sensorDecodings.get(i).get(sensorIndex);
+			if(intv==null){
+				System.out.println("tag");
+			}
+			double sv = intv.start + rnd.nextDouble() * (intv.end-intv.start);
+			input[i] = sv;
+		}
+		return input;
 	}
 
 	public List<String> getSensors() {
