@@ -27,9 +27,9 @@ public class Config {
 	//	public static String MODEL_SETTING = "L=2,N=10";
 	public static int ELG_L = 2;
 	public static int EGL_N = 10;
-	public static final int SWAT_SAMPLE_STEP = 10; // in ms
-	public static final int SWAT_RECORD_STEP = 5; // in s
-	public static final int SWAT_RUNNING_TIME = 10; // in minutes
+	public static final int SWAT_SAMPLE_STEP = 500; // in ms
+	public static final int SWAT_RECORD_STEP = 30; // in s
+	public static final int SWAT_RUNNING_TIME = 30; // in minutes
 	public static final String MODEL_SETTING = SWAT_SAMPLE_STEP + "," + SWAT_RECORD_STEP;
 	public static final int DATA_SIZE = 20000; // data size of learning
 	public static int PROPERTY_INDEX = 1; // index of the property in the property file

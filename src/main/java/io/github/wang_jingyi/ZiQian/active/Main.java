@@ -22,24 +22,33 @@ public class Main {
 		//															{0, 0, 0, 0, 0, 0, 1}};
 		//				RandomMarkovChain rmc = new RandomMarkovChain(16, 0.8, "test");
 
-		int[] stateNumber = new int[]{ 48
-//				8
-//								,16,32
+		int[] stateNumber = new int[]{ 
+//				48,
+				8,
+				16
+				,32
+				,48
 		};
 
-		int[] sampleSize = new int[]{  5000
+		int[] sampleSize = new int[]{  
+				5000
 //				1000,2000,3000,4000,5000,
 //				6000,7000,8000,9000
-				,10000
-				,50000,100000,200000
+				,10000, 20000
+				,50000,100000
+//				,200000
 		};
 		double density = 0.8;
-		int repeatTime = 10;
+		int repeatTime = 20;
 
-
+		List<List<Double>> idoTFResults = new ArrayList<List<Double>>();
+		List<List<Double>> idoTFResultsr = new ArrayList<List<Double>>();
+		List<List<Double>> rsTFResults = new ArrayList<List<Double>>();
 		List<List<Double>> idoMSEResults = new ArrayList<List<Double>>();
+		List<List<Double>> idoMSEResultsr = new ArrayList<List<Double>>();
 		List<List<Double>> rsMSEResults = new ArrayList<List<Double>>();
 		List<List<Double>> idoReachResults = new ArrayList<List<Double>>();
+		List<List<Double>> idoReachResultsr = new ArrayList<List<Double>>();
 		List<List<Double>> rsReachResults = new ArrayList<List<Double>>();
 
 
@@ -52,13 +61,21 @@ public class Main {
 
 			int boundedStep = ALConfig.pathLength;
 			
+			List<Double> idotf = new ArrayList<Double>();
+			List<Double> idotfr = new ArrayList<Double>();
+			List<Double> rstf = new ArrayList<Double>();
+			
 			List<Double> idomse = new ArrayList<Double>();
+			List<Double> idomser = new ArrayList<Double>();
 			List<Double> rsmse = new ArrayList<Double>();
+			
 			List<Double> idoreach = new ArrayList<Double>();
+			List<Double> idoreachr = new ArrayList<Double>();
 			List<Double> rsreach = new ArrayList<Double>();
 			for(int numSample : sampleSize){
 				
-				double imse = 0, rmse = 0, ireach = 0, rreach = 0;
+				double imse = 0, imser = 0, rmse = 0, ireach = 0, ireachr = 0, rreach = 0;
+				double idoTargetFrequency = 0, idoTargetFrequencyReach = 0, rsTargetFrequency = 0; 
 				
 				for(int time=0; time<repeatTime; time++){
 					
@@ -91,45 +108,79 @@ public class Main {
 					// define estimator, initial distribution getter
 					Estimator estimator = new LaplaceEstimator();
 					Sampler sampler = new MarkovChainSampler(new MarkovChain(rmc.getTransitionMatrix()));
-					InitialDistGetter idoidg = new InitialDistributionOptimizer(mc.getNodeNumber(), validInitStates, sn);
+					InitialDistGetter idoidg = new InitialDistributionOptimizer(mc.getNodeNumber(), validInitStates, ALConfig.pathLength);
+					InitialDistGetter idoidgReach = new ReachabilityOptimizer(mc.getNodeNumber(), validInitStates, targetStates, ALConfig.pathLength);
 					InitialDistGetter uniformidg = new UniformInitialDistribution(validInitStates);
 					
 
 					System.out.println("current sample size: " + numSample);
+					
 					Samples idoSample = IterSampling(mc, validInitStates, ALConfig.pathLength, numSample, estimator, sampler, idoidg);
+					Samples idoSampleReach = IterSampling(mc, validInitStates, ALConfig.pathLength, numSample, estimator, sampler, idoidgReach);
 					Samples randomSample = IterSampling(mc, validInitStates, ALConfig.pathLength, numSample, estimator, sampler, uniformidg);
-
+					
+					idoTargetFrequency += ListUtil.listSum(MetricComputing.calculateTargetStateFreq(idoSample.getFrequencyMatrix(), targetStates));
+					idoTargetFrequencyReach += ListUtil.listSum(MetricComputing.calculateTargetStateFreq(idoSampleReach.getFrequencyMatrix(), targetStates));
+					rsTargetFrequency += ListUtil.listSum(MetricComputing.calculateTargetStateFreq(randomSample.getFrequencyMatrix(), targetStates));
+					
+					System.out.println("ido target frequency: " + MetricComputing.calculateTargetStateFreq(idoSample.getFrequencyMatrix(), targetStates));
+					System.out.println("ido reach target frequency: " + MetricComputing.calculateTargetStateFreq(idoSampleReach.getFrequencyMatrix(), targetStates));
+					System.out.println("rs target frequency: " + MetricComputing.calculateTargetStateFreq(randomSample.getFrequencyMatrix(), targetStates));
+					
+					
 					imse += MetricComputing.calculateMSE(mc.getTransitionMatrix(), idoSample.getEstimatedTransitionMatrix());
+					imser += MetricComputing.calculateMSE(mc.getTransitionMatrix(), idoSampleReach.getEstimatedTransitionMatrix());
 					rmse += MetricComputing.calculateMSE(mc.getTransitionMatrix(),randomSample.getEstimatedTransitionMatrix());
 					
 					Reachability idormcr = new Reachability(idoSample.getEstimatedTransitionMatrix(), validInitStates, targetStates,
 							PlatformDependent.MODEL_ROOT + "/active/rmc", rmc.getRmcName()+"_ido", boundedStep);
 					List<Double> idoReachProbs = idormcr.computeReachability();
-					Reachability rsrmcr = new Reachability(idoSample.getEstimatedTransitionMatrix(), validInitStates, targetStates,
+					Reachability idormcrr = new Reachability(idoSampleReach.getEstimatedTransitionMatrix(), validInitStates, targetStates,
+							PlatformDependent.MODEL_ROOT + "/active/rmc", rmc.getRmcName()+"_ido_reach", boundedStep);
+					List<Double> idoReachProbsr = idormcrr.computeReachability();
+					Reachability rsrmcr = new Reachability(randomSample.getEstimatedTransitionMatrix(), validInitStates, targetStates,
 							PlatformDependent.MODEL_ROOT + "/active/rmc", rmc.getRmcName()+"_rs", boundedStep);
 					List<Double> randomReachProbs = rsrmcr.computeReachability();
 					
 
 					List<Double> idoDiff = ListUtil.listABSDiff(actualReach, idoReachProbs);
+					List<Double> idoDiffReach = ListUtil.listABSDiff(actualReach, idoReachProbsr);
 					List<Double> randomDiff = ListUtil.listABSDiff(actualReach, randomReachProbs);
-
+					
 					ireach += ListUtil.listMean(idoDiff);
+					ireachr += ListUtil.listMean(idoDiffReach);
 					rreach += ListUtil.listMean(randomDiff);
 				}
+				
+				idotf.add(idoTargetFrequency/repeatTime);
+				idotfr.add(idoTargetFrequencyReach/repeatTime);
+				rstf.add(rsTargetFrequency/repeatTime);
 				idomse.add(imse/repeatTime);
+				idomser.add(imser/repeatTime);
 				rsmse.add(rmse/repeatTime);
 				idoreach.add(ireach/repeatTime);
+				idoreachr.add(ireachr/repeatTime);
 				rsreach.add(rreach/repeatTime);
 			}
-
+			
+			idoTFResults.add(idotf);
+			idoTFResultsr.add(idotfr);
+			rsTFResults.add(rstf);
 			idoMSEResults.add(idomse);
+			idoMSEResultsr.add(idomser);
 			rsMSEResults.add(rsmse);
 			idoReachResults.add(idoreach);
+			idoReachResultsr.add(idoreachr);
 			rsReachResults.add(rsreach);
-
+			
+			System.out.println("ido targets frequency progress: " + idoTFResults);
+			System.out.println("ido reach targets frequency progress: " + idoTFResultsr);
+			System.out.println("rs targets frequency progress: " + rsTFResults);
 			System.out.println("idoMSE current progress: " + idoMSEResults);
+			System.out.println("idoMSE reach current progress: " + idoMSEResultsr);
 			System.out.println("rsMSE current progress: " + rsMSEResults);
 			System.out.println("idoReach current progress: " + idoReachResults);
+			System.out.println("idoReach reach current progress: " + idoReachResultsr);
 			System.out.println("rsReach current progress: " + rsReachResults);
 
 		}

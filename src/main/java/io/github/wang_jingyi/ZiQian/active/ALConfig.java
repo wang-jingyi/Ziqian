@@ -7,8 +7,8 @@ public class ALConfig {
 
 	public static boolean sparse = false;   // if the matrix is sparse
 	public static int stateNumber; 	// number of states
-	public static int newSampleNumber = 50; // number of new samples
-	public static int pathLength = 1;
+	public static int newSampleNumber = 500; // number of new samples
+	public static int pathLength = 30;
 	
 	public static boolean ido = true;
 	

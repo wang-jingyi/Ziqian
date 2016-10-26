@@ -45,6 +45,14 @@ public class ListUtil {
 		return sum/len;
 	}
 	
+	public static double listSum(List<Double> ls){
+		double sum = 0;
+		for(double d : ls){
+			sum += d;
+		}
+		return sum;
+	}
+	
 	public static double listMean(List<Double> list){ // only consider non-zero values
 		int len = list.size();
 		double sum = 0.0;

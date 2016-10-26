@@ -2,6 +2,7 @@ package io.github.wang_jingyi.ZiQian.active;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import org.apache.commons.math3.linear.RealMatrix;
 
@@ -59,9 +60,15 @@ public class MetricComputing {
 		int min = -1;
 		for(int i=0; i<targetStates.size(); i++){
 			int j = targetStates.get(i);
-			if(rowsums[j]<minFre && rowsums[j]!=0){
+			if(rowsums[j]<minFre 
+//					&& rowsums[j]!=0
+					){
 				minFre = rowsums[j];
 				min = j;
+				continue;
+			}
+			if(rowsums[j]==minFre){
+				min = new Random().nextDouble()>0.5? min : j;
 			}
 		}
 		return min;
@@ -84,6 +91,7 @@ public class MetricComputing {
 		for(int i=0; i<rowsums.length; i++){
 			if(rowsums[i]<minFreq){
 				minFreq = rowsums[i];
+				continue;
 			}
 		}
 		return minFreq;
@@ -129,6 +137,10 @@ public class MetricComputing {
 			if(rowsums[i]<minNonZeroRowSum && rowsums[i]!=0){ // only those states 
 				minFreqState = i;
 				minNonZeroRowSum = rowsums[i];
+				continue;
+			}
+			if(rowsums[i]==minNonZeroRowSum){
+				minFreqState = new Random().nextDouble()>0.5? minFreqState : i;
 			}
 		}
 		System.out.println("minimum row sum: " + minNonZeroRowSum);
