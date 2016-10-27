@@ -25,21 +25,22 @@ public class Main {
 		int[] stateNumber = new int[]{ 
 //				48,
 				8,
-				16
-				,32
-				,48
+//				16
+//				,32
+				48
 		};
 
 		int[] sampleSize = new int[]{  
-				5000
+				5000,
 //				1000,2000,3000,4000,5000,
-//				6000,7000,8000,9000
-				,10000, 20000
-				,50000,100000
+//				6000,7000,8000,9000,
+				10000,
+				20000, 30000, 40000
+				,50000
 //				,200000
 		};
 		double density = 0.8;
-		int repeatTime = 20;
+		int repeatTime = 10;
 
 		List<List<Double>> idoTFResults = new ArrayList<List<Double>>();
 		List<List<Double>> idoTFResultsr = new ArrayList<List<Double>>();
@@ -79,9 +80,11 @@ public class Main {
 				
 				for(int time=0; time<repeatTime; time++){
 					
+					System.out.println("---model count in the set: " + time);
+					
 					RandomMarkovChain rmc = new RandomMarkovChain(sn, density, "rmc_test_" + sn); 
 					rmc.generateRMC();
-					System.out.println("current random model: " +  rmc.toString());
+					System.out.println("-current random model: " +  rmc.toString());
 					
 					// set initial states
 					List<Integer> validInitStates = new ArrayList<>();

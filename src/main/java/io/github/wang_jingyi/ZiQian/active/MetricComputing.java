@@ -2,9 +2,9 @@ package io.github.wang_jingyi.ZiQian.active;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import org.apache.commons.math3.linear.RealMatrix;
+import org.uncommons.maths.random.MersenneTwisterRNG;
 
 public class MetricComputing {
 
@@ -68,7 +68,7 @@ public class MetricComputing {
 				continue;
 			}
 			if(rowsums[j]==minFre){
-				min = new Random().nextDouble()>0.5? min : j;
+				min = new MersenneTwisterRNG().nextDouble()>0.5? min : j;
 			}
 		}
 		return min;
@@ -140,7 +140,7 @@ public class MetricComputing {
 				continue;
 			}
 			if(rowsums[i]==minNonZeroRowSum){
-				minFreqState = new Random().nextDouble()>0.5? minFreqState : i;
+				minFreqState = new MersenneTwisterRNG().nextDouble()>0.5? minFreqState : i;
 			}
 		}
 		System.out.println("minimum row sum: " + minNonZeroRowSum);

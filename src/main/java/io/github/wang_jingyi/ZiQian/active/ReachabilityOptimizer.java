@@ -91,10 +91,10 @@ public class ReachabilityOptimizer implements InitialDistGetter{
 
 			for(int i=0; i<nodeNumber; i++){
 				optimalDistribution[i] = vars.get(i).get(GRB.DoubleAttr.X);
-				System.out.println(vars.get(i).get(GRB.StringAttr.VarName) + ": " + vars.get(i).get(GRB.DoubleAttr.X));
+//				System.out.println(vars.get(i).get(GRB.StringAttr.VarName) + ": " + vars.get(i).get(GRB.DoubleAttr.X));
 			}
 
-			System.out.println("Obj: " + model.get(GRB.DoubleAttr.ObjVal));
+//			System.out.println("Obj: " + model.get(GRB.DoubleAttr.ObjVal));
 
 			// Dispose of model and environment
 			model.dispose();

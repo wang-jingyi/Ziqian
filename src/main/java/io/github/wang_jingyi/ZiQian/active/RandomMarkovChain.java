@@ -8,10 +8,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
+import org.uncommons.maths.random.MersenneTwisterRNG;
 
 public class RandomMarkovChain {
 
@@ -32,7 +32,7 @@ public class RandomMarkovChain {
 	private int rareTransNum = 0; // number of rare transitions under a rare level
 	private Map<TransitionPoint, Double> rts = new HashMap<TransitionPoint, Double>();
 	
-	private Random rnd;
+	private MersenneTwisterRNG rnd;
 	private String rmcName;
 
 	public RandomMarkovChain(int n, double density,String rmcName) {
@@ -44,7 +44,7 @@ public class RandomMarkovChain {
 		this.edgeIndexes = new ArrayList<>();
 		this.validStateIndex = new ArrayList<Integer>();
 		this.initStates = new ArrayList<Integer>();
-		this.rnd = new Random();
+		this.rnd = new MersenneTwisterRNG();
 
 	}
 	
@@ -60,7 +60,7 @@ public class RandomMarkovChain {
 		this.edgeIndexes = new ArrayList<>();
 		this.validStateIndex = new ArrayList<Integer>();
 		this.initStates = new ArrayList<Integer>();
-		this.rnd = new Random();
+		this.rnd = new MersenneTwisterRNG();
 	}
 
 
@@ -78,7 +78,7 @@ public class RandomMarkovChain {
 		this.edgeIndexes = new ArrayList<>();
 		this.validStateIndex = new ArrayList<Integer>();
 		this.initStates = new ArrayList<Integer>();
-		this.rnd = new Random();
+		this.rnd = new MersenneTwisterRNG();
 
 	}
 
