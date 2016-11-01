@@ -27,20 +27,22 @@ public class Main {
 				8,
 //				16
 //				,32
-				48
+				//48
 		};
 
 		int[] sampleSize = new int[]{  
 				5000,
 //				1000,2000,3000,4000,5000,
 //				6000,7000,8000,9000,
-				10000,
-				20000, 30000, 40000
-				,50000
+//				10000,
+//				20000, 30000, 40000
+//				,
+//				50000
 //				,200000
 		};
 		double density = 0.8;
-		int repeatTime = 10;
+		int repeatTime = 2;
+		int initialTrainPathNumber = 1000;
 
 		List<List<Double>> idoTFResults = new ArrayList<List<Double>>();
 		List<List<Double>> idoTFResultsr = new ArrayList<List<Double>>();
@@ -55,13 +57,10 @@ public class Main {
 
 		for(int sn : stateNumber){
 			
-			System.out.println("current number of states: " + sn);
-
 			ALConfig.stateNumber = sn;
 			ALConfig.pathLength = sn/2;
+			ALConfig.boundedSteps = ALConfig.pathLength;
 
-			int boundedStep = ALConfig.pathLength;
-			
 			List<Double> idotf = new ArrayList<Double>();
 			List<Double> idotfr = new ArrayList<Double>();
 			List<Double> rstf = new ArrayList<Double>();
@@ -80,7 +79,8 @@ public class Main {
 				
 				for(int time=0; time<repeatTime; time++){
 					
-					System.out.println("---model count in the set: " + time);
+					System.out.println("---current number of states: " + sn);
+					System.out.println("---model count in the set: " + (time+1));
 					
 					RandomMarkovChain rmc = new RandomMarkovChain(sn, density, "rmc_test_" + sn); 
 					rmc.generateRMC();
@@ -97,20 +97,25 @@ public class Main {
 					rmc.getValidRMC();
 					
 					List<Integer> targetStates = new ArrayList<Integer>();
-					for(int i=rmc.getNumOfState()/2; i<rmc.getNumOfState(); i++){
+					for(int i=rmc.getNumOfState()/2 ; i<rmc.getNumOfState(); i++){
 						targetStates.add(i);
+//						break;
 					}
 					
 					RealMatrix matrix = rmc.getTransitionMatrix();
-					MarkovChain mc = new MarkovChain(matrix);
+					MarkovChain mc = new MarkovChain(matrix, validInitStates, validInitDist);
 
 					Reachability rmcr = new Reachability(rmc.getTransitionMatrix(), validInitStates, targetStates,
-							PlatformDependent.MODEL_ROOT+"/active/rmc", rmc.getRmcName(), boundedStep);
+							PlatformDependent.MODEL_ROOT+"/active/rmc", rmc.getRmcName(), ALConfig.boundedSteps);
 					List<Double> actualReach = rmcr.computeReachability();
 
 					// define estimator, initial distribution getter
 					Estimator estimator = new LaplaceEstimator();
-					Sampler sampler = new MarkovChainSampler(new MarkovChain(rmc.getTransitionMatrix()));
+					
+					System.out.println("generating ");
+					MCInitialTrain mit = new MCInitialTrain(mc, ALConfig.pathLength, initialTrainPathNumber);
+					
+					Sampler sampler = new MarkovChainSampler(mc);
 					InitialDistGetter idoidg = new InitialDistributionOptimizer(mc.getNodeNumber(), validInitStates, ALConfig.pathLength);
 					InitialDistGetter idoidgReach = new ReachabilityOptimizer(mc.getNodeNumber(), validInitStates, targetStates, ALConfig.pathLength);
 					InitialDistGetter uniformidg = new UniformInitialDistribution(validInitStates);
@@ -118,9 +123,9 @@ public class Main {
 
 					System.out.println("current sample size: " + numSample);
 					
-					Samples idoSample = IterSampling(mc, validInitStates, ALConfig.pathLength, numSample, estimator, sampler, idoidg);
-					Samples idoSampleReach = IterSampling(mc, validInitStates, ALConfig.pathLength, numSample, estimator, sampler, idoidgReach);
-					Samples randomSample = IterSampling(mc, validInitStates, ALConfig.pathLength, numSample, estimator, sampler, uniformidg);
+					Samples idoSample = IterSampling(mc, mit.getInitialFrequencyMatrix(), validInitStates, ALConfig.pathLength, numSample, estimator, sampler, idoidg);
+					Samples idoSampleReach = IterSampling(mc, mit.getInitialFrequencyMatrix(), validInitStates, ALConfig.pathLength, numSample, estimator, sampler, idoidgReach);
+					Samples randomSample = IterSampling(mc, mit.getInitialFrequencyMatrix(), validInitStates, ALConfig.pathLength, numSample, estimator, sampler, uniformidg);
 					
 					idoTargetFrequency += ListUtil.listSum(MetricComputing.calculateTargetStateFreq(idoSample.getFrequencyMatrix(), targetStates));
 					idoTargetFrequencyReach += ListUtil.listSum(MetricComputing.calculateTargetStateFreq(idoSampleReach.getFrequencyMatrix(), targetStates));
@@ -136,13 +141,13 @@ public class Main {
 					rmse += MetricComputing.calculateMSE(mc.getTransitionMatrix(),randomSample.getEstimatedTransitionMatrix());
 					
 					Reachability idormcr = new Reachability(idoSample.getEstimatedTransitionMatrix(), validInitStates, targetStates,
-							PlatformDependent.MODEL_ROOT + "/active/rmc", rmc.getRmcName()+"_ido", boundedStep);
+							PlatformDependent.MODEL_ROOT + "/active/rmc", rmc.getRmcName()+"_ido", ALConfig.boundedSteps);
 					List<Double> idoReachProbs = idormcr.computeReachability();
 					Reachability idormcrr = new Reachability(idoSampleReach.getEstimatedTransitionMatrix(), validInitStates, targetStates,
-							PlatformDependent.MODEL_ROOT + "/active/rmc", rmc.getRmcName()+"_ido_reach", boundedStep);
+							PlatformDependent.MODEL_ROOT + "/active/rmc", rmc.getRmcName()+"_ido_reach", ALConfig.boundedSteps);
 					List<Double> idoReachProbsr = idormcrr.computeReachability();
 					Reachability rsrmcr = new Reachability(randomSample.getEstimatedTransitionMatrix(), validInitStates, targetStates,
-							PlatformDependent.MODEL_ROOT + "/active/rmc", rmc.getRmcName()+"_rs", boundedStep);
+							PlatformDependent.MODEL_ROOT + "/active/rmc", rmc.getRmcName()+"_rs", ALConfig.boundedSteps);
 					List<Double> randomReachProbs = rsrmcr.computeReachability();
 					
 
@@ -190,9 +195,9 @@ public class Main {
 
 	}
 
-	public static Samples IterSampling(MarkovChain mc, List<Integer> validInitStates, int sampleLength, int numSample, Estimator estimator, 
+	public static Samples IterSampling(MarkovChain mc, RealMatrix currentFM, List<Integer> validInitStates, int pathLength, int numSample, Estimator estimator, 
 			Sampler sampler, InitialDistGetter idg) throws GRBException{
-		Samples sample = new Samples(ALConfig.pathLength, estimator, sampler, idg);
+		Samples sample = new Samples(pathLength, currentFM, estimator, sampler, idg);
 		for(int i=0; i<numSample; i++){
 			sample.newSample();
 		}

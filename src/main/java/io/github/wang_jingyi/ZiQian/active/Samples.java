@@ -31,9 +31,10 @@ public class Samples {
 		}
 	}
 
-	public Samples(RealMatrix currentFrequencyMatrix, Estimator estimator, Sampler sampler,
+	public Samples(int pathLength, RealMatrix currentFrequencyMatrix, Estimator estimator, Sampler sampler,
 			InitialDistGetter idg){
-		this.frequencyMatrix = currentFrequencyMatrix;
+		this.pathLength = pathLength;
+		this.frequencyMatrix = currentFrequencyMatrix.copy(); // make a copy instead of using it directly
 		this.estimator = estimator;
 		this.sampler = sampler;
 		this.idg = idg;

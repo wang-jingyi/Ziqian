@@ -22,7 +22,7 @@ public class MarkovChainSampler implements Sampler {
 		List<Integer> path = new ArrayList<Integer>();
 		int crstate = startIndex;
 		path.add(startIndex);
-		for(int i=0; i<pathLength; i++){
+		for(int i=0; i<pathLength-1; i++){ // note that this is pathLength-1 since start state is already added
 			crstate = mc.nextState(crstate);
 			path.add(crstate);
 		}

@@ -92,7 +92,7 @@ public class SwatActiveMain {
 		FileUtil.cleanDirectory(PlatformDependent.MODEL_ROOT + "/active/swat/new_sample_ido");//
 		FileUtil.cleanDirectory(PlatformDependent.MODEL_ROOT + "/active/swat/new_sample_rs");
 		
-		Estimator estimator = new EmpiricalFrequencyEstimator();
+		Estimator estimator = new EFEstimator();
 		Sampler idosampler = new SwatSampler(ssa, 
 				PlatformDependent.MODEL_ROOT + "/active/swat/new_sample_ido", ALConfig.pathLength);
 		InitialDistGetter idoidg = new ReachabilityOptimizer(ALConfig.stateNumber, validInitStates, targetStates, ALConfig.pathLength);
@@ -156,7 +156,7 @@ public class SwatActiveMain {
 	
 	public static Samples IterSampling(RealMatrix currentFrequencyMatrix, int numSample, Estimator estimator, 
 			Sampler sampler, InitialDistGetter idg) throws GRBException{
-		Samples sample = new Samples(currentFrequencyMatrix, estimator, sampler, idg);
+		Samples sample = new Samples(ALConfig.pathLength, currentFrequencyMatrix, estimator, sampler, idg);
 		for(int i=1; i<=numSample; i++){
 			System.out.println("getting a new sample, number: " + i);
 			sample.newSample();

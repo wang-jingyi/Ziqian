@@ -31,19 +31,21 @@ public class ReachabilityOptimizer implements InitialDistGetter{
 	@Override
 	public double[] getInitialDistribution(RealMatrix frequencyMatrix,
 			RealMatrix origEstimation) {
-
-		RealMatrix A = InitialDistributionOptimizer.accumulatedMatrix(pathLength, origEstimation);
+		
+		RealMatrix tm = origEstimation.copy();
+		tm = adaptEstimation(tm);
+		RealMatrix A = InitialDistributionOptimizer.accumulatedMatrix(pathLength, tm);
 		RealMatrix AT = A.transpose();
 
-		int min = MetricComputing.calculateTargetStateMinFreq(frequencyMatrix, targetStates);
+//		int min = MetricComputing.calculateTargetStateMinFreq(frequencyMatrix, targetStates);
 		double[] ATI = 
-				AT.getRow(min);
-//				new double[frequencyMatrix.getRowDimension()];
-//		for(int t : targetStates){ 
-//			for(int i=0; i<ATI.length; i++){
-//				ATI[i] += AT.getRow(t)[i]; // accumulate over all target states
-//			}
-//		}
+//				AT.getRow(min);
+				new double[frequencyMatrix.getRowDimension()];
+		for(int t : targetStates){ 
+			for(int i=0; i<ATI.length; i++){
+				ATI[i] += AT.getRow(t)[i]; // accumulate over all target states
+			}
+		}
 
 		GRBEnv env;
 		double[] optimalDistribution = new double[nodeNumber];
@@ -104,6 +106,21 @@ public class ReachabilityOptimizer implements InitialDistGetter{
 		}
 		return optimalDistribution;
 	}
+
+	private RealMatrix adaptEstimation(RealMatrix tm) { // adapt to calculate reachability
+		for(int ts : targetStates){
+			for(int i=0; i<tm.getColumnDimension(); i++){
+				if(i!=ts){
+					tm.setEntry(ts, i, 0);
+					continue;
+				}
+				tm.setEntry(ts, i, 1);
+				
+			}
+		}
+		return tm;
+	}
+
 
 	@Override
 	public void setValidInitialStates(List<Integer> validInitialStates) {

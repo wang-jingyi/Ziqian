@@ -17,6 +17,7 @@ public class RMCRareReachMain {
 		ALConfig.pathLength = ALConfig.stateNumber;
 		ALConfig.newSampleNumber = 200000;
 		int boundedStep = ALConfig.pathLength;
+		int itPathNumber = 5000;
 
 		RandomMarkovChain rmc = new RandomMarkovChain(ALConfig.stateNumber,
 				0.8, "rmc_reach_" + ALConfig.stateNumber, true, 1E-4);
@@ -40,17 +41,19 @@ public class RMCRareReachMain {
 
 
 		RealMatrix matrix = rmc.getTransitionMatrix();
-		MarkovChain mc = new MarkovChain(matrix);
-
+		MarkovChain mc = new MarkovChain(matrix, validInitStates, validInitDist);
+		
+		MCInitialTrain it = new MCInitialTrain(mc, ALConfig.pathLength, itPathNumber);
+		
 		// define estimator, initial distribution getter
-		Estimator estimator = new EmpiricalFrequencyEstimator();
-		Sampler sampler = new MarkovChainSampler(new MarkovChain(rmc.getTransitionMatrix()));
+		Estimator estimator = new EFEstimator();
+		Sampler sampler = new MarkovChainSampler(mc);
 		InitialDistGetter idoidg = new InitialDistributionOptimizer(mc.getNodeNumber(), validInitStates, ALConfig.stateNumber);
 		InitialDistGetter uniformidg = new UniformInitialDistribution(validInitStates);
 
 		try {
-			Samples idoSample = Main.IterSampling(mc, validInitStates, ALConfig.pathLength, ALConfig.newSampleNumber, estimator, sampler, idoidg);
-			Samples randomSample = Main.IterSampling(mc, validInitStates, ALConfig.pathLength, ALConfig.newSampleNumber, estimator, sampler, uniformidg);
+			Samples idoSample = Main.IterSampling(mc, it.getInitialFrequencyMatrix(), validInitStates, ALConfig.pathLength, ALConfig.newSampleNumber, estimator, sampler, idoidg);
+			Samples randomSample = Main.IterSampling(mc, it.getInitialFrequencyMatrix(), validInitStates, ALConfig.pathLength, ALConfig.newSampleNumber, estimator, sampler, uniformidg);
 			
 			Reachability rmcr = new Reachability(rmc.getTransitionMatrix(), validInitStates, targetStates,
 					PlatformDependent.MODEL_ROOT+"/active/rmc",

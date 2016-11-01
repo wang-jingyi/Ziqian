@@ -56,10 +56,11 @@ public class ExampleMain {
 				{0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 1 , 0}
 		};
 
-		MarkovChain mc = new MarkovChain(MatrixUtils.createRealMatrix(matrix));
+		
 		ALConfig.stateNumber = 11;
 		ALConfig.pathLength = 11;
 		String modelName = "queue_model";
+		int itPathNumber = 5000;
 
 
 		// add initial states
@@ -75,11 +76,13 @@ public class ExampleMain {
 		for(int i=ALConfig.stateNumber/2; i<ALConfig.stateNumber; i++){
 			targetStates.add(i);
 		}
-
+		
+		MarkovChain mc = new MarkovChain(MatrixUtils.createRealMatrix(matrix), validInitStates, validInitDist);
+		MCInitialTrain it = new MCInitialTrain(mc, ALConfig.pathLength, itPathNumber);
 
 		// define estimator, initial distribution getter
 		Estimator estimator = new LaplaceEstimator();
-		Sampler sampler = new MarkovChainSampler(new MarkovChain(mc.getTransitionMatrix()));
+		Sampler sampler = new MarkovChainSampler(mc);
 		InitialDistGetter idoidg = new InitialDistributionOptimizer(mc.getNodeNumber(), validInitStates, ALConfig.stateNumber);
 		InitialDistGetter uniformidg = new UniformInitialDistribution(validInitStates);
 
@@ -109,9 +112,9 @@ public class ExampleMain {
 
 			for(int i=0; i<10; i++){
 				try {
-					Samples idosample = Main.IterSampling(mc, validInitStates, ALConfig.pathLength, 
+					Samples idosample = Main.IterSampling(mc, it.getInitialFrequencyMatrix(), validInitStates, ALConfig.pathLength, 
 							ALConfig.newSampleNumber, estimator, sampler, idoidg);
-					Samples rdsample = Main.IterSampling(mc, validInitStates, ALConfig.pathLength, 
+					Samples rdsample = Main.IterSampling(mc, it.getInitialFrequencyMatrix(), validInitStates, ALConfig.pathLength, 
 							ALConfig.newSampleNumber, estimator, sampler, uniformidg);
 					im += MetricComputing.calculateMSE(MatrixUtils.createRealMatrix(matrix), idosample.getEstimatedTransitionMatrix());
 					rm += MetricComputing.calculateMSE(MatrixUtils.createRealMatrix(matrix), rdsample.getEstimatedTransitionMatrix());

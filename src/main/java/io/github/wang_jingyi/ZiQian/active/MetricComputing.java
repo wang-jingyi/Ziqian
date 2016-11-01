@@ -58,6 +58,7 @@ public class MetricComputing {
 
 		double minFre = Double.MAX_VALUE;
 		int min = -1;
+		
 		for(int i=0; i<targetStates.size(); i++){
 			int j = targetStates.get(i);
 			if(rowsums[j]<minFre 
@@ -65,13 +66,23 @@ public class MetricComputing {
 					){
 				minFre = rowsums[j];
 				min = j;
-				continue;
+//				continue;
 			}
-			if(rowsums[j]==minFre){
-				min = new MersenneTwisterRNG().nextDouble()>0.5? min : j;
+//			if(rowsums[j]==minFre){
+//				min = new MersenneTwisterRNG().nextDouble()>0.5? min : j;
+//			}
+		}
+		
+		List<Integer> mins = new ArrayList<Integer>();
+		for(int i=0; i<targetStates.size(); i++){
+			int j = targetStates.get(i);
+			if(rowsums[j]==rowsums[min]){
+				mins.add(j);
 			}
 		}
-		return min;
+		
+		int minsSize = mins.size();
+		return mins.get(new MersenneTwisterRNG().nextInt(minsSize));
 	}
 
 	public static double calculateMinFreq(RealMatrix frequencyMatrix){
@@ -134,16 +145,28 @@ public class MetricComputing {
 		int minFreqState = 0;
 		double minNonZeroRowSum = Double.MAX_VALUE;
 		for(int i=0; i<rowsums.length; i++){
-			if(rowsums[i]<minNonZeroRowSum && rowsums[i]!=0){ // only those states 
+			if(rowsums[i]<minNonZeroRowSum 
+					&& rowsums[i]!=0
+					){ // only those states 
 				minFreqState = i;
 				minNonZeroRowSum = rowsums[i];
-				continue;
+//				continue;
 			}
-			if(rowsums[i]==minNonZeroRowSum){
-				minFreqState = new MersenneTwisterRNG().nextDouble()>0.5? minFreqState : i;
+//			if(rowsums[i]==minNonZeroRowSum){
+//				minFreqState = new MersenneTwisterRNG().nextDouble()>0.5? minFreqState : i;
+//			}
+		}
+		
+		List<Integer> mins = new ArrayList<Integer>();
+		for(int i=0; i<nodeNumber; i++){
+			if(rowsums[i]==rowsums[minFreqState]){
+				mins.add(i);
 			}
 		}
-		System.out.println("minimum row sum: " + minNonZeroRowSum);
+		
+		int minsSize = mins.size();
+		minFreqState = mins.get(new MersenneTwisterRNG().nextInt(minsSize));
+		System.out.println("minimum row sum: " + minFreqState);
 		return minFreqState;
 	}
 }

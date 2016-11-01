@@ -76,7 +76,7 @@ public class SwatApproMatrix {
 		
 		RealMatrix frequencyMatrix = Samples.getFrequencyMatrix(abstractTraces, ALConfig.stateNumber);
 //		Estimator estimator = new LaplaceEstimator();
-		Estimator estimator = new EmpiricalFrequencyEstimator();
+		Estimator estimator = new EFEstimator();
 //		Estimator estimator = new GoodTuringEstimator();
 		RealMatrix estTransMatrix = estimator.estimate(frequencyMatrix);
 		

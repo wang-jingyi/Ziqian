@@ -1,13 +1,16 @@
 package io.github.wang_jingyi.ZiQian.active;
 
-import java.util.Random;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
+import org.uncommons.maths.random.MersenneTwisterRNG;
 
 public class MarkovChain {
 
 	private int nodeNumber;
+	private double[] initDistribution; 
 	private RealMatrix transitionMatrix;
 
 	public MarkovChain(int nn) {
@@ -23,9 +26,34 @@ public class MarkovChain {
 		return nodeNumber;
 	}
 
-	public MarkovChain(RealMatrix matrix) {
+	public MarkovChain(RealMatrix matrix, double[] initDist) {
+		this.nodeNumber = matrix.getRowDimension();
+		this.initDistribution = initDist;
+		this.transitionMatrix = matrix;
+	}
+	
+	public MarkovChain(RealMatrix matrix, List<Integer> validInitStates,
+			List<Double> validInitDist) {
 		this.nodeNumber = matrix.getRowDimension();
 		this.transitionMatrix = matrix;
+		this.initDistribution = new double[nodeNumber];
+		for(int i=0; i<validInitStates.size(); i++){ // generate initial distribution
+			int s = validInitStates.get(i);
+			double d = validInitDist.get(i);
+			this.initDistribution[s] = d;
+		}
+	}
+
+	public List<Integer> simulate(int pathLength){
+		List<Integer> path = new ArrayList<Integer>();
+		int initState = nextState(initDistribution);
+		path.add(initState);
+		int currentState = initState;
+		for(int i=0; i<pathLength-1; i++){
+			int ns = nextState(currentState);
+			currentState = ns;
+		}
+		return path;
 	}
 	
 	public static int nextState(double[] dis){
@@ -35,7 +63,7 @@ public class MarkovChain {
 			acc += dis[i];
 			accdis[i] = acc;
 		}
-		double rn = new Random().nextDouble();
+		double rn = new MersenneTwisterRNG().nextDouble();
 		for(int i=0; i<dis.length; i++){
 			if(i==0){
 				if(rn<=accdis[i]){

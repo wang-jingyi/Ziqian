@@ -6,7 +6,7 @@ import org.apache.commons.math3.linear.RealMatrix;
 
 
 
-public class EmpiricalFrequencyEstimator implements Estimator {
+public class EFEstimator implements Estimator {
 
 	@Override
 	public RealMatrix estimate(RealMatrix frequencyMatrix) {
