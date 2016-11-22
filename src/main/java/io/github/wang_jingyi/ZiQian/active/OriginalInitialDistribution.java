@@ -4,20 +4,23 @@ import java.util.List;
 
 import org.apache.commons.math3.linear.RealMatrix;
 
-public class UniformInitialDistribution implements InitialDistGetter {
+public class OriginalInitialDistribution implements InitialDistGetter {
 
 	private List<Integer> validInitialStates;
+	private List<Double> initDist;
 	
-	public UniformInitialDistribution(List<Integer> validInitialStates) {
+	public OriginalInitialDistribution(List<Integer> validInitialStates, List<Double> initDist) {
 		this.validInitialStates = validInitialStates;
+		this.initDist = initDist;
 	}
 	
 	@Override
 	public double[] getInitialDistribution(RealMatrix frequencyMatrix, RealMatrix origEstimation) {
-		double p = (double) 1 / validInitialStates.size();
+//		double p = (double) 1 / validInitialStates.size();
 		double[] id = new double[validInitialStates.size()];
 		for(int i=0; i<validInitialStates.size(); i++){
-			id[i] = p;
+			int ind = validInitialStates.get(i);
+			id[ind] = initDist.get(i);
 		}
 		return id;
 	}

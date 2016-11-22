@@ -1,6 +1,7 @@
 package io.github.wang_jingyi.ZiQian.active;
 
 import io.github.wang_jingyi.ZiQian.utils.FileUtil;
+import io.github.wang_jingyi.ZiQian.utils.IntegerUtil;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -267,16 +268,18 @@ public class RandomMarkovChain {
 	}
 
 	private void generateEdgesWithDensity(){ // add edges according to density
-		for (int outerIndex = 0; outerIndex < edges.length; outerIndex++) {
+
+		for (int outerIndex = 0; outerIndex < numOfState; outerIndex++) {
 			List<Integer> ind = new ArrayList<>();
-			for (int innerIndex = 0; innerIndex < edges[outerIndex].length; innerIndex++) {
-				if (rnd.nextDouble() < density) {
-					edges[outerIndex][innerIndex] = true;
-					ind.add(innerIndex);
-				} else {
-					edges[outerIndex][innerIndex] = false;
+			int count =0;
+			while(count<numOfState*density){
+				int i = rnd.nextInt(numOfState);
+				if(!IntegerUtil.isInList(i, ind)){
+					ind.add(i);
+					count++;
 				}
 			}
+			Collections.sort(ind);
 			edgeIndexes.add(ind);
 		}
 	}

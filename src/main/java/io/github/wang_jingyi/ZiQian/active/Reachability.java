@@ -15,15 +15,17 @@ public class Reachability {
 
 	private RealMatrix transitionMatrix;
 	private List<Integer> initialStates;
+	private List<Double> initDist;
 	private List<Integer> targetStates;
 	private String dirPath;
 	private String fileName;
 	private int boundedStep;
 
-	public Reachability(RealMatrix tm, List<Integer> is, List<Integer> targetStates, 
+	public Reachability(RealMatrix tm, List<Integer> is, List<Double> id, List<Integer> targetStates, 
 			String dirPath, String fileName, int boundedStep) throws FileNotFoundException {
 		this.transitionMatrix = tm;
 		this.initialStates = is;
+		this.initDist = id;
 		this.targetStates = targetStates;
 		this.dirPath= dirPath;
 		this.fileName = fileName;
@@ -33,7 +35,7 @@ public class Reachability {
 
 	private void generatePrismFiles() throws FileNotFoundException{
 		FileUtil.createDir(dirPath);
-		PrismUtil.MCToPrism(transitionMatrix.getData(), initialStates, fileName, dirPath);
+		PrismUtil.MCToPrism(transitionMatrix.getData(), initialStates, initDist, fileName, dirPath);
 		PrismUtil.WritePropertyList(targetStates, dirPath, fileName, transitionMatrix.getRowDimension(), boundedStep);
 	}
 

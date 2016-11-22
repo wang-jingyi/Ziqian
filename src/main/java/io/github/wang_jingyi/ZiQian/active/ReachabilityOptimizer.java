@@ -36,12 +36,16 @@ public class ReachabilityOptimizer implements InitialDistGetter{
 		tm = adaptEstimation(tm);
 		RealMatrix A = InitialDistributionOptimizer.accumulatedMatrix(pathLength, tm);
 		RealMatrix AT = A.transpose();
-
+		
+//		HashSet<Integer> ops = MetricComputing.oneStepToTargetStates(frequencyMatrix, targetStates);
 //		int min = MetricComputing.calculateTargetStateMinFreq(frequencyMatrix, targetStates);
 		double[] ATI = 
 //				AT.getRow(min);
 				new double[frequencyMatrix.getRowDimension()];
-		for(int t : targetStates){ 
+		
+		
+		for(int t : targetStates){
+//		for(int t : ops){	
 			for(int i=0; i<ATI.length; i++){
 				ATI[i] += AT.getRow(t)[i]; // accumulate over all target states
 			}

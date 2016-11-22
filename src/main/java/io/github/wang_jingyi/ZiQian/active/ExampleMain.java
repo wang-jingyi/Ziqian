@@ -25,12 +25,12 @@ public class ExampleMain {
 		//				{0.5, 0.1, 0, 0, 0, 0, 0.4},
 		//				{0, 0, 0, 0, 0, 0, 1}};
 
-		//		double[][] matrix = new double[][]{
-		//				{0.9,0.09,0.01,0},
-		//				{0,0,0.05,0.95},
-		//				{0,0,0,1},
-		//				{0,0,0,1}
-		//		};
+				double[][] matrix = new double[][]{
+						{0.9,0.09,0.01,0},
+						{0,0,0.05,0.95},
+						{0,0,0,1},
+						{0,0,0,1}
+				};
 		
 		
 		// hollow matrix
@@ -42,87 +42,111 @@ public class ExampleMain {
 //		};
 		
 		// queuing model
-		double[][] matrix = new double[][]{
-				{0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0.53 , 0 , 0.47 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0},
-				{0 , 0.65 , 0 , 0.35 , 0 , 0 , 0 , 0 , 0 , 0 , 0},
-				{0 , 0 , 0.45 , 0 , 0.55 , 0 , 0 , 0 , 0 , 0 , 0},
-				{0 , 0 , 0 , 0.30 , 0 , 0.70 , 0 , 0 , 0 , 0 , 0},
-				{0 , 0 , 0 , 0 , 0.62 , 0 , 0.38 , 0 , 0 , 0 , 0},
-				{0 , 0 , 0 , 0 , 0 , 0.68 , 0 , 0.32 , 0 , 0 , 0},
-				{0 , 0 , 0 , 0 , 0 , 0 , 0.64 , 0 , 0.36 , 0 , 0},
-				{0 , 0 , 0 , 0 , 0 , 0 , 0 , 0.52 , 0 , 0.48 , 0},
-				{0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0.61 , 0 , 0.39},
-				{0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 1 , 0}
-		};
+//		double[][] matrix = new double[][]{
+//				{0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+//				{0.53 , 0 , 0.47 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0},
+//				{0 , 0.65 , 0 , 0.35 , 0 , 0 , 0 , 0 , 0 , 0 , 0},
+//				{0 , 0 , 0.45 , 0 , 0.55 , 0 , 0 , 0 , 0 , 0 , 0},
+//				{0 , 0 , 0 , 0.30 , 0 , 0.70 , 0 , 0 , 0 , 0 , 0},
+//				{0 , 0 , 0 , 0 , 0.62 , 0 , 0.38 , 0 , 0 , 0 , 0},
+//				{0 , 0 , 0 , 0 , 0 , 0.68 , 0 , 0.32 , 0 , 0 , 0},
+//				{0 , 0 , 0 , 0 , 0 , 0 , 0.64 , 0 , 0.36 , 0 , 0},
+//				{0 , 0 , 0 , 0 , 0 , 0 , 0 , 0.52 , 0 , 0.48 , 0},
+//				{0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0.61 , 0 , 0.39},
+//				{0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 1 , 0}
+//		};
 
 		
-		ALConfig.stateNumber = 11;
-		ALConfig.pathLength = 11;
-		String modelName = "queue_model";
+		ALConfig.stateNumber = 4;
+		ALConfig.pathLength = ALConfig.stateNumber;
+		String modelName = "toy_example";
 		int itPathNumber = 5000;
+		int repeatTime = 5;
 
 
 		// add initial states
 		List<Integer> validInitStates = new ArrayList<>();
 		List<Double> validInitDist = new ArrayList<Double>();
-
-		for(int i=0; i<ALConfig.stateNumber/2; i++){
-			validInitStates.add(i);
-			validInitDist.add((double)1/ALConfig.stateNumber);
-		}
-		
 		List<Integer> targetStates = new ArrayList<Integer>();
-		for(int i=ALConfig.stateNumber/2; i<ALConfig.stateNumber; i++){
-			targetStates.add(i);
-		}
+		
+		// example inital states setting
+		validInitStates.add(0);
+		validInitDist.add(0.9);
+		validInitStates.add(1);
+		validInitDist.add(0.1);
+		targetStates.add(3);
+
+//		for(int i=0; i<ALConfig.stateNumber/2; i++){
+//			validInitStates.add(i);
+//			validInitDist.add((double)1/ALConfig.stateNumber);
+//		}
+		
+//		for(int i=ALConfig.stateNumber/2; i<ALConfig.stateNumber; i++){
+//			targetStates.add(i);
+//		}
 		
 		MarkovChain mc = new MarkovChain(MatrixUtils.createRealMatrix(matrix), validInitStates, validInitDist);
 		MCInitialTrain it = new MCInitialTrain(mc, ALConfig.pathLength, itPathNumber);
 
 		// define estimator, initial distribution getter
-		Estimator estimator = new LaplaceEstimator();
+//		Estimator estimator = new LaplaceEstimator();
+		Estimator estimator = new EFEstimator();
 		Sampler sampler = new MarkovChainSampler(mc);
 		InitialDistGetter idoidg = new InitialDistributionOptimizer(mc.getNodeNumber(), validInitStates, ALConfig.stateNumber);
-		InitialDistGetter uniformidg = new UniformInitialDistribution(validInitStates);
+		InitialDistGetter origidg = new OriginalInitialDistribution(validInitStates, validInitDist);
 
-		int[] sampleSize = new int[]{  5000,
+		int[] sampleSize = new int[]{  
+//				5000,
 //								1000,2000,3000,4000,5000,
 //								6000,7000,8000,9000,
-				10000
-				,50000,100000,200000
+				25000
+//				,50000,
+//				100000, 200000
 		};
-
+		
+		List<Double> idominfre = new ArrayList<Double>();
+		List<Double> rsminfre = new ArrayList<Double>();
+		List<Double> idofrevar = new ArrayList<Double>();
+		List<Double> rsfrevar = new ArrayList<Double>();
 		List<Double> idomse = new ArrayList<Double>();
 		List<Double> rsmse = new ArrayList<Double>();
 		List<Double> idoreach = new ArrayList<Double>();
 		List<Double> rsreach = new ArrayList<Double>();
 		
-		Reachability reach = new Reachability(MatrixUtils.createRealMatrix(matrix), validInitStates, targetStates,
+		Reachability reach = new Reachability(MatrixUtils.createRealMatrix(matrix), validInitStates, validInitDist, targetStates,
 				PlatformDependent.MODEL_ROOT + "/active/" + modelName, modelName , ALConfig.stateNumber);
 		List<Double> actualReach = reach.computeReachability();
 
 		for(int ss : sampleSize){
 			ALConfig.newSampleNumber = ss;
-
+			
+			double imf = 0.0;
+			double rmf = 0.0;
+			double ifv = 0.0;
+			double rfv = 0.0;
 			double im = 0.0;
 			double rm = 0.0;
 			double ir = 0.0;
 			double rr = 0.0;
 
-			for(int i=0; i<10; i++){
+			for(int i=0; i<repeatTime; i++){
 				try {
 					Samples idosample = Main.IterSampling(mc, it.getInitialFrequencyMatrix(), validInitStates, ALConfig.pathLength, 
 							ALConfig.newSampleNumber, estimator, sampler, idoidg);
 					Samples rdsample = Main.IterSampling(mc, it.getInitialFrequencyMatrix(), validInitStates, ALConfig.pathLength, 
-							ALConfig.newSampleNumber, estimator, sampler, uniformidg);
+							ALConfig.newSampleNumber, estimator, sampler, origidg);
+					imf += MetricComputing.calculateMinFreq(idosample.getFrequencyMatrix());
+					rmf += MetricComputing.calculateMinFreq(rdsample.getFrequencyMatrix());
+					ifv += MetricComputing.calculateVariance(idosample.getFrequencyMatrix());
+					rfv += MetricComputing.calculateVariance(rdsample.getFrequencyMatrix());
+					
 					im += MetricComputing.calculateMSE(MatrixUtils.createRealMatrix(matrix), idosample.getEstimatedTransitionMatrix());
 					rm += MetricComputing.calculateMSE(MatrixUtils.createRealMatrix(matrix), rdsample.getEstimatedTransitionMatrix());
 					
-					Reachability ircompute = new Reachability(idosample.getEstimatedTransitionMatrix(), validInitStates, targetStates,
+					Reachability ircompute = new Reachability(idosample.getEstimatedTransitionMatrix(), validInitStates, validInitDist, targetStates,
 							PlatformDependent.MODEL_ROOT + "/active/"+ modelName, modelName + "_ido", ALConfig.stateNumber);
 					List<Double> idoReach = ircompute.computeReachability();
-					Reachability rscompute = new Reachability(rdsample.getEstimatedTransitionMatrix(), validInitStates, targetStates,
+					Reachability rscompute = new Reachability(rdsample.getEstimatedTransitionMatrix(), validInitStates, validInitDist, targetStates,
 							PlatformDependent.MODEL_ROOT + "/active/" + modelName, modelName + "_rs", ALConfig.stateNumber);
 					List<Double> rsReach= rscompute.computeReachability();
 					
@@ -133,6 +157,7 @@ public class ExampleMain {
 					List<Double> idoDiff = ListUtil.listABSDiff(actualReach, idoReach);
 					List<Double> randomDiff = ListUtil.listABSDiff(actualReach, rsReach);
 					
+					
 					ir += ListUtil.listMean(idoDiff);
 					rr += ListUtil.listMean(randomDiff);
 
@@ -140,13 +165,19 @@ public class ExampleMain {
 					e.printStackTrace();
 				}
 			}
-
-			idomse.add(im/10);
-			rsmse.add(rm/10);
-			idoreach.add(ir/10);
-			rsreach.add(rr/10);
+			idominfre.add(imf/repeatTime);
+			rsminfre.add(rmf/repeatTime);
+			idofrevar.add(ifv/repeatTime);
+			rsfrevar.add(rfv/repeatTime);
+			idomse.add(im/repeatTime);
+			rsmse.add(rm/repeatTime);
+			idoreach.add(ir/repeatTime);
+			rsreach.add(rr/repeatTime);
 		}
-		
+		System.out.println("ido min fre: " + idominfre);
+		System.out.println("rs min fre: " + rsminfre);
+		System.out.println("ido fre var: " + idofrevar);
+		System.out.println("rs fre var: " + rsfrevar);
 		System.out.println("ido mse: " + idomse);
 		System.out.println("rs mse: " + rsmse);
 		System.out.println("ido reach: " + idoreach);

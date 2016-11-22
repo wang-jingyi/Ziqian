@@ -39,7 +39,7 @@ public class PrismUtil {
 		FileUtil.writeStringToFile(filePath+"/"+fileName+".pm", sb.toString());
 	}
 
-	public static void MCToPrism(double[][] tm, List<Integer> initialStates, String fileName, String dirPath) throws FileNotFoundException{
+	public static void MCToPrism(double[][] tm, List<Integer> initialStates, List<Double> initDist, String fileName, String dirPath) throws FileNotFoundException{
 		StringBuilder sb = new StringBuilder();
 		sb.append("dtmc" + " \n \n");
 		int numOfState = tm.length;
@@ -49,15 +49,19 @@ public class PrismUtil {
 		sb.append("s:[0.." + numOfState + "] init 0; \n"); //
 
 		sb.append("[]s=0 -> ");
-		double up = (double)1/initialStates.size();
-		boolean flag = true;
+//		double up = (double)1/initialStates.size();
+//		boolean flag = true;
+		int counter = 0;
 		for(int is : initialStates){
-			if(flag){
+			double up = initDist.get(counter);
+			if(counter==0){
 				sb.append( up +":(s'=" + (is+1) + ")");
-				flag = false;
+//				flag = false;
+				counter ++;
 				continue;
 			}
 			sb.append(" + " + up + " :(s'=" + (is+1) + ")");
+			counter++;
 		}
 		sb.append(";\n");
 

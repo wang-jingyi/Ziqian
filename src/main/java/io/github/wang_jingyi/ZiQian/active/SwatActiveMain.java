@@ -49,7 +49,7 @@ public class SwatActiveMain {
 		
 		ALConfig.stateNumber = ssa.getStateNumber(); // update state number according to sensor abstraction
 		
-		String swatTrainPaths= PlatformDependent.SWAT_SIMULATE_PATH + "/Jingyi_Data/10_5";
+		String swatTrainPaths= PlatformDependent.SWAT_SIMULATE_PATH + "/samples_train";
 		 
 		System.out.println("number of states: " + ALConfig.stateNumber);
 		
@@ -98,13 +98,13 @@ public class SwatActiveMain {
 		InitialDistGetter idoidg = new ReachabilityOptimizer(ALConfig.stateNumber, validInitStates, targetStates, ALConfig.pathLength);
 		Sampler rssampler = new SwatSampler(ssa, 
 				PlatformDependent.MODEL_ROOT + "/active/swat/new_sample_rs", ALConfig.pathLength);
-		InitialDistGetter uniformidg = new UniformInitialDistribution(validInitStates);
+		InitialDistGetter uniformidg = new OriginalInitialDistribution(validInitStates,validInitDist);
 		
 		try {
 			
 			Samples idosample = IterSampling(frequencyMatrix, ALConfig.newSampleNumber, estimator, idosampler, idoidg);
-			Reachability idoReach = new Reachability(idosample.getEstimatedTransitionMatrix(), validInitStates, targetStates,
-					PlatformDependent.MODEL_ROOT + "/active/swat", "swat_10_5_ido", ALConfig.boundedSteps);
+			Reachability idoReach = new Reachability(idosample.getEstimatedTransitionMatrix(), validInitStates, validInitDist, targetStates,
+					PlatformDependent.MODEL_ROOT + "/active/swat", "swat_"+Config.SWAT_SAMPLE_STEP+"_"+Config.SWAT_RECORD_STEP+"_ido", ALConfig.boundedSteps);
 			List<Double> idoReachProbs = idoReach.computeReachability();
 			double idominfre = MetricComputing.calculateNonZeroMinFreq(idosample.getFrequencyMatrix());
 			double idomse = MetricComputing.calculateMSE(estExactMatrix, idosample.getEstimatedTransitionMatrix());
@@ -122,8 +122,8 @@ public class SwatActiveMain {
 			ALConfig.ido = false;
 			
 			Samples uniformsample = IterSampling(frequencyMatrix, ALConfig.newSampleNumber, estimator, rssampler, uniformidg);
-			Reachability rsReach = new Reachability(uniformsample.getEstimatedTransitionMatrix(), validInitStates, targetStates,
-					PlatformDependent.MODEL_ROOT + "/active/swat", "swat_10_5_rs", ALConfig.boundedSteps);
+			Reachability rsReach = new Reachability(uniformsample.getEstimatedTransitionMatrix(), validInitStates, validInitDist, targetStates,
+					PlatformDependent.MODEL_ROOT + "/active/swat", "swat_"+Config.SWAT_SAMPLE_STEP+"_"+Config.SWAT_RECORD_STEP+"_rs", ALConfig.boundedSteps);
 			List<Double> rsReachProbs = rsReach.computeReachability();
 			FileUtil.writeObject(Config.TMP_PATH + "/swat_rs_reach_probs", rsReachProbs);
 			double rsminfre = MetricComputing.calculateNonZeroMinFreq(uniformsample.getFrequencyMatrix());

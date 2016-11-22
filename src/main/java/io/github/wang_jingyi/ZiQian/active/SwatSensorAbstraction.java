@@ -20,6 +20,7 @@ public class SwatSensorAbstraction implements Serializable{
 	private List<Interval> ranges; // sensor value range
 	private List<Integer> denominators; // denominator of range
 	private List<Integer> initialStates;
+	private List<Double> initDist;
 	private List<Integer> targetStates;
 
 	private List<Integer> splitStateNumber;
@@ -35,6 +36,7 @@ public class SwatSensorAbstraction implements Serializable{
 		this.denominators = new ArrayList<Integer>();
 		this.splitStateNumber = new ArrayList<Integer>();
 		this.initialStates = new ArrayList<Integer>();
+		this.initDist = new ArrayList<Double>();
 		this.targetStates = new ArrayList<Integer>();
 		this.stateNumber = 1;
 	}
@@ -101,8 +103,22 @@ public class SwatSensorAbstraction implements Serializable{
 				initialStates.add(i);
 			}
 		}
+		
+		double p = (double)1/initialStates.size();
+		for(int i=0; i<initialStates.size(); i++){
+			initDist.add(p);
+		}
+		
 		System.out.println("initial states: " + initialStates);
 		System.out.println("initial states number: " + initialStates.size());
+	}
+
+	public List<Double> getInitDist() {
+		return initDist;
+	}
+
+	public void setInitDist(List<Double> initDist) {
+		this.initDist = initDist;
 	}
 
 	public void computeTargetStates(){

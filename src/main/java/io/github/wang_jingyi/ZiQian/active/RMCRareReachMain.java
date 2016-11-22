@@ -49,21 +49,21 @@ public class RMCRareReachMain {
 		Estimator estimator = new EFEstimator();
 		Sampler sampler = new MarkovChainSampler(mc);
 		InitialDistGetter idoidg = new InitialDistributionOptimizer(mc.getNodeNumber(), validInitStates, ALConfig.stateNumber);
-		InitialDistGetter uniformidg = new UniformInitialDistribution(validInitStates);
+		InitialDistGetter uniformidg = new OriginalInitialDistribution(validInitStates,validInitDist);
 
 		try {
 			Samples idoSample = Main.IterSampling(mc, it.getInitialFrequencyMatrix(), validInitStates, ALConfig.pathLength, ALConfig.newSampleNumber, estimator, sampler, idoidg);
 			Samples randomSample = Main.IterSampling(mc, it.getInitialFrequencyMatrix(), validInitStates, ALConfig.pathLength, ALConfig.newSampleNumber, estimator, sampler, uniformidg);
 			
-			Reachability rmcr = new Reachability(rmc.getTransitionMatrix(), validInitStates, targetStates,
+			Reachability rmcr = new Reachability(rmc.getTransitionMatrix(), validInitStates, validInitDist, targetStates,
 					PlatformDependent.MODEL_ROOT+"/active/rmc",
 					rmc.getRmcName(), boundedStep);
 			double realRareReach = rmcr.computeReachability(ALConfig.stateNumber);
 			
-			Reachability idormcr = new Reachability(idoSample.getEstimatedTransitionMatrix(), validInitStates, targetStates,
+			Reachability idormcr = new Reachability(idoSample.getEstimatedTransitionMatrix(), validInitStates, validInitDist, targetStates,
 					PlatformDependent.MODEL_ROOT + "/active/rmc", rmc.getRmcName()+"_ido", boundedStep);
 			double idoestRareReach = idormcr.computeReachability(ALConfig.stateNumber);
-			Reachability rsrmcr = new Reachability(randomSample.getEstimatedTransitionMatrix(), validInitStates, targetStates,
+			Reachability rsrmcr = new Reachability(randomSample.getEstimatedTransitionMatrix(), validInitStates, validInitDist, targetStates,
 					PlatformDependent.MODEL_ROOT + "/active/rmc", rmc.getRmcName()+"_rs", boundedStep);
 			double rsestRareReach = rsrmcr.computeReachability(ALConfig.stateNumber);
 			

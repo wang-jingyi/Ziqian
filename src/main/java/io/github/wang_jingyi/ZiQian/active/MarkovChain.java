@@ -51,6 +51,7 @@ public class MarkovChain {
 		int currentState = initState;
 		for(int i=0; i<pathLength-1; i++){
 			int ns = nextState(currentState);
+			path.add(ns);
 			currentState = ns;
 		}
 		return path;

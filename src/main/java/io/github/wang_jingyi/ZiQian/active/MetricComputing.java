@@ -1,6 +1,7 @@
 package io.github.wang_jingyi.ZiQian.active;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import org.apache.commons.math3.linear.RealMatrix;
@@ -22,6 +23,44 @@ public class MetricComputing {
 		return mse;
 	}
 	
+	public static double calculateVariance(RealMatrix freqMatrix){
+		int nodeNumber = freqMatrix.getRowDimension();
+		double[] rowsums = new double[nodeNumber];
+		for(int i=0; i<nodeNumber; i++){
+			int rowsum = 0;
+			double[] row = freqMatrix.getRow(i);
+			for(int j=0; j<nodeNumber; j++){
+				rowsum += row[j];
+			}
+			rowsums[i] = rowsum;
+		} 
+		return getVariance(rowsums);
+	}
+	
+	public static double getMean(double[] data)
+    {
+        double sum = 0.0;
+        int size = data.length;
+        for(double a : data)
+            sum += a;
+        return sum/size;
+    }
+
+    public static double getVariance(double[] data)
+    {
+        double mean = getMean(data);
+        double temp = 0;
+        int size = data.length;
+        for(double a :data)
+            temp += (a-mean)*(a-mean);
+        return temp/size;
+    }
+
+    public static double getStdDev(double[] data)
+    {
+        return Math.sqrt(getVariance(data));
+    }
+	
 	public static List<Double> calculateTargetStateFreq(RealMatrix frequencyMatrix, List<Integer> targetStates){
 
 		int nodeNumber = frequencyMatrix.getRowDimension();
@@ -41,6 +80,21 @@ public class MetricComputing {
 			freqs.add(rowsums[j]);
 		}
 		return freqs;
+	}
+	
+	public static HashSet<Integer> oneStepToTargetStates(RealMatrix fm, List<Integer> targetStates){
+		HashSet<Integer> oneStepTSs = new HashSet<Integer>();
+		for(int ts : targetStates){
+			double[] tots = fm.getColumn(ts);
+			for(int i=0; i<tots.length; i++){
+				if(tots[i]!=0){
+					if(!oneStepTSs.contains(i)){
+						oneStepTSs.add(i);
+					}
+				}
+			}
+		}
+		return oneStepTSs;
 	}
 	
 	public static int calculateTargetStateMinFreq(RealMatrix frequencyMatrix, List<Integer> targetStates){

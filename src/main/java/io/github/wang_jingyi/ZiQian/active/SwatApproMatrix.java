@@ -31,11 +31,15 @@ public class SwatApproMatrix {
 		
 		ALConfig.stateNumber = ssa.getStateNumber(); // update state number according to sensor abstraction
 		List<String> swatPathRoot = new ArrayList<String>();
-		swatPathRoot.add(PlatformDependent.SWAT_SIMULATE_PATH + "/Jingyi_Data/10_5");
-		swatPathRoot.add(PlatformDependent.SWAT_SIMULATE_PATH + "/Jingyi_Data_1/10_5");
-		swatPathRoot.add(PlatformDependent.SWAT_SIMULATE_PATH + "/Jingyi_Data_2/10_5");
-		swatPathRoot.add(PlatformDependent.SWAT_SIMULATE_PATH + "/Jingyi_Data_3/10_5");
-		swatPathRoot.add(PlatformDependent.SWAT_SIMULATE_PATH + "/Jingyi_Data_5/10_5");
+//		swatPathRoot.add(PlatformDependent.SWAT_SIMULATE_PATH + "/Jingyi_Data/10_5");
+//		swatPathRoot.add(PlatformDependent.SWAT_SIMULATE_PATH + "/Jingyi_Data_1/10_5");
+//		swatPathRoot.add(PlatformDependent.SWAT_SIMULATE_PATH + "/Jingyi_Data_2/10_5");
+//		swatPathRoot.add(PlatformDependent.SWAT_SIMULATE_PATH + "/Jingyi_Data_3/10_5");
+//		swatPathRoot.add(PlatformDependent.SWAT_SIMULATE_PATH + "/Jingyi_Data_5/10_5");
+		
+		swatPathRoot.add(PlatformDependent.SWAT_SIMULATE_PATH + "/samples");
+//		swatPathRoot.add(PlatformDependent.SWAT_SIMULATE_PATH + "/samples_1");
+//		swatPathRoot.add(PlatformDependent.SWAT_SIMULATE_PATH + "/samples_2");
 		
 		 
 		System.out.println("number of states: " + ALConfig.stateNumber);
@@ -80,7 +84,7 @@ public class SwatApproMatrix {
 //		Estimator estimator = new GoodTuringEstimator();
 		RealMatrix estTransMatrix = estimator.estimate(frequencyMatrix);
 		
-		Reachability swatReach = new Reachability(estTransMatrix, ssa.getInitialStates(), ssa.getTargetStates(),
+		Reachability swatReach = new Reachability(estTransMatrix, ssa.getInitialStates(), ssa.getInitDist(), ssa.getTargetStates(),
 				PlatformDependent.MODEL_ROOT + "/active/swat", "swat_10_5", ALConfig.boundedSteps);
 		List<Double> reachs = swatReach.computeReachability();
 		

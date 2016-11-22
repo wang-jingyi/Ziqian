@@ -92,7 +92,7 @@ public class SwatReachabilityTest {
 		try {
 
 			Samples idosample = IterSampling(frequencyMatrix, ALConfig.newSampleNumber, estimator, idosampler, idoidg);
-			Reachability idoReach = new Reachability(idosample.getEstimatedTransitionMatrix(), validInitStates, targetStates,
+			Reachability idoReach = new Reachability(idosample.getEstimatedTransitionMatrix(), validInitStates, validInitDist, targetStates,
 					PlatformDependent.MODEL_ROOT + "/active/swat", "swat_10_5_ido", ALConfig.boundedSteps);
 			List<Double> idoReachProbs = idoReach.computeReachability();
 			double idominfre = MetricComputing.calculateNonZeroMinFreq(idosample.getFrequencyMatrix());
@@ -104,7 +104,7 @@ public class SwatReachabilityTest {
 			ALConfig.ido = false;
 
 			Samples idosampleReach = IterSampling(frequencyMatrix, ALConfig.newSampleNumber, estimator, idosamplerReach, idoidgReach);
-			Reachability rsReach = new Reachability(idosampleReach.getEstimatedTransitionMatrix(), validInitStates, targetStates,
+			Reachability rsReach = new Reachability(idosampleReach.getEstimatedTransitionMatrix(), validInitStates, validInitDist, targetStates,
 					PlatformDependent.MODEL_ROOT + "/active/swat", "swat_10_5_rs", ALConfig.boundedSteps);
 			List<Double> rsReachProbs = rsReach.computeReachability();
 			FileUtil.writeObject(Config.TMP_PATH + "/swat_rs_reach_probs", rsReachProbs);
