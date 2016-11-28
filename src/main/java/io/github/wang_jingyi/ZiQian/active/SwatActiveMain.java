@@ -42,10 +42,11 @@ public class SwatActiveMain {
 		
 		List<Integer> targetStates = new ArrayList<Integer>();
 		for(int i=0; i<swatReachProbs.size(); i++){
-			if(swatReachProbs.get(i)!=0){
+			if(swatReachProbs.get(i)<0.001){ // only observe target states with small reachability
 				targetStates.add(i);
 			}
 		}
+		System.out.println("number of target small reachability states: " + targetStates.size());
 		
 		ALConfig.stateNumber = ssa.getStateNumber(); // update state number according to sensor abstraction
 		

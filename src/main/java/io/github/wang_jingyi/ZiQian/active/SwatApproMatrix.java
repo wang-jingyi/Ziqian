@@ -38,8 +38,8 @@ public class SwatApproMatrix {
 //		swatPathRoot.add(PlatformDependent.SWAT_SIMULATE_PATH + "/Jingyi_Data_5/10_5");
 		
 		swatPathRoot.add(PlatformDependent.SWAT_SIMULATE_PATH + "/samples");
-//		swatPathRoot.add(PlatformDependent.SWAT_SIMULATE_PATH + "/samples_1");
-//		swatPathRoot.add(PlatformDependent.SWAT_SIMULATE_PATH + "/samples_2");
+		swatPathRoot.add(PlatformDependent.SWAT_SIMULATE_PATH + "/samples_1");
+		swatPathRoot.add(PlatformDependent.SWAT_SIMULATE_PATH + "/samples_2");
 		
 		 
 		System.out.println("number of states: " + ALConfig.stateNumber);

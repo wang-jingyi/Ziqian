@@ -109,7 +109,6 @@ public class Main {
 					List<Integer> targetStates = new ArrayList<Integer>();
 					for(int i=rmc.getNumOfState()/2 ; i<rmc.getNumOfState(); i++){
 						targetStates.add(i);
-//						break;
 					}
 					
 					RealMatrix matrix = rmc.getTransitionMatrix();
