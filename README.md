@@ -22,14 +22,14 @@ ZiQian has been evaluated by multiple PRISM benchmark systems, random generated 
 * There are multiple example case studies in the package 'example'.
 
 ### Dependencies ###
-The following external tools is not included in maven repository and have to be manually installed to your local maven repository. Before this, make sure maven has been installed in your system by running "mvn -version" in command line.
+The following external tools is not included in maven repository and have to be manually installed to your local maven repository. Before this, make sure maven has been installed in your system by running "mvn -version" in command line. The PRISM and javaml jar files are in /ext folder.
 
 
 * PRISM
 
 Download PRISM (jar file) at http://www.prismmodelchecker.org/download.php
 
-Execute 'mvn install:install-file -Dfile=<path-to-file> -DgroupId=oxford.modelchecker 
+Execute 'mvn install:install-file -Dfile=/ext/prism.jar -DgroupId=oxford.modelchecker 
     -DartifactId=prism -Dversion=4.2.1 -Dpackaging=jar' in command line
 
 
@@ -39,13 +39,13 @@ Execute 'mvn install:install-file -Dfile=<path-to-file> -DgroupId=oxford.modelch
 Download javaml (jar file) at https://sourceforge.net/projects/java-ml/files/
 
 
-Execute 'mvn install:install-file -Dfile=<path-to-file> -DgroupId=net.sf 
+Execute 'mvn install:install-file -Dfile=/ext/javaml-0.1.7/javaml-0.1.7.jar -DgroupId=net.sf 
     -DartifactId=javaml -Dversion=0.1.7 -Dpackaging=jar' in command line
 
 
 * Gurobi
 
-Download Gurobi (jar file) at https://www.gurobi.com/registration/download-reg. It's free for academic use.
+Download Gurobi (jar file) at https://www.gurobi.com/registration/download-reg. It's free for academic use but make sure you acquire a license. Install GUROBI following the instructions and install the license as well. Then,
 
 Execute 'mvn install:install-file -Dfile=<path-to-file> -DgroupId=com.gurobi.www 
     -DartifactId=gurobi -Dversion=6.5 -Dpackaging=jar' in command line
