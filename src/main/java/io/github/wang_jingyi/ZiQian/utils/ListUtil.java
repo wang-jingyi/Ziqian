@@ -21,6 +21,18 @@ public class ListUtil {
 		return ls;
 	}
 	
+	
+	public static List<Double> listABSPercThresDiff(List<Double> list1, List<Double> list2, double thre){
+		int len = list1.size();
+		List<Double> res = new ArrayList<Double>();
+		for(int i=0; i<len; i++){
+			if(list1.get(i)>0 && list1.get(i)<=thre){
+				res.add(Math.abs(list1.get(i)-list2.get(i))/list1.get(i));
+			}
+		}
+		return res;
+	}
+	
 	public static List<Double> listABSDiff(List<Double> list1, List<Double> list2){
 		int len = list1.size();
 		List<Double> res = new ArrayList<Double>();
@@ -55,6 +67,7 @@ public class ListUtil {
 	
 	public static double listMean(List<Double> list){ // only consider non-zero values
 		int len = list.size();
+		if(len==0){return 0;}
 		double sum = 0.0;
 		for(int i=0; i<len; i++){
 			sum += list.get(i);

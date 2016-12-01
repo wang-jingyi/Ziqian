@@ -17,7 +17,7 @@ public class OriginalInitialDistribution implements InitialDistGetter {
 	@Override
 	public double[] getInitialDistribution(RealMatrix frequencyMatrix, RealMatrix origEstimation) {
 //		double p = (double) 1 / validInitialStates.size();
-		double[] id = new double[validInitialStates.size()];
+		double[] id = new double[frequencyMatrix.getColumnDimension()];// should be over all the states
 		for(int i=0; i<validInitialStates.size(); i++){
 			int ind = validInitialStates.get(i);
 			id[ind] = initDist.get(i);

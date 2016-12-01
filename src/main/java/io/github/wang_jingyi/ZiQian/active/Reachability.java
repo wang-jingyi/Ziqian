@@ -58,5 +58,16 @@ public class Reachability {
 		}
 		return reachProbs;
 	}
+	
+	
+	public static List<Double> computeReachability(String pm, String pctl, int propcount){
+		List<Double> result = new ArrayList<Double>();
+		for(int i=1; i<=propcount; i++){
+			result.add(PrismUtil.extractResultFromCommandOutput(ExternalCaller.executeCommand(new String[]{Config.PRISM_PATH
+				, pm, pctl, "-prop", String.valueOf(i)})));
+		}
+		return result;
+			
+	}
 
 }

@@ -35,7 +35,7 @@ public class ExampleMain {
 		
 		// hollow matrix
 		double[][] matrix = new double[][]{
-				{0,0.992,0.0003,0.0005},
+				{0,0.992,0.003,0.005},
 				{0.98,0,0.01,0.01},
 				{0.4,0.13,0,0.47},
 				{0.42,0.2,0.38,0}
@@ -119,7 +119,7 @@ public class ExampleMain {
 //				25000,
 //				30000,35000,40000,45000,
 				50000,
-				100000, 150000, 200000
+//				100000, 150000, 200000
 		};
 		
 		List<Double> idominfre = new ArrayList<Double>();
@@ -164,18 +164,18 @@ public class ExampleMain {
 					rm += MetricComputing.calculateMSE(MatrixUtils.createRealMatrix(matrix), rdsample.getEstimatedTransitionMatrix());
 					
 					Reachability ircompute = new Reachability(idosample.getEstimatedTransitionMatrix(), validInitStates, validInitDist, targetStates,
-							PlatformDependent.MODEL_ROOT + "/active/"+ modelName, modelName + "_ido_" + ss, ALConfig.stateNumber);
+							PlatformDependent.MODEL_ROOT + "/active/"+ modelName, modelName + "_ido_" + ss + "_" + i, ALConfig.stateNumber);
 					List<Double> idoReach = ircompute.computeReachability();
 					Reachability rscompute = new Reachability(rdsample.getEstimatedTransitionMatrix(), validInitStates, validInitDist, targetStates,
-							PlatformDependent.MODEL_ROOT + "/active/" + modelName, modelName + "_rs_" + ss, ALConfig.stateNumber);
+							PlatformDependent.MODEL_ROOT + "/active/" + modelName, modelName + "_rs_" + ss + "_" + i, ALConfig.stateNumber);
 					List<Double> rsReach= rscompute.computeReachability();
 					
 					System.out.println("actual reach: " + actualReach);
 					System.out.println("ido reach: " + idoReach);
 					System.out.println("rs reach: " + rsReach);
 					
-					List<Double> idoDiff = ListUtil.listABSDiff(actualReach, idoReach);
-					List<Double> randomDiff = ListUtil.listABSDiff(actualReach, rsReach);
+					List<Double> idoDiff = ListUtil.listABSPercThresDiff(actualReach, idoReach,0.1);
+					List<Double> randomDiff = ListUtil.listABSPercThresDiff(actualReach, rsReach,0.1);
 					
 //					for(int ri=0; ri<targetStates.size(); ri++){
 //						int r = targetStates.get(ri);
@@ -201,8 +201,8 @@ public class ExampleMain {
 //						}
 //					}
 					
-					ir += ListUtil.listMean(idoDiff)/actualReach.get(0);
-					rr += ListUtil.listMean(randomDiff)/actualReach.get(0);
+					ir += ListUtil.listMean(idoDiff);
+					rr += ListUtil.listMean(randomDiff);
 
 				} catch (GRBException e) {
 					e.printStackTrace();
