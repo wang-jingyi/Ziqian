@@ -3,7 +3,7 @@
 ***ZiQian*** is a research tool actively maintained in SUTD, Singapore, to learn probabilistic models (mainly DTMCs) from system logs for model checking. 
 
 * In the first stage, ZiQian supports learning from multiple executions and a single execution. For both cases, two categories of algorithms are implemented: state-of-art tree based algorithms and evolution-based algorithms.
-* In the second stage, ZiQian integrates predicate abstraction to the learning framework. ZiQian starts from the coarsest abstraction and iteratively refine it by learning a new predicate by SVM.
+* In the second stage, ZiQian integrates predicate abstraction to the learning framework. ZiQian starts from the coarsest abstraction and iteratively refine it by learning new predicates using SVM.
 * In the third stage, ZiQian supports active learning for probabilistic models, where 'active' means we compute an optimal initial distribution for new samples to better estimate the model.
 
 ZiQian has been evaluated by multiple PRISM benchmark systems, random generated DTMCs, probabilistic boolean networks, as well as a real world water purification system testbed in SUTD. The promising experimental results prove that our theory and ZiQian work smoothly.     
