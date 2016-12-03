@@ -15,10 +15,11 @@ public class ResultProcessor {
 	
 	public static void main(String[] args) throws FileNotFoundException, ClassNotFoundException, IOException{
 		int[] samplesizes = new int[]{50000,100000,150000,200000};
+		double thres = 0.1;
 		List<Double> idoresults = new ArrayList<Double>();
 		List<Double> rsresults = new ArrayList<Double>();
 		for(int ss : samplesizes){
-			double[] result = computeRMCReachabilityResult("rmc16", 16, ss, 20, 0.05);
+			double[] result = computeRMCReachabilityResult("rmc8", 8, ss, 20, thres);
 			idoresults.add(result[0]);
 			rsresults.add(result[1]);
 		}
@@ -67,8 +68,8 @@ public class ResultProcessor {
 			
 			System.out.println("compute rs reachability...");
 			List<Double> rs = new ArrayList<Double>();
-			String rspath = Config.TMP_PATH+"/"+model+"_"+i+"rs_"+samplesize+"_reach";
-			File rsfile = new File(idopath);
+			String rspath = Config.TMP_PATH+"/"+model+"_"+i+"_rs_"+samplesize+"_reach";
+			File rsfile = new File(rspath);
 			if(rsfile.exists()){
 				rs = (List<Double>) FileUtil.readObject(rspath);
 			}

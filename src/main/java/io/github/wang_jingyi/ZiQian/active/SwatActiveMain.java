@@ -42,7 +42,7 @@ public class SwatActiveMain {
 		
 		List<Integer> targetStates = new ArrayList<Integer>();
 		for(int i=0; i<swatReachProbs.size(); i++){
-			if(swatReachProbs.get(i)<0.001){ // only observe target states with small reachability
+			if(swatReachProbs.get(i)<0.1){ // only observe target states with small reachability
 				targetStates.add(i);
 			}
 		}
@@ -50,7 +50,7 @@ public class SwatActiveMain {
 		
 		ALConfig.stateNumber = ssa.getStateNumber(); // update state number according to sensor abstraction
 		
-		String swatTrainPaths= PlatformDependent.SWAT_SIMULATE_PATH + "/samples_train";
+		String swatTrainPaths= PlatformDependent.SWAT_SIMULATE_PATH + "/samples_train_1"; // initial data for base estimation
 		 
 		System.out.println("number of states: " + ALConfig.stateNumber);
 		
@@ -96,30 +96,30 @@ public class SwatActiveMain {
 		Estimator estimator = new EFEstimator();
 		Sampler idosampler = new SwatSampler(ssa, 
 				PlatformDependent.MODEL_ROOT + "/active/swat/new_sample_ido", ALConfig.pathLength);
-		InitialDistGetter idoidg = new ReachabilityOptimizer(ALConfig.stateNumber, validInitStates, targetStates, ALConfig.pathLength);
+		InitialDistGetter idoidg = new InitialDistributionOptimizer(ALConfig.stateNumber, validInitStates, ALConfig.pathLength);
+		
 		Sampler rssampler = new SwatSampler(ssa, 
 				PlatformDependent.MODEL_ROOT + "/active/swat/new_sample_rs", ALConfig.pathLength);
 		InitialDistGetter uniformidg = new OriginalInitialDistribution(validInitStates,validInitDist);
 		
 		try {
-			double thres = 0.01;
+			double thres = 0.1;
 			Samples idosample = IterSampling(frequencyMatrix.copy(), ALConfig.newSampleNumber, estimator, idosampler, idoidg);
 			Reachability idoReach = new Reachability(idosample.getEstimatedTransitionMatrix(), validInitStates, validInitDist, targetStates,
 					PlatformDependent.MODEL_ROOT + "/active/swat", "swat_"+Config.SWAT_SAMPLE_STEP+"_"+Config.SWAT_RECORD_STEP+"_ido", ALConfig.boundedSteps);
 			List<Double> idoReachProbs = idoReach.computeReachability();
-			double idominfre = MetricComputing.calculateNonZeroMinFreq(idosample.getFrequencyMatrix());
-			double idomse = MetricComputing.calculateMSE(estExactMatrix, idosample.getEstimatedTransitionMatrix());
+			double ido_mv = MetricComputing.calculateNonZeroMinFreq(idosample.getFrequencyMatrix());
+			double ido_mse = MetricComputing.calculateMSE(estExactMatrix, idosample.getEstimatedTransitionMatrix());
 			List<Double> idoDiff = ListUtil.listABSPercThresDiff(swatReachProbs, idoReachProbs, thres); 
-//					ListUtil.listABSDiff(nonZeroSwatReachProbs, idoReachProbs);
-			double idoMeanDiff = ListUtil.listMean(idoDiff);
+			double ido_rrd = ListUtil.listMean(idoDiff);
 			FileUtil.writeObject(Config.TMP_PATH + "/swat_ido_reach_probs", idoReachProbs);
 			
-			logInfo.append("ido min frequency: " + idominfre + "\n");
+			logInfo.append("ido min frequency: " + ido_mv + "\n");
 			logInfo.append("ido target stats frequency: " + MetricComputing.
 					calculateTargetStateFreq(idosample.getFrequencyMatrix(),targetStates));
-			logInfo.append("ido mse: " + idomse + "\n");
+			logInfo.append("ido mse: " + ido_mse + "\n");
 			logInfo.append("ido reachability probs: " + idoReachProbs + "\n");
-			logInfo.append("ido reachability average diff: " + idoMeanDiff + "\n");
+			logInfo.append("ido reachability average diff: " + ido_rrd + "\n");
 			
 			ALConfig.ido = false;
 			
@@ -129,26 +129,26 @@ public class SwatActiveMain {
 			List<Double> rsReachProbs = rsReach.computeReachability();
 			FileUtil.writeObject(Config.TMP_PATH + "/swat_rs_reach_probs", rsReachProbs);
 			
-			double rsminfre = MetricComputing.calculateNonZeroMinFreq(uniformsample.getFrequencyMatrix());
-			double rsmse = MetricComputing.calculateMSE(estExactMatrix, uniformsample.getEstimatedTransitionMatrix());
+			double rs_mv = MetricComputing.calculateNonZeroMinFreq(uniformsample.getFrequencyMatrix());
+			double rs_mse = MetricComputing.calculateMSE(estExactMatrix, uniformsample.getEstimatedTransitionMatrix());
 			List<Double> rsDiff = ListUtil.listABSPercThresDiff(swatReachProbs, rsReachProbs, thres); 
-//					ListUtil.listABSDiff(nonZeroSwatReachProbs, rsReachProbs);
-			double rsMeanDiff = ListUtil.listMean(rsDiff);
-			logInfo.append("random sampling min frequency: " + rsminfre + "\n");
+			double rs_rrd = ListUtil.listMean(rsDiff);
+			
+			logInfo.append("random sampling min frequency: " + rs_mv + "\n");
 			logInfo.append("random target stats frequency: " + MetricComputing.
 					calculateTargetStateFreq(uniformsample.getFrequencyMatrix(),
 					targetStates));
-			logInfo.append("random sampling mse: " + rsmse + "\n");
+			logInfo.append("random sampling mse: " + rs_mse + "\n");
 			logInfo.append("random sampling reachability probs: " + rsReachProbs + "\n");
-			logInfo.append("random sampling reachability average diff: " + rsMeanDiff + "\n");
+			logInfo.append("random sampling reachability average diff: " + rs_rrd+ "\n");
 			
 			
-			System.out.println("ido min fre: " + idominfre + "\n");
-			System.out.println("rs min fre: " + rsminfre + "\n");
-			System.out.println("ido mse: " + idomse + "\n");
-			System.out.println("rs mse: " + rsmse + "\n");
-			System.out.println("ido reach: " + idoMeanDiff + "\n"); // only average on non-zero differences
-			System.out.println("rs reach: " + rsMeanDiff + "\n");
+			System.out.println("ido min fre: " + ido_mv + "\n");
+			System.out.println("rs min fre: " + rs_mv + "\n");
+			System.out.println("ido mse: " + ido_mse + "\n");
+			System.out.println("rs mse: " + rs_mse + "\n");
+			System.out.println("ido reach: " + ido_rrd + "\n"); // only average on non-zero differences
+			System.out.println("rs reach: " + rs_rrd + "\n");
 			
 			FileUtil.appendStringToFile(Config.TMP_PATH + "/swat_logs", logInfo.toString());
 			

@@ -20,10 +20,10 @@ public class SwatApproMatrix {
 		System.out.println("Add sensors, define abstractions...");
 		SwatSensorAbstraction ssa = new SwatSensorAbstraction();
 //		ssa.addSensor("LIT101", new Interval(200, 1100), 500);
-		ssa.addSensor("LIT301", new Interval(200, 1000), 100);
-		ssa.addSensor("LIT401", new Interval(200, 1000), 100);
+		ssa.addSensor("LIT301", new Interval(200, 1000), 500);
+		ssa.addSensor("LIT401", new Interval(200, 1000), 500);
 //		ssa.addSensor("LS601", new Interval(200, 8000), 5000);
-		ssa.addSensor("LS602", new Interval(200, 1000), 100);
+		ssa.addSensor("LS602", new Interval(200, 1000), 500);
 		ssa.computeInitialStates();
 		ssa.computeTargetStates();
 		
@@ -39,7 +39,7 @@ public class SwatApproMatrix {
 		
 		swatPathRoot.add(PlatformDependent.SWAT_SIMULATE_PATH + "/samples");
 		swatPathRoot.add(PlatformDependent.SWAT_SIMULATE_PATH + "/samples_1");
-		swatPathRoot.add(PlatformDependent.SWAT_SIMULATE_PATH + "/samples_2");
+//		swatPathRoot.add(PlatformDependent.SWAT_SIMULATE_PATH + "/samples_2");
 		
 		 
 		System.out.println("number of states: " + ALConfig.stateNumber);
