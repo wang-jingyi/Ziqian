@@ -20,16 +20,17 @@ public class SwatApproMatrix {
 		System.out.println("Add sensors, define abstractions...");
 		SwatSensorAbstraction ssa = new SwatSensorAbstraction();
 //		ssa.addSensor("LIT101", new Interval(200, 1100), 500);
-		ssa.addSensor("LIT301", new Interval(200, 1000), 500);
-		ssa.addSensor("LIT401", new Interval(200, 1000), 500);
+		ssa.addSensor("LIT301", new Interval(200, 1000), 200);
+		ssa.addSensor("LIT401", new Interval(200, 1000), 200);
 //		ssa.addSensor("LS601", new Interval(200, 8000), 5000);
-		ssa.addSensor("LS602", new Interval(200, 1000), 500);
+		ssa.addSensor("LS602", new Interval(200, 1000), 200);
 		ssa.computeInitialStates();
 		ssa.computeTargetStates();
 		
 		
 		
 		ALConfig.stateNumber = ssa.getStateNumber(); // update state number according to sensor abstraction
+		ALConfig.boundedSteps = ALConfig.stateNumber;
 		List<String> swatPathRoot = new ArrayList<String>();
 //		swatPathRoot.add(PlatformDependent.SWAT_SIMULATE_PATH + "/Jingyi_Data/10_5");
 //		swatPathRoot.add(PlatformDependent.SWAT_SIMULATE_PATH + "/Jingyi_Data_1/10_5");
@@ -38,12 +39,12 @@ public class SwatApproMatrix {
 //		swatPathRoot.add(PlatformDependent.SWAT_SIMULATE_PATH + "/Jingyi_Data_5/10_5");
 		
 		swatPathRoot.add(PlatformDependent.SWAT_SIMULATE_PATH + "/samples");
-		swatPathRoot.add(PlatformDependent.SWAT_SIMULATE_PATH + "/samples_1");
+//		swatPathRoot.add(PlatformDependent.SWAT_SIMULATE_PATH + "/samples_1");
 //		swatPathRoot.add(PlatformDependent.SWAT_SIMULATE_PATH + "/samples_2");
 		
 		 
 		System.out.println("number of states: " + ALConfig.stateNumber);
-		if(ALConfig.stateNumber>500){
+		if(ALConfig.stateNumber>200){
 			System.out.println("building sparse matrix...");
 			ALConfig.sparse = true;
 		}

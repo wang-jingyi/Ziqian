@@ -23,6 +23,7 @@ public class ListUtil {
 	
 	
 	public static List<Double> listABSPercThresDiff(List<Double> list1, List<Double> list2, double thre){
+		assert list1.size()==list2.size() : "inequal number of elements in the list.";
 		int len = list1.size();
 		List<Double> res = new ArrayList<Double>();
 		for(int i=0; i<len; i++){

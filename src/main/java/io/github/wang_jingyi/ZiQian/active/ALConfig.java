@@ -7,7 +7,7 @@ public class ALConfig {
 
 	public static boolean sparse = false;   // if the matrix is sparse
 	public static int stateNumber; 	// number of states
-	public static int newSampleNumber = 1000; // number of new samples
+	public static int newSampleNumber = 5000; // number of new samples
 	public static int pathLength = 30;
 	
 	public static boolean ido = true;
@@ -16,6 +16,6 @@ public class ALConfig {
 	
 	public static List<Integer> sensorIndex = new ArrayList<Integer>();
 	public static boolean sensorIndexAdded = false;
-	public static int boundedSteps = 60;
+	public static int boundedSteps;
 	
 }
