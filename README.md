@@ -3,7 +3,7 @@
 ***ZiQian*** is a research tool actively maintained in SUTD, Singapore, to learn probabilistic models (mainly DTMCs) from system logs for model checking. 
 
 * In the first stage, ZiQian supports learning from multiple executions and a single execution. For both cases, two categories of algorithms are implemented: state-of-art tree based algorithms and evolution-based algorithms.
-* In the second stage, ZiQian integrates predicate abstraction to the learning framework. ZiQian starts from the coarsest abstraction and iteratively refine it by learning a new predicate by SVM.
+* In the second stage, ZiQian integrates predicate abstraction to the learning framework. ZiQian starts from the coarsest abstraction and iteratively refine it by learning new predicates using SVM.
 * In the third stage, ZiQian supports active learning for probabilistic models, where 'active' means we compute an optimal initial distribution for new samples to better estimate the model.
 
 ZiQian has been evaluated by multiple PRISM benchmark systems, random generated DTMCs, probabilistic boolean networks, as well as a real world water purification system testbed in SUTD. The promising experimental results prove that our theory and ZiQian work smoothly.     
@@ -22,38 +22,31 @@ ZiQian has been evaluated by multiple PRISM benchmark systems, random generated 
 * There are multiple example case studies in the package 'example'.
 
 ### Dependencies ###
-The following external tools is not included in maven repository and have to be manually installed to your local maven repository. Before this, make sure maven has been installed in your system by running "mvn -version" in command line.
+The following external tools is not included in maven repository and have to be manually installed to your local maven repository. Before this, make sure maven has been installed in your system by running "mvn -version" in command line. The PRISM and javaml jar files are in /ext under project folder.
 
 
 * PRISM
 
-Download PRISM (jar file) at http://www.prismmodelchecker.org/download.php
-
-Execute 'mvn install:install-file -Dfile=<path-to-file> -DgroupId=oxford.modelchecker 
+Execute 'mvn install:install-file -Dfile=/ext/prism.jar -DgroupId=oxford.modelchecker 
     -DartifactId=prism -Dversion=4.2.1 -Dpackaging=jar' in command line
 
 
 
 * javaml
 
-Download javaml (jar file) at https://sourceforge.net/projects/java-ml/files/
-
-
-Execute 'mvn install:install-file -Dfile=<path-to-file> -DgroupId=net.sf 
+Execute 'mvn install:install-file -Dfile=/ext/javaml-0.1.7/javaml-0.1.7.jar -DgroupId=net.sf 
     -DartifactId=javaml -Dversion=0.1.7 -Dpackaging=jar' in command line
 
 
 * Gurobi
 
-Download Gurobi (jar file) at https://www.gurobi.com/registration/download-reg. It's free for academic use.
+Download Gurobi (jar file) at https://www.gurobi.com/registration/download-reg. It's free for academic use but make sure you acquire a license. Install GUROBI following the instructions and install the license as well. Then,
 
 Execute 'mvn install:install-file -Dfile=<path-to-file> -DgroupId=com.gurobi.www 
     -DartifactId=gurobi -Dversion=6.5 -Dpackaging=jar' in command line
 
 
 , where <path-to-file> is the path to the .jar file (located in ext folder) in all cases.
-
-
 
 ### Guidelines ###
 * Follow the examples in 'example' package and guidelines in 'run.Main' and 'run.LearnMain' to write your own case studies. Check run.Config for configuration of the algorithms. The learned model is in PRISM DTMC model format, which can be directly used for model checking using PRISM.
