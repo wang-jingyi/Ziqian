@@ -14,19 +14,47 @@ import java.util.List;
 public class ResultProcessor {
 	
 	public static void main(String[] args) throws FileNotFoundException, ClassNotFoundException, IOException{
-		int[] samplesizes = new int[]{50000,100000,150000,200000};
-		double thres = 0.1;
-		List<Double> idoresults = new ArrayList<Double>();
-		List<Double> rsresults = new ArrayList<Double>();
-		for(int ss : samplesizes){
-			double[] result = computeRMCReachabilityResult("rmc8", 8, ss, 20, thres);
-			idoresults.add(result[0]);
-			rsresults.add(result[1]);
+//		int[] samplesizes = new int[]{50000,100000,150000,200000};
+//		double thres = 0.1;
+//		List<Double> idoresults = new ArrayList<Double>();
+//		List<Double> rsresults = new ArrayList<Double>();
+//		for(int ss : samplesizes){
+//			double[] result = computeRMCReachabilityResult("rmc8", 8, ss, 20, thres);
+//			idoresults.add(result[0]);
+//			rsresults.add(result[1]);
+//		}
+//		System.out.println("ido results: " + idoresults);
+//		System.out.println("rs results: " + rsresults);
+		computeSwatResult(64, 5001, 0.01);
+		
+		
+	}
+	
+	@SuppressWarnings("unchecked")
+	public static void computeSwatResult(int state_number, int new_sample_number, double thres) throws FileNotFoundException, ClassNotFoundException, IOException{
+		String name_suffix = "state_" + state_number;
+		String actual_result_root = PlatformDependent.MODEL_ROOT +  "/active/swat/" + "swat_"+Config.SWAT_SAMPLE_STEP+"_"+
+				Config.SWAT_RECORD_STEP + "/" + name_suffix;
+		String result_root = PlatformDependent.MODEL_ROOT +  "/active/swat/" + "swat_"+Config.SWAT_SAMPLE_STEP+"_"+
+				Config.SWAT_RECORD_STEP + "/" + name_suffix + "/new_" + new_sample_number;
+		String ido_result_root = result_root+"/ido";
+		String rs_result_root = result_root+"/rs";
+		
+		
+		List<Double> swatReachProbs = (List<Double>) FileUtil.readObject(actual_result_root + "/swat_reach");
+		List<Double> targetReachProbs = new ArrayList<Double>();
+		for(int i=0; i<swatReachProbs.size(); i++){
+			if(swatReachProbs.get(i)>0 && swatReachProbs.get(i)<1){ // only observe target states with small reachability
+				targetReachProbs.add(swatReachProbs.get(i));
+			}
 		}
-		System.out.println("ido results: " + idoresults);
-		System.out.println("rs results: " + rsresults);
 		
-		
+		List<Double> idoReachProbs = (List<Double>) FileUtil.readObject(ido_result_root + "/ido_reach");
+		List<Double> rsReachProbs = (List<Double>) FileUtil.readObject(rs_result_root + "/rs_reach");
+		List<Double> ido_rrd = ListUtil.listABSPercThresDiff(targetReachProbs, idoReachProbs, thres);
+		List<Double> rs_rrd = ListUtil.listABSPercThresDiff(targetReachProbs, rsReachProbs, thres);
+		System.out.println("ido rrd: " + ListUtil.listMean(ido_rrd));
+		System.out.println("rs rrd: " +ListUtil.listMean(rs_rrd));
 	}
 	
 	@SuppressWarnings("unchecked")

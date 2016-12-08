@@ -34,6 +34,18 @@ public class ListUtil {
 		return res;
 	}
 	
+	public static List<Double> listABSThresDiff(List<Double> list1, List<Double> list2, double thre){
+		assert list1.size()==list2.size() : "inequal number of elements in the list.";
+		int len = list1.size();
+		List<Double> res = new ArrayList<Double>();
+		for(int i=0; i<len; i++){
+			if(list1.get(i)>0 && list1.get(i)<=thre){
+				res.add(Math.abs(list1.get(i)-list2.get(i)));
+			}
+		}
+		return res;
+	}
+	
 	public static List<Double> listABSDiff(List<Double> list1, List<Double> list2){
 		int len = list1.size();
 		List<Double> res = new ArrayList<Double>();
@@ -122,6 +134,15 @@ public class ListUtil {
 			ls.add(l);
 		}
 		return ls;
+	}
+	
+	public static void main(String[] args){
+		double[] d = new double[]{114.0, 6312.0, 3536.0, 2.0, 75.0, 6680.0, 4040.0, 5.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1608.0, 1194.0, 8.0};
+		double ds = 0;
+		for(double i : d){
+			ds += i;
+		}
+		System.out.println("ds: " + ds) ;
 	}
 
 }
