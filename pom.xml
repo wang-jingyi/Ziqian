@@ -9,7 +9,7 @@
 
 	<name>ziqian</name>
 	<url>http://maven.apache.org</url>
-	
+
 	<build>
 		<plugins>
 			<plugin>
@@ -83,6 +83,13 @@
 			<groupId>org.uncommons.watchmaker</groupId>
 			<artifactId>watchmaker-framework</artifactId>
 			<version>0.7.1</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/com.joptimizer/joptimizer -->
+		<dependency>
+			<groupId>com.joptimizer</groupId>
+			<artifactId>joptimizer</artifactId>
+			<version>3.4.0</version>
 		</dependency>
 
 		<dependency>

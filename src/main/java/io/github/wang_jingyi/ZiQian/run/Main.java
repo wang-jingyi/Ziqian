@@ -162,7 +162,7 @@ public class Main {
 		System.out.println("analyzing counterexample...");
 		ce.analyze();
 		
-		System.out.println("refine...");
+		System.out.println("refine the predicate set...");
 		
 		Refiner refiner = new Refiner();
 //		List<String> dataPaths = new ArrayList<>();

@@ -1,6 +1,13 @@
 package io.github.wang_jingyi.ZiQian;
 
 import java.util.List;
+/*
+ * an interface for predicate
+ * 1) name
+ * 2) relevant variables
+ * 3) variable values
+ * 
+ * */
 
 public interface Predicate {
 	
