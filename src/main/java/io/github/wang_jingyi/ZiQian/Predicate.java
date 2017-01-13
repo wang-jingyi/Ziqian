@@ -9,7 +9,7 @@ import java.util.List;
  * 
  * */
 
-public interface Predicate {
+public interface Predicate{
 	
 	public String getPredicateName();
 	

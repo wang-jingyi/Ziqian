@@ -207,7 +207,7 @@ public class PrismPathData {
 			String str2 = br.readLine(); // second line of file
 			String[] firstLine = str.split(" "); // take care of the delimiter here
 			String[] secondLine = str2.split(" ");
-			for(int i=0; i<firstLine.length; i++){
+			for(int i=2; i<firstLine.length; i++){ // extract variable 'action' and 'step' as they're irrelevant
 				if(Character.isDigit(secondLine[i].charAt(0)) || secondLine[i].equalsIgnoreCase("true") || 
 						secondLine[i].equalsIgnoreCase("false")){ // only add variables who are numbers, true or false
 					vars.add(firstLine[i]);

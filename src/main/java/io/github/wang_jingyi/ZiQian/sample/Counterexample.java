@@ -168,7 +168,6 @@ public class Counterexample implements SplitPointFinder{
 			sps.add(sp);
 		}
 		
-		
 		List<SplittingPoint> finalsps = new ArrayList<>();
 		if(Config.LOOP_FIRST){
 			// put splitting points of loops in front

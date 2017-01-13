@@ -27,26 +27,28 @@ The following external tools is not included in maven repository and have to be 
 
 * PRISM
 
-Execute 'mvn install:install-file -Dfile=/ext/prism.jar -DgroupId=oxford.modelchecker 
+Execute 'mvn install:install-file -Dfile=./ext/prism.jar -DgroupId=oxford.modelchecker 
     -DartifactId=prism -Dversion=4.2.1 -Dpackaging=jar' in command line
 
 
 
 * javaml
 
-Execute 'mvn install:install-file -Dfile=/ext/javaml-0.1.7/javaml-0.1.7.jar -DgroupId=net.sf 
+Execute 'mvn install:install-file -Dfile=./ext/javaml-0.1.7/javaml-0.1.7.jar -DgroupId=net.sf 
     -DartifactId=javaml -Dversion=0.1.7 -Dpackaging=jar' in command line
 
+We use javaml to apply SVM for generating new predicates for abstraction.
 
 * Gurobi
 
-Download Gurobi (jar file) at https://www.gurobi.com/registration/download-reg. It's free for academic use but make sure you acquire a license. Install GUROBI following the instructions and install the license as well. Then,
+Gurobi is free for academic use but make sure you acquire a license. Install GUROBI following the instructions and install the license as well. Then,
 
-Execute 'mvn install:install-file -Dfile=<path-to-file> -DgroupId=com.gurobi.www 
+Execute 'mvn install:install-file -Dfile=./ext/gurobi.jar -DgroupId=com.gurobi.www 
     -DartifactId=gurobi -Dversion=6.5 -Dpackaging=jar' in command line
 
+We use Gurobi for the optimization of initial distribution for active learning. 
 
-, where <path-to-file> is the path to the .jar file (located in ext folder) in all cases.
+After installing all the dependencies, update the project.
 
 ### Guidelines ###
 * Follow the examples in 'example' package and guidelines in 'run.Main' and 'run.LearnMain' to write your own case studies. Check run.Config for configuration of the algorithms. The learned model is in PRISM DTMC model format, which can be directly used for model checking using PRISM.

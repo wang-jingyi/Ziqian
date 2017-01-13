@@ -1,13 +1,18 @@
 package io.github.wang_jingyi.ZiQian.example;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import io.github.wang_jingyi.ZiQian.Predicate;
 import io.github.wang_jingyi.ZiQian.VariablesValue;
 
-public class NandReliable implements Predicate{
+public class NandReliable implements Predicate, Serializable{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 5064163201514810835L;
 	List<String> vars = new ArrayList<>();
 	int N;
 	

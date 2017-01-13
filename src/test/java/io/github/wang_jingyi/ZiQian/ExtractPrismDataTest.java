@@ -1,5 +1,12 @@
 package io.github.wang_jingyi.ZiQian;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.junit.Test;
+
 import io.github.wang_jingyi.ZiQian.example.CrowdPositive;
 import io.github.wang_jingyi.ZiQian.learn.LearningDTMC;
 import io.github.wang_jingyi.ZiQian.learn.ModelSelection;
@@ -15,15 +22,6 @@ import io.github.wang_jingyi.ZiQian.sample.CounterexamplePath;
 import io.github.wang_jingyi.ZiQian.sample.HypothesisTest;
 import io.github.wang_jingyi.ZiQian.sample.SprtTest;
 import io.github.wang_jingyi.ZiQian.sample.TestEnvironment;
-
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import net.sf.javaml.core.Dataset;
-
-import org.junit.Test;
 
 public class ExtractPrismDataTest {
 	
@@ -89,12 +87,10 @@ public class ExtractPrismDataTest {
 		
 		System.out.println("splitting point: " + ce.getSortedSplittingPoints().get(0).getCurrentStateId() + "->" + ce.getSortedSplittingPoints().get(0).getNextStateId());
 		
-		Refiner refiner = new Refiner();
+		Refiner refiner = new Refiner(ce.getSortedSplittingPoints(), vvl, pres, bestDTMC.getPrismModel());
 		List<String> dps = new ArrayList<>();
 		dps.add(PlatformDependent.MODEL_ROOT+"/crowds/testPaths");
-		Dataset ds = refiner.collectDataFromPaths(dps, ps.getPredicates(), 
-				ce.getSortedSplittingPoints(), bestDTMC.getPrismModel());
-		Predicate newPredicate = refiner.findSplitPredicates(ds);
+		Predicate newPredicate = refiner.refine();
 		pres.add(newPredicate);
 		AlgoProfile.newIteration = true;
 		AlgoProfile.iterationCount ++;
