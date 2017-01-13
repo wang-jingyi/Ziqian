@@ -1,5 +1,6 @@
 package io.github.wang_jingyi.ZiQian.refine;
 
+import java.io.Serializable;
 import java.util.List;
 
 import io.github.wang_jingyi.ZiQian.Predicate;
@@ -8,10 +9,21 @@ import net.sf.javaml.classification.Classifier;
 import net.sf.javaml.core.DenseInstance;
 import net.sf.javaml.core.Instance;
 
-public class LearnedPredicate implements Predicate{
+public class LearnedPredicate implements Predicate, Serializable{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2900688502055037029L;
 	private Classifier classifier;
 	private String predicateName;
+	
+	@Override
+	public String toString() {
+		return "LearnedPredicate [classifier=" + classifier + ", predicateName=" + predicateName + ", vars=" + vars
+				+ "]";
+	}
+
 	private List<String> vars;
 	
 	public LearnedPredicate(Classifier cls, String pn, List<String> vars){

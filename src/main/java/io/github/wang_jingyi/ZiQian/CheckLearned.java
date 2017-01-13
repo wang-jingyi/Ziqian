@@ -1,11 +1,13 @@
 package io.github.wang_jingyi.ZiQian;
 
 
-import java.io.FileNotFoundException;
+import java.io.IOException;
 
+import io.github.wang_jingyi.ZiQian.profile.AlgoProfile;
 import io.github.wang_jingyi.ZiQian.profile.TimeProfile;
 import io.github.wang_jingyi.ZiQian.run.Config;
 import io.github.wang_jingyi.ZiQian.sample.ShellInteraction;
+import io.github.wang_jingyi.ZiQian.utils.FileUtil;
 import io.github.wang_jingyi.ZiQian.utils.StringUtil;
 
 public class CheckLearned {
@@ -21,7 +23,7 @@ public class CheckLearned {
 		this.propertyIndex = pi;
 	}
 	
-	public void check() throws FileNotFoundException{
+	public void check() throws IOException{
 		
 		// first check if the given property holds
 		String[] prismCommandParas = new String[]{Config.PRISM_PATH,
@@ -39,6 +41,7 @@ public class CheckLearned {
 			TimeProfile.mainEndTime = System.nanoTime();
 			TimeProfile.outputTimeProfile();
 			TimeProfile.outputTimeProfile(Config.OUTPUT_MODEL_PATH + "/time.txt");
+			FileUtil.writeObject(Config.OUTPUT_MODEL_PATH + "/predicates", AlgoProfile.predicates);
 			System.exit(0);
 		}
 		

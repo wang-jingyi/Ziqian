@@ -2,7 +2,7 @@ package io.github.wang_jingyi.ZiQian;
 
 import java.util.List;
 
-public interface Predicate {
+public interface Predicate{
 	
 	public String getPredicateName();
 	

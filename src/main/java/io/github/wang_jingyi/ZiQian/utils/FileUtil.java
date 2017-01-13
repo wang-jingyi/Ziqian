@@ -283,7 +283,9 @@ public class FileUtil {
 
 	public static void createDir(String dirPath){
 		File theDir = new File(dirPath);
-		theDir.mkdirs();
+		if(!theDir.exists()){
+			theDir.mkdirs();
+		}
 	}
 
 }

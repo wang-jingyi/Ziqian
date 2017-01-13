@@ -3,11 +3,16 @@ package io.github.wang_jingyi.ZiQian.example;
 import io.github.wang_jingyi.ZiQian.Predicate;
 import io.github.wang_jingyi.ZiQian.VariablesValue;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CrowdPositive implements Predicate{
+public class CrowdPositive implements Predicate, Serializable{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 8374509487552795407L;
 	List<String> vars = new ArrayList<>();
 	
 	public CrowdPositive() {
