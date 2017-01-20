@@ -1,19 +1,15 @@
 package io.github.wang_jingyi.ZiQian.active;
 
-import gurobi.GRB;
-import gurobi.GRBEnv;
-import gurobi.GRBException;
-import gurobi.GRBLinExpr;
-import gurobi.GRBModel;
-import gurobi.GRBVar;
-import io.github.wang_jingyi.ZiQian.utils.IntegerUtil;
-
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.OpenMapRealMatrix;
 import org.apache.commons.math3.linear.RealMatrix;
+
+import com.joptimizer.functions.ConvexMultivariateRealFunction;
+import com.joptimizer.functions.LinearMultivariateRealFunction;
+import com.joptimizer.optimizers.JOptimizer;
+import com.joptimizer.optimizers.OptimizationRequest;
 
 public class InitialDistributionOptimizer implements InitialDistGetter{
 
@@ -57,66 +53,115 @@ public class InitialDistributionOptimizer implements InitialDistGetter{
 		int mini = MetricComputing.calculateMinFreqState(frequencyMatrix); // get i: arg min mi
 		double[] ATI = AT.getRow(mini); // the i-th row
 
-		GRBEnv env;
-		double[] optimalDistribution = new double[nodeNumber];
+//		double[] optimalDistribution = new double[nodeNumber];
+
+		LinearMultivariateRealFunction objectiveFunction = new LinearMultivariateRealFunction(ATI, 0);
+		ConvexMultivariateRealFunction[] inequalities = new ConvexMultivariateRealFunction[2*nodeNumber];
+
+		double[] g0 = new double[nodeNumber];
+		double[] g1 = new double[nodeNumber];
+		for(int i=0; i<nodeNumber; i++){
+			if(i!=0){
+				g0[i-1]=0;
+				g1[i-1]=0;
+			}
+			g0[i] = -1;
+			g1[i] = 1;
+			inequalities[i] = new LinearMultivariateRealFunction(g0, 0); // xi >= 0
+			inequalities[i+nodeNumber] = new LinearMultivariateRealFunction(g1, -1); // xi <=1
+		}
+
+		double[][] a = new double[1][nodeNumber];
+		for(int i=0; i<nodeNumber; i++){
+			a[0][i]=1;
+		}
+		double[] b = new double[]{1};
+
+		//optimization problem
+		OptimizationRequest or = new OptimizationRequest();
+		or.setF0(objectiveFunction);
+		or.setFi(inequalities);
+		or.setA(a);
+		or.setB(b);
+		//or.setInitialPoint(new double[] {0.0, 0.0});//initial feasible point, not mandatory
+		or.setToleranceFeas(1.E-2);
+		or.setTolerance(1.E-2);
+
+		//optimization
+		JOptimizer opt = new JOptimizer();
+		opt.setOptimizationRequest(or);
 		try {
-			env = new GRBEnv("optimize.initial.distribution.log");
-			GRBModel  model = new GRBModel(env);
-
-			// Create variables
-			List<GRBVar> vars = new ArrayList<>();
-			for(int i=0; i<nodeNumber; i++){
-				vars.add(model.addVar(0.0, 1.0, 0.0, GRB.CONTINUOUS, "x"+i));
-			}
-			model.update();
-
-			GRBLinExpr obj = new GRBLinExpr();
-			GRBLinExpr cst = new GRBLinExpr();
-
-			for(int i : validInitialStates){ // only optimize over initial states
-				obj.addTerm(ATI[i], vars.get(i));
-				cst.addTerm(1.0, vars.get(i));
-			}
-
-			// set objective
-			model.setObjective(obj, GRB.MAXIMIZE);
-
-			//		System.out.println(model.getObjective());
-
-
-			// add constraints
-			model.addConstr(cst, GRB.EQUAL, 1.0, "valid distribution");
-
-			List<GRBLinExpr> zeros = new ArrayList<>();
-			for(int i=0; i<nodeNumber; i++){
-				if(!IntegerUtil.isInList(i, validInitialStates)){
-					GRBLinExpr newcst = new GRBLinExpr();
-					newcst.addTerm(1.0, vars.get(i));
-					zeros.add(newcst);
-				}
-			}
-
-			for(GRBLinExpr le : zeros){
-				model.addConstr(le, GRB.EQUAL, 0.0, "non initial states");
-			}
-
-			// Optimize model
-			model.optimize();
-
-			for(int i=0; i<nodeNumber; i++){
-				optimalDistribution[i] = vars.get(i).get(GRB.DoubleAttr.X);
-//				System.out.println(vars.get(i).get(GRB.StringAttr.VarName) + ": " + vars.get(i).get(GRB.DoubleAttr.X));
-			}
-
-			//		System.out.println("Obj: " + model.get(GRB.DoubleAttr.ObjVal));
-
-			// Dispose of model and environment
-			model.dispose();
-			env.dispose();
-		} catch (GRBException e) {
+			opt.optimize();
+		} catch (Exception e) {
+			System.out.println("optimization problem");
 			e.printStackTrace();
 		}
-		return optimalDistribution;
+		double[] sol = opt.getOptimizationResponse().getSolution();
+		for(double d : sol){
+			System.out.println("solution: " + d);
+		}
+
+
+		//		GRBEnv env;
+
+		//		try {
+		//			env = new GRBEnv("optimize.initial.distribution.log");
+		//			GRBModel  model = new GRBModel(env);
+		//
+		//			// Create variables
+		//			List<GRBVar> vars = new ArrayList<>();
+		//			for(int i=0; i<nodeNumber; i++){
+		//				vars.add(model.addVar(0.0, 1.0, 0.0, GRB.CONTINUOUS, "x"+i));
+		//			}
+		//			model.update();
+		//
+		//			GRBLinExpr obj = new GRBLinExpr();
+		//			GRBLinExpr cst = new GRBLinExpr();
+		//
+		//			for(int i : validInitialStates){ // only optimize over initial states
+		//				obj.addTerm(ATI[i], vars.get(i));
+		//				cst.addTerm(1.0, vars.get(i));
+		//			}
+		//
+		//			// set objective
+		//			model.setObjective(obj, GRB.MAXIMIZE);
+		//
+		//			//		System.out.println(model.getObjective());
+		//
+		//
+		//			// add constraints
+		//			model.addConstr(cst, GRB.EQUAL, 1.0, "valid distribution");
+		//
+		//			List<GRBLinExpr> zeros = new ArrayList<>();
+		//			for(int i=0; i<nodeNumber; i++){
+		//				if(!IntegerUtil.isInList(i, validInitialStates)){
+		//					GRBLinExpr newcst = new GRBLinExpr();
+		//					newcst.addTerm(1.0, vars.get(i));
+		//					zeros.add(newcst);
+		//				}
+		//			}
+		//
+		//			for(GRBLinExpr le : zeros){
+		//				model.addConstr(le, GRB.EQUAL, 0.0, "non initial states");
+		//			}
+		//
+		//			// Optimize model
+		//			model.optimize();
+		//
+		//			for(int i=0; i<nodeNumber; i++){
+		//				optimalDistribution[i] = vars.get(i).get(GRB.DoubleAttr.X);
+		////				System.out.println(vars.get(i).get(GRB.StringAttr.VarName) + ": " + vars.get(i).get(GRB.DoubleAttr.X));
+		//			}
+		//
+		//			//		System.out.println("Obj: " + model.get(GRB.DoubleAttr.ObjVal));
+		//
+		//			// Dispose of model and environment
+		//			model.dispose();
+		//			env.dispose();
+		//		} catch (GRBException e) {
+		//			e.printStackTrace();
+		//		}
+		return sol;
 	}
 
 

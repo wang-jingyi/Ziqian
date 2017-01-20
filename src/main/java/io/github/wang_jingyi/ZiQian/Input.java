@@ -19,6 +19,12 @@ public class Input implements Serializable{
 		this.dataSize = getInputSize();
 	}
 	
+	@Override
+	public String toString() {
+		return "Input [alphabet=" + alphabet + ", observations=" + observations
+				+ ", dataSize=" + dataSize + "]";
+	}
+
 	public List<String> getAlphabet() {
 		return alphabet;
 	}

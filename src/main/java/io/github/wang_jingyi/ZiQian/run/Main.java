@@ -41,8 +41,6 @@ public class Main {
 		FileUtil.cleanDirectory(Config.TESTING_PATH);
 		
 		
-		
-		
 		if(FileUtil.filesInDir(Config.DATA_PATH).size()<1){
 			if(Config.SWAT){
 				for(int i=1; i<=100; i++){
@@ -167,7 +165,7 @@ public class Main {
 		System.out.println("analyzing counterexample...");
 		ce.analyze();
 		
-		System.out.println("refine...");
+		System.out.println("refine the predicate set...");
 		
 		Refiner refiner = new Refiner(ce.getSortedSplittingPoints(), vvl, pres, bestDTMC.getPrismModel());
 //		List<String> dataPaths = new ArrayList<>();
