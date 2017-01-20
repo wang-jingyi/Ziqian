@@ -127,6 +127,11 @@ public class Counterexample implements SplitPointFinder{
 
 	private boolean CheckValidity(CounterexamplePath cp, List<String> pathData, PrismModel pm) throws FileNotFoundException, ClassNotFoundException, IOException{
 		List<Integer> path = cp.getCounterPath();
+		
+		if(pathData.size()<=1){
+			return false;
+		}
+		
 		for(int i=0; i<path.size()-1; i++){
 			String tmps = pathData.get(i+1);
 			int j = StringUtil.getStringIndex(tmps, pm.getPrismStates().get(path.get(i)).getSigmas());

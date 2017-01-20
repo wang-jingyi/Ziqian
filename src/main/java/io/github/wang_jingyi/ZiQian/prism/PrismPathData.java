@@ -20,7 +20,7 @@ public class PrismPathData {
 	 * @ para: dataPath is a single file path
 	 * @ para: variables to extract
 	 * */
-	public static List<VariablesValue>  extractSEData(String dataPath, List<String> vars, int ds) throws IOException{
+	public static List<VariablesValue>  extractSEData(String dataPath, List<String> vars, int ds, int stepSize) throws IOException{
 		List<VariablesValue> values = new ArrayList<VariablesValue>();
 		FileReader reader = new FileReader(dataPath);
 		BufferedReader br = new BufferedReader(reader);
@@ -37,26 +37,30 @@ public class PrismPathData {
 		}
 
 		int cds = 0;
+		int lineCount = 0;
 		while((str = br.readLine()) != null){ // read each line of data from file
-			String[] strs = str.split(" ");
-			VariablesValue rivv = new VariablesValue(vars);
-			for(int i=0; i<varInd.length; i++){
-				if(strs.length < vars.size()){ // make sure each variable has a value
+			lineCount++;
+			if(lineCount%stepSize==0){
+				String[] strs = str.split(" ");
+				VariablesValue rivv = new VariablesValue(vars);
+				for(int i=0; i<varInd.length; i++){
+					if(strs.length < vars.size()){ // make sure each variable has a value
+						break;
+					}
+					rivv.getValues().add(new Value(strs[varInd[i]]));
+				}
+				values.add(rivv);
+				cds ++;
+				if(cds>ds){
 					break;
 				}
-				rivv.getValues().add(new Value(strs[varInd[i]]));
-			}
-			values.add(rivv);
-			cds ++;
-			if(cds>ds){
-				break;
 			}
 		}
 		br.close();
 		return values;
 	}
 
-	public static List<List<VariablesValue>> extractMEData(String dirPath, List<String> vars, int dataSize) throws IOException{
+	public static List<List<VariablesValue>> extractMEData(String dirPath, List<String> vars, int dataSize, int stepSize) throws IOException{
 		List<List<VariablesValue>> mv = new ArrayList<List<VariablesValue>>();
 		int totalSize = 0;
 		List<String> fus = FileUtil.filesInDir(dirPath);
@@ -68,7 +72,7 @@ public class PrismPathData {
 				ds = new Random().nextInt(2*dataSize/fus.size());
 			}
 			
-			List<VariablesValue> v = extractSEData(s, vars, ds);
+			List<VariablesValue> v = extractSEData(s, vars, ds, stepSize);
 			mv.add(v);
 			totalSize = totalSize + v.size();
 			if(totalSize>=dataSize){
@@ -207,7 +211,7 @@ public class PrismPathData {
 			String str2 = br.readLine(); // second line of file
 			String[] firstLine = str.split(" "); // take care of the delimiter here
 			String[] secondLine = str2.split(" ");
-			for(int i=2; i<firstLine.length; i++){ // extract variable 'action' and 'step' as they're irrelevant
+			for(int i=0; i<firstLine.length; i++){ // extract variable 'action' and 'step' as they're irrelevant
 				if(Character.isDigit(secondLine[i].charAt(0)) || secondLine[i].equalsIgnoreCase("true") || 
 						secondLine[i].equalsIgnoreCase("false")){ // only add variables who are numbers, true or false
 					vars.add(firstLine[i]);

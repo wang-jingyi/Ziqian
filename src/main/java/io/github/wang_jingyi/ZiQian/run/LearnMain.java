@@ -24,7 +24,7 @@ public class LearnMain {
 		
 		TimeProfile.mainStartTime = System.nanoTime();
 		
-		ExtractPrismData epd = new ExtractPrismData(Config.DATA_PATH, Config.DATA_SIZE);
+		ExtractPrismData epd = new ExtractPrismData(Config.DATA_PATH, Config.DATA_SIZE, 1);
 		VariablesValueInfo vvl = epd.getVariablesValueInfo();
 		
 		// swat 

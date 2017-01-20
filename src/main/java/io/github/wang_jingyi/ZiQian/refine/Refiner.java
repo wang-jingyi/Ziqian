@@ -69,7 +69,7 @@ public class Refiner{
 
 		if(oneLabel==true){
 			return	null;
-//					unsupervisedClassify(ds);
+			//					unsupervisedClassify(ds);
 		}
 		else{
 			return supervisedClassify(ds);
@@ -104,6 +104,8 @@ public class Refiner{
 		PredicateAbstraction pa = new PredicateAbstraction(predicates);
 
 		for(List<VariablesValue> vvl : vvs){
+			int pcount = 0;
+			int ncount = 0;
 			List<String> vvls = pa.abstractList(vvl); // abstract list of values
 			for(int i=0; i<vvls.size(); i++){
 				String abs_s = vvls.get(i);
@@ -128,17 +130,36 @@ public class Refiner{
 				}
 
 				if(vvls.get(i+1).equals(nextString)){ 
-					// check if the next state is according to the counterexample path
-					Instance ins = new DenseInstance(values,"positive");
-					ds.add(ins);
-					posCount++; // update positive instance count
 
+					if(Config.SELECTIVE_DATA_COLLECTION){
+						if(pcount<1){
+							// check if the next state is according to the counterexample path
+							Instance ins = new DenseInstance(values,"positive");
+							ds.add(ins);
+							pcount ++;
+							posCount++; // update positive instance count
+						}
+					}
+					else{
+						Instance ins = new DenseInstance(values,"positive");
+						ds.add(ins);
+						posCount++; // update positive instance count
+					}
 				}
 				else{
-					Instance ins = new DenseInstance(values,"negative");
-					ds.add(ins);
-					negCount++; // update negative instance count
-
+					if(Config.SELECTIVE_DATA_COLLECTION){
+						if(ncount<1){
+							Instance ins = new DenseInstance(values,"negative");
+							ds.add(ins);
+							ncount++;
+							negCount++; // update negative instance count
+						}
+					}
+					else{
+						Instance ins = new DenseInstance(values,"negative");
+						ds.add(ins);
+						negCount++; // update negative instance count
+					}
 				}
 			}
 		}
@@ -226,60 +247,60 @@ public class Refiner{
 	//		return ds;
 	//	}
 
-//	private LearnedPredicate unsupervisedClassify(Dataset ds){
-//
-//		System.out.println("build cluster...");
-//		//		System.out.println(ds.toString());
-//		KMeans km = new KMeans(2);
-//		Dataset[] dss = km.cluster(ds);
-//
-//		System.out.println("instance in first cluster: " + dss[0].size());
-//		System.out.println("instance in second cluster: " + dss[1].size());
-//
-//		Dataset labeledDataset = new DefaultDataset();
-//		for(Instance ins : dss[0]){
-//			ins.setClassValue("positive");
-//		}
-//		for(Instance ins : dss[1]){
-//			ins.setClassValue("negative");
-//		}
-//		labeledDataset.addAll(dss[0]);
-//		labeledDataset.addAll(dss[1]);
-//
-//		LibSVM svm = new LibSVM();
-//		svm.buildClassifier(labeledDataset);
-//		double[] weights = svm.getWeights();
-//
-//		List<Integer> ind = selectWeightElements(weights);
-//		for(int i=0; i<ind.size(); i++){
-//			newVars.add(allVars.get(ind.get(i)));
-//		}
-//
-//
-//		System.out.println("weights of the classifier: " + NumberUtil.ArrayToString(svm.getWeights()));
-//
-//		int rightCount = 0;
-//		int sumCount = 0;
-//		System.out.println("calculate accuracy...");
-//
-//		for(Instance ins : labeledDataset){
-//			if(svm.classify(ins).equals(ins.classValue())){
-//				rightCount ++;
-//			}
-//			sumCount++;
-//		}
-//
-//		classifyAccuracy = (double)rightCount/sumCount;
-//		System.out.println("accuracy : " + classifyAccuracy);
-//
-//		if(rightCount==negCount || rightCount==posCount){ // all data are in one side, fail to classify
-//			System.out.println("fail to find a splitting predicate...");
-//			return null;
-//		}
-//
-//		LearnedPredicate newPredicate = new LearnedPredicate(svm,"learned_predicate_" + AlgoProfile.iterationCount, newVars);
-//		return newPredicate;
-//	}
+	//	private LearnedPredicate unsupervisedClassify(Dataset ds){
+	//
+	//		System.out.println("build cluster...");
+	//		//		System.out.println(ds.toString());
+	//		KMeans km = new KMeans(2);
+	//		Dataset[] dss = km.cluster(ds);
+	//
+	//		System.out.println("instance in first cluster: " + dss[0].size());
+	//		System.out.println("instance in second cluster: " + dss[1].size());
+	//
+	//		Dataset labeledDataset = new DefaultDataset();
+	//		for(Instance ins : dss[0]){
+	//			ins.setClassValue("positive");
+	//		}
+	//		for(Instance ins : dss[1]){
+	//			ins.setClassValue("negative");
+	//		}
+	//		labeledDataset.addAll(dss[0]);
+	//		labeledDataset.addAll(dss[1]);
+	//
+	//		LibSVM svm = new LibSVM();
+	//		svm.buildClassifier(labeledDataset);
+	//		double[] weights = svm.getWeights();
+	//
+	//		List<Integer> ind = selectWeightElements(weights);
+	//		for(int i=0; i<ind.size(); i++){
+	//			newVars.add(allVars.get(ind.get(i)));
+	//		}
+	//
+	//
+	//		System.out.println("weights of the classifier: " + NumberUtil.ArrayToString(svm.getWeights()));
+	//
+	//		int rightCount = 0;
+	//		int sumCount = 0;
+	//		System.out.println("calculate accuracy...");
+	//
+	//		for(Instance ins : labeledDataset){
+	//			if(svm.classify(ins).equals(ins.classValue())){
+	//				rightCount ++;
+	//			}
+	//			sumCount++;
+	//		}
+	//
+	//		classifyAccuracy = (double)rightCount/sumCount;
+	//		System.out.println("accuracy : " + classifyAccuracy);
+	//
+	//		if(rightCount==negCount || rightCount==posCount){ // all data are in one side, fail to classify
+	//			System.out.println("fail to find a splitting predicate...");
+	//			return null;
+	//		}
+	//
+	//		LearnedPredicate newPredicate = new LearnedPredicate(svm,"learned_predicate_" + AlgoProfile.iterationCount, newVars);
+	//		return newPredicate;
+	//	}
 
 
 }

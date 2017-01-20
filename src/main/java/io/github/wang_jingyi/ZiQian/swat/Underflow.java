@@ -1,17 +1,22 @@
 package io.github.wang_jingyi.ZiQian.swat;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import io.github.wang_jingyi.ZiQian.Predicate;
 import io.github.wang_jingyi.ZiQian.VariablesValue;
 
-public class Underflow implements Predicate{
+public class Underflow implements Predicate, Serializable{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4971393425170521837L;
 	List<String> vars = new ArrayList<>();
 
 	public Underflow() {
-		vars.add("LIT101");
+		vars.add("LIT301");
 	}
 	
 	@Override

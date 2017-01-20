@@ -52,7 +52,7 @@ public class TestEnvironment {
 	
 	public boolean test(Counterexample ce) throws IOException, ClassNotFoundException{
 		List<VariablesValue> vvs = PrismPathData.extractSEData(outputFilePath+"/path_"+(simulationCount-1)+".txt", 
-				AlgoProfile.vars,Integer.MAX_VALUE); // variables values of last simulation
+				AlgoProfile.vars,Integer.MAX_VALUE,Config.STEP_SIZE); // variables values of last simulation
 		PredicateAbstraction pa = new PredicateAbstraction(ps.getPredicates());
 		List<String> absExs = pa.abstractList(vvs);
 		return ce.checkMembership(absExs);

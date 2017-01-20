@@ -10,17 +10,19 @@ import java.util.List;
 public class ExtractPrismData implements FormatVariablesValue{
 	
 	private String dataPath;
+	private int stepSize;
 	private int dataSize;
 	
-	public ExtractPrismData(String datapath, int datasize) {
+	public ExtractPrismData(String datapath, int datasize, int stepSize) {
 		this.dataPath = datapath;
 		this.dataSize = datasize;
+		this.stepSize = stepSize;
 	}
 
 	@Override
 	public VariablesValueInfo getVariablesValueInfo() throws IOException {
 		List<String> vars = PrismPathData.extractPathVars(dataPath);
-		List<List<VariablesValue>> vvs = PrismPathData.extractMEData(dataPath, vars, dataSize);
+		List<List<VariablesValue>> vvs = PrismPathData.extractMEData(dataPath, vars, dataSize, stepSize);
 		List<Integer> varsLength = PrismPathData.updateMEVarsLength(vvs);
 		return new VariablesValueInfo(vars, varsLength, vvs);
 	}
@@ -28,7 +30,7 @@ public class ExtractPrismData implements FormatVariablesValue{
 	
 	// extract specific variables information
 	public VariablesValueInfo getVariablesValueInfo(List<String> vars) throws IOException {
-		List<List<VariablesValue>> vvs = PrismPathData.extractMEData(dataPath, vars, dataSize);
+		List<List<VariablesValue>> vvs = PrismPathData.extractMEData(dataPath, vars, dataSize, stepSize);
 		List<Integer> varsLength = PrismPathData.updateMEVarsLength(vvs);
 		return new VariablesValueInfo(vars, varsLength, vvs);
 	}

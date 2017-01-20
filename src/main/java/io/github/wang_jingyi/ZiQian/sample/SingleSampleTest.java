@@ -84,7 +84,8 @@ public class SingleSampleTest implements HypothesisTest{
 		paths.addAll(FileUtil.filesInDir(Config.DATA_PATH)); // add learning data statistics in
 		
 		for(String path : paths){
-			List<VariablesValue> vvs = PrismPathData.extractSEData(path, AlgoProfile.vars,Integer.MAX_VALUE); // variables values of last simulation
+			List<VariablesValue> vvs = PrismPathData.extractSEData(path, AlgoProfile.vars,Integer.MAX_VALUE, 
+					Config.STEP_SIZE); // variables values of last simulation
 			PredicateAbstraction pa = new PredicateAbstraction(te.getPredicateSet().getPredicates());
 			List<String> absExs = pa.abstractList(vvs);
 			

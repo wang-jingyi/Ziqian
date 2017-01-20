@@ -30,7 +30,7 @@ public class ExtractPrismDataTest {
 	public void testExtractData() throws IOException, ClassNotFoundException{
 		String modelPath = "/crowds/TotalRuns=5,CrowdSize=10/paths";
 		int dataSize = Integer.MAX_VALUE;
-		ExtractPrismData epd = new ExtractPrismData(PlatformDependent.MODEL_ROOT+modelPath, dataSize);
+		ExtractPrismData epd = new ExtractPrismData(PlatformDependent.MODEL_ROOT+modelPath, dataSize, 1);
 		VariablesValueInfo vvl = epd.getVariablesValueInfo();
 		
 		AlgoProfile.vars = vvl.getVars();
