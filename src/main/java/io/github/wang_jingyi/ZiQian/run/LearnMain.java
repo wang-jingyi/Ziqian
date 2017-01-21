@@ -13,7 +13,7 @@ import io.github.wang_jingyi.ZiQian.evolution.LearnMergeEvolutions;
 import io.github.wang_jingyi.ZiQian.example.CrowdPositive;
 import io.github.wang_jingyi.ZiQian.learn.LearningDTMC;
 import io.github.wang_jingyi.ZiQian.learn.ModelSelection;
-import io.github.wang_jingyi.ZiQian.learn.PrefixMergeGoldenSearch;
+import io.github.wang_jingyi.ZiQian.learn.AAlergia;
 import io.github.wang_jingyi.ZiQian.prism.ExtractPrismData;
 import io.github.wang_jingyi.ZiQian.prism.FormatPrismModel;
 import io.github.wang_jingyi.ZiQian.profile.TimeProfile;
@@ -63,7 +63,7 @@ public class LearnMain {
 		
 		if(Config.LEARN_METHOD.equals("AA")){
 			System.out.println("learn by aalergia...");
-			ModelSelection gs = new PrefixMergeGoldenSearch(Math.pow(2, -6), Math.pow(2, 6)); //
+			ModelSelection gs = new AAlergia(Math.pow(2, -6), Math.pow(2, 6)); //
 			LearningDTMC bestDTMC = gs.selectCriterion(data);
 			bestDTMC.PrismModelTranslation(data, ps, Config.MODEL_NAME+Config.DATA_SIZE); //
 			// format to .pm file

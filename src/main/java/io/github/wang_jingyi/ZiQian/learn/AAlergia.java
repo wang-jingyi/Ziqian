@@ -5,13 +5,13 @@ import io.github.wang_jingyi.ZiQian.Input;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-public class PrefixMergeGoldenSearch extends GoldenSectionSearch implements ModelSelection {
+public class AAlergia extends GoldenSectionSearch implements ModelSelection {
 
 	
 	private double epsilon;
 	private double highestSelectionCriterion;
 
-	public PrefixMergeGoldenSearch(double start, double end) {
+	public AAlergia(double start, double end) {
 		this.leftBound = start;
 		this.rightBound = end;
 	}
@@ -28,8 +28,8 @@ public class PrefixMergeGoldenSearch extends GoldenSectionSearch implements Mode
 
 		epsilon = 0;
 		highestSelectionCriterion = 0;
-		LearnPrefixMerge leftLA = new LearnPrefixMerge();
-		LearnPrefixMerge rightLA = new LearnPrefixMerge();
+		AAlergiamain leftLA = new AAlergiamain();
+		AAlergiamain rightLA = new AAlergiamain();
 		boolean leftWins = false;
 		double LRdistance = Double.MAX_VALUE;
 //		int iteration = 1;

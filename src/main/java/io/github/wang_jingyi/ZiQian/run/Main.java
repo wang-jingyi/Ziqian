@@ -75,7 +75,7 @@ public class Main {
 		
 		System.out.println("data path: " + Config.DATA_PATH) ;
 		TimeProfile.mainStartTime = System.nanoTime();
-		ExtractPrismData epd = new ExtractPrismData(Config.DATA_PATH, Config.DATA_SIZE);
+		ExtractPrismData epd = new ExtractPrismData(Config.DATA_PATH, Config.DATA_SIZE, Config.STEP_SIZE);
 		VariablesValueInfo vvl = epd.getVariablesValueInfo(varsSet);
 		
 		AlgoProfile.vars = vvl.getVars();	

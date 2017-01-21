@@ -11,7 +11,7 @@ import io.github.wang_jingyi.ZiQian.PredicateSet;
 import io.github.wang_jingyi.ZiQian.VariablesValueInfo;
 import io.github.wang_jingyi.ZiQian.learn.LearningDTMC;
 import io.github.wang_jingyi.ZiQian.learn.ModelSelection;
-import io.github.wang_jingyi.ZiQian.learn.PrefixMergeGoldenSearch;
+import io.github.wang_jingyi.ZiQian.learn.AAlergia;
 import io.github.wang_jingyi.ZiQian.prism.ExtractPrismData;
 import io.github.wang_jingyi.ZiQian.prism.FormatPrismModel;
 import io.github.wang_jingyi.ZiQian.prism.PrismPathData;
@@ -56,7 +56,7 @@ public class ConvergenceTest {
 
 		String modelName = Config.MODEL_NAME + "_" + name;
 
-				ModelSelection gs = new PrefixMergeGoldenSearch(Math.pow(2, -6), Math.pow(2, 6)); //
+				ModelSelection gs = new AAlergia(Math.pow(2, -6), Math.pow(2, 6)); //
 				LearningDTMC bestDTMC = gs.selectCriterion(data);
 				bestDTMC.PrismModelTranslation(data, ps, modelName); //
 

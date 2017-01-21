@@ -19,7 +19,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
-public class LearnPrefixMerge implements LearningDTMC{
+public class AAlergiamain implements LearningDTMC{
 
 	private int numOfStates;
 	private double alpha = 2; // default threshold
