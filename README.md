@@ -2,7 +2,7 @@
 
 ***Ziqian*** (named after a famous student of Confucius) is a research tool actively maintained in Singapore University of Technology and Design, Singapore, to support automatically 'learning' probabilistic models (mainly in the form of discrete-time Markov Chains) from system logs for the purpose of model checking or other system analysis tasks. 
 
-## Ziqian supports:## 
+## Ziqian supports: ##
 * two categories of learning: from multiple executions and from a single execution. For either case, two types of learning algorithms are implemented: state-of-art tree based algorithms and evolution-based algorithms.
 * integrating predicate abstraction and abstraction refinement to the learning framework. Given a safety property of interest, Ziqian starts from the coarsest abstraction and iteratively refine the abstraction by learning new predicates using SVM until Ziqian successfully verifies the property or identify a counterexample.
 * actively generating more informative samples to learn more accurate models, where 'active' means that we compute an optimal initial distribution to generate a most useful sample in terms of learning better models.
