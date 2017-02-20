@@ -52,7 +52,11 @@ We use Gurobi for the optimization of initial distribution for active learning.
 After installing all the dependencies, update the project.
 
 ### Guidelines ###
-* Please follow the examples in package 'example' and guidelines in 'run.Main' and 'run.LearnMain' to write your own case studies. Check run.PlatformDependent to set up the tool paths used. Check run.Config for configuration of the algorithms. The learned model is in PRISM DTMC model format, which can be directly used for model checking using PRISM.
+* Check run.PlatformDependent to set up the tool paths used.
+* Check run.Config for configuration of the algorithms, like where to hold the generated models.
+* Follow the guidelines in example.CrowdPositive to write your own property or predicate or atomic propositions.
+* Follow the guidelines in 'run.Main' and 'run.LearnMain' to write your own case studies.
+* The learned model is in PRISM DTMC model format, which can be directly used for model checking using PRISM.
 
 ### Who do I talk to? ###
 
