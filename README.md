@@ -1,19 +1,20 @@
 # README #
 
-***ZiQian*** is a research tool actively maintained in SUTD, Singapore, to learn probabilistic models (mainly DTMCs) from system logs for model checking. 
+***Ziqian*** (named after a famous student of Confucius) is a research tool actively maintained in Singapore University of Technology and Design, Singapore, to support automatically 'learning' probabilistic models (mainly in the form of discrete-time Markov Chains) from system logs for the purpose of model checking or other system analysis tasks. 
 
-* In the first stage, ZiQian supports learning from multiple executions and a single execution. For both cases, two categories of algorithms are implemented: state-of-art tree based algorithms and evolution-based algorithms.
-* In the second stage, ZiQian integrates predicate abstraction to the learning framework. ZiQian starts from the coarsest abstraction and iteratively refine it by learning new predicates using SVM.
-* In the third stage, ZiQian supports active learning for probabilistic models, where 'active' means we compute an optimal initial distribution for new samples to better estimate the model.
+## Ziqian supports: ##
+* two categories of learning: from multiple executions and from a single execution. For either case, two types of learning algorithms are implemented: state-of-art tree based algorithms and evolution-based algorithms.
+* integrating predicate abstraction and abstraction refinement to the learning framework. Given a safety property of interest, Ziqian starts from the coarsest abstraction and iteratively refine the abstraction by learning new predicates using SVM until Ziqian successfully verifies the property or identify a counterexample.
+* actively generating more informative samples to learn more accurate models, where 'active' means that we compute an optimal initial distribution to generate a most useful sample in terms of learning better models.
 
-ZiQian has been evaluated by multiple PRISM benchmark systems, random generated DTMCs, probabilistic boolean networks, as well as a real world water purification system testbed in SUTD. The promising experimental results prove that our theory and ZiQian work smoothly.     
+For all the mentioned features, Ziqian has been evaluated by multiple PRISM benchmark systems, random generated DTMCs, probabilistic boolean networks, as well as a real world water purification system testbed in SUTD. The promising experimental results prove that the theory and Ziqian work smoothly.     
 
 ### What is this repository for? ###
 
-* This repository is maintained for the development of tool ZiQian. The evaluation results of multiple systems of submitted research papers are hosted in another neighborhood repository called ziqian_evaluation. 
+* This repository is maintained for the development of tool ZiQian. The evaluation results of multiple systems of submitted research papers are hosted in another neighborhood repository called ziqian_evaluation[here](https://bitbucket.org/jingyi_wang/ziqian_evaluation). 
 
 
-### The current version supports the all three stages described above. Our next plan is to apply our research into the real world Singapore water treatment system testbed to build a complete environment model from system logs fully automatically. ###
+### Our ongoing research is to apply our proposed approaches into the the real-world Singapore water treatment system testbed to build an environment model from system logs fully automatically. ###
 
 ### How do I set up? ###
 
@@ -22,7 +23,7 @@ ZiQian has been evaluated by multiple PRISM benchmark systems, random generated 
 * There are multiple example case studies in the package 'example'.
 
 ### Dependencies ###
-The following external tools is not included in maven repository and have to be manually installed to your local maven repository. Before this, make sure maven has been installed in your system by running "mvn -version" in command line. The PRISM and javaml jar files are in /ext under project folder.
+The following external tools is not included in maven repository and have to be manually downloaded (they're already in ext/ folder) and installed to your local maven repository. Before this, make sure maven has been installed in your system by running "mvn -version" in command line. The PRISM and javaml jar files are in /ext under project folder.
 
 
 * PRISM
@@ -51,7 +52,11 @@ We use Gurobi for the optimization of initial distribution for active learning.
 After installing all the dependencies, update the project.
 
 ### Guidelines ###
-* Follow the examples in 'example' package and guidelines in 'run.Main' and 'run.LearnMain' to write your own case studies. Check run.Config for configuration of the algorithms. The learned model is in PRISM DTMC model format, which can be directly used for model checking using PRISM.
+* Check run.PlatformDependent to set up the tool paths used.
+* Check run.Config for configuration of the algorithms, like where to hold the generated models.
+* Follow the guidelines in example.CrowdPositive to write your own property or predicate or atomic propositions.
+* Follow the guidelines in 'run.Main' and 'run.LearnMain' to write your own case studies.
+* The learned model is in PRISM DTMC model format, which can be directly used for model checking using PRISM.
 
 ### Who do I talk to? ###
 
