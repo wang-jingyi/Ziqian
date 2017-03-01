@@ -14,7 +14,8 @@ import io.github.wang_jingyi.ZiQian.PredicateSet;
 import io.github.wang_jingyi.ZiQian.TruePredicate;
 import io.github.wang_jingyi.ZiQian.VariablesValueInfo;
 import io.github.wang_jingyi.ZiQian.evolution.LearnMergeEvolutions;
-import io.github.wang_jingyi.ZiQian.example.NandReliable;
+import io.github.wang_jingyi.ZiQian.exceptions.PrismNoResultException;
+import io.github.wang_jingyi.ZiQian.exceptions.SimulationException;
 import io.github.wang_jingyi.ZiQian.prism.ExtractPrismData;
 import io.github.wang_jingyi.ZiQian.prism.FormatPrismModel;
 import io.github.wang_jingyi.ZiQian.prism.PrismPathData;
@@ -28,18 +29,19 @@ import io.github.wang_jingyi.ZiQian.sample.HypothesisTest;
 import io.github.wang_jingyi.ZiQian.sample.Simulation;
 import io.github.wang_jingyi.ZiQian.sample.SprtTest;
 import io.github.wang_jingyi.ZiQian.sample.TestEnvironment;
+import io.github.wang_jingyi.ZiQian.swat.Overflow;
 import io.github.wang_jingyi.ZiQian.swat.SwatSimulation;
+import io.github.wang_jingyi.ZiQian.swat.Underflow;
 import io.github.wang_jingyi.ZiQian.utils.FileUtil;
 
 public class Main {
 	
-	public static void main(String[] args) throws FileNotFoundException, ClassNotFoundException, IOException {
+	public static void main(String[] args) throws FileNotFoundException, ClassNotFoundException, IOException, SimulationException {
 		
 		Config.initConfig();
-		
 		FileUtil.cleanDirectory(Config.OUTPUT_MODEL_PATH);
 		FileUtil.cleanDirectory(Config.TESTING_PATH);
-		
+		Config.writePropertyLearnFile();
 		
 		if(FileUtil.filesInDir(Config.DATA_PATH).size()<1){
 			if(Config.SWAT){
@@ -56,6 +58,10 @@ public class Main {
 					sim.run();
 				}
 			}
+		}
+		
+		if(FileUtil.filesInDir(Config.DATA_PATH).size()<1){
+			throw new SimulationException();
 		}
 		
 		List<String> varsSet 
@@ -83,12 +89,12 @@ public class Main {
 		
 		List<Predicate> pres = new ArrayList<>();
 		pres.add(new TruePredicate());
-		pres.add(new NandReliable(20));
+//		pres.add(new NandReliable(20));
 //		pres.add(new EglFormulaA());
 //		pres.add(new EglFormulaB());
 //		pres.add(new CrowdPositive());
-//		pres.add(new Underflow());
-//		pres.add(new Overflow());
+		pres.add(new Underflow());
+		pres.add(new Overflow());
 		
 		AlgoProfile.predicates = pres;
 		
@@ -148,7 +154,11 @@ public class Main {
 		
 		CheckLearned cl = new CheckLearned(Config.OUTPUT_MODEL_PATH + "/" + modelName + ".pm" , 
 				Config.PROPERTY_LEARN_FILE, Config.PROPERTY_INDEX);
-		cl.check();
+		try {
+			cl.check();
+		} catch (PrismNoResultException e) {
+			e.printStackTrace();
+		}
 		
 		CounterexampleGenerator counterg = new CounterexampleGenerator(bestDTMC.getPrismModel(),  // generate counterexamples
 				Config.BOUNDED_STEP, Config.SAFETY_THRESHOLD);

@@ -1,13 +1,18 @@
 package io.github.wang_jingyi.ZiQian.swat;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import io.github.wang_jingyi.ZiQian.Predicate;
 import io.github.wang_jingyi.ZiQian.VariablesValue;
 
-public class Overflow implements Predicate{
+public class Overflow implements Predicate, Serializable{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 262212472467613540L;
 	List<String> vars = new ArrayList<>();
 	
 	public Overflow() {

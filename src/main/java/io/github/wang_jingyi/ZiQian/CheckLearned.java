@@ -3,6 +3,7 @@ package io.github.wang_jingyi.ZiQian;
 
 import java.io.IOException;
 
+import io.github.wang_jingyi.ZiQian.exceptions.PrismNoResultException;
 import io.github.wang_jingyi.ZiQian.profile.AlgoProfile;
 import io.github.wang_jingyi.ZiQian.profile.TimeProfile;
 import io.github.wang_jingyi.ZiQian.run.Config;
@@ -23,7 +24,7 @@ public class CheckLearned {
 		this.propertyIndex = pi;
 	}
 	
-	public void check() throws IOException{
+	public void check() throws IOException, PrismNoResultException{
 		
 		// first check if the given property holds
 		String[] prismCommandParas = new String[]{Config.PRISM_PATH,
@@ -36,13 +37,16 @@ public class CheckLearned {
 			// if not, get the counterexample
 			System.out.println("Generating counterexample...");
 		}
-		else{
+		else if(result.contains("Result: true")){
 			System.out.println("The property has been verified.");
 			TimeProfile.mainEndTime = System.nanoTime();
 			TimeProfile.outputTimeProfile();
 			TimeProfile.outputTimeProfile(Config.OUTPUT_MODEL_PATH + "/time.txt");
 			FileUtil.writeObject(Config.OUTPUT_MODEL_PATH + "/predicates", AlgoProfile.predicates);
 			System.exit(0);
+		}
+		else{
+			throw new PrismNoResultException();
 		}
 		
 	}

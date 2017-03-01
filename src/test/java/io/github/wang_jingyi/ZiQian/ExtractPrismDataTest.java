@@ -8,6 +8,7 @@ import java.util.List;
 import org.junit.Test;
 
 import io.github.wang_jingyi.ZiQian.example.CrowdPositive;
+import io.github.wang_jingyi.ZiQian.exceptions.PrismNoResultException;
 import io.github.wang_jingyi.ZiQian.learn.LearningDTMC;
 import io.github.wang_jingyi.ZiQian.learn.ModelSelection;
 import io.github.wang_jingyi.ZiQian.learn.AAlergia;
@@ -27,7 +28,7 @@ public class ExtractPrismDataTest {
 	
 	
 	@Test
-	public void testExtractData() throws IOException, ClassNotFoundException{
+	public void testExtractData() throws IOException, ClassNotFoundException, PrismNoResultException{
 		String modelPath = "/crowds/TotalRuns=5,CrowdSize=10/paths";
 		int dataSize = Integer.MAX_VALUE;
 		ExtractPrismData epd = new ExtractPrismData(PlatformDependent.MODEL_ROOT+modelPath, dataSize, 1);
@@ -52,7 +53,7 @@ public class ExtractPrismDataTest {
 		}
 	}
 	
-	private void run(VariablesValueInfo vvl, List<Predicate> pres, int iteration) throws FileNotFoundException, ClassNotFoundException, IOException{
+	private void run(VariablesValueInfo vvl, List<Predicate> pres, int iteration) throws FileNotFoundException, ClassNotFoundException, IOException, PrismNoResultException{
 		PredicateSet ps = new PredicateSet(pres);
 		PredicateAbstraction pa = new PredicateAbstraction(pres);
 		Input data = pa.abstractInput(vvl.getVarsValues());

@@ -29,7 +29,7 @@ public class Config {
 	public static int ELG_L = 2;
 	public static int EGL_N = 5;
 	public static final int SWAT_SAMPLE_STEP = 5; // in ms
-	public static final int SWAT_RECORD_STEP = 5; // in s
+	public static final int SWAT_RECORD_STEP = 1; // in s
 	public static final int SWAT_RUNNING_TIME = 1; // in minutes
 	public static final String MODEL_SETTING = SWAT_SAMPLE_STEP + "," + SWAT_RECORD_STEP;
 	public static final int STEP_SIZE = 1;
@@ -40,7 +40,7 @@ public class Config {
 	public static double SAFETY_THRESHOLD = 0.3; // safety threshold of safety property
 	public static boolean TERMINATE_SAMPLE = false; // if a sample would terminate
 	public static boolean LOOP_FIRST = false; // if loop is put in front of spurious transitions
-	public static boolean SELECTIVE_DATA_COLLECTION = true; // if all data is collected or each one a trace
+	public static boolean SELECTIVE_DATA_COLLECTION = false; // if all data is collected or each one a trace
 	public static String LEARN_METHOD = "AA";
 
 	// updated while running

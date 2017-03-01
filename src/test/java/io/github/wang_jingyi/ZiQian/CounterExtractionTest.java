@@ -7,6 +7,7 @@ import java.util.List;
 import org.junit.Test;
 
 import io.github.wang_jingyi.ZiQian.example.CrowdPositive;
+import io.github.wang_jingyi.ZiQian.exceptions.PrismNoResultException;
 import io.github.wang_jingyi.ZiQian.learn.LearningDTMC;
 import io.github.wang_jingyi.ZiQian.learn.ModelSelection;
 import io.github.wang_jingyi.ZiQian.learn.AAlergia;
@@ -25,7 +26,7 @@ import io.github.wang_jingyi.ZiQian.sample.TestEnvironment;
 public class CounterExtractionTest {
 
 	@Test
-	public void testCounterExtraction() throws IOException, ClassNotFoundException{
+	public void testCounterExtraction() throws IOException, ClassNotFoundException, PrismNoResultException{
 		String modelPath = "/crowds/TotalRuns=5,CrowdSize=10/paths";
 		int dataSize = Integer.MAX_VALUE;
 		ExtractPrismData epd = new ExtractPrismData(PlatformDependent.MODEL_ROOT+modelPath, dataSize,1);

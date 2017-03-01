@@ -20,6 +20,10 @@ import net.sf.javaml.core.Dataset;
 import net.sf.javaml.core.DefaultDataset;
 import net.sf.javaml.core.DenseInstance;
 import net.sf.javaml.core.Instance;
+import net.sf.javaml.featureselection.FeatureScoring;
+import net.sf.javaml.featureselection.ranking.RankingFromScoring;
+import net.sf.javaml.featureselection.scoring.GainRatio;
+import net.sf.javaml.filter.normalize.NormalizeMidrange;
 
 public class Refiner{
 
@@ -182,12 +186,20 @@ public class Refiner{
 
 	private LearnedPredicate supervisedClassify(Dataset ds) throws FileNotFoundException {
 
+		// dataset normalization between [0,1]
+		System.out.println("normalize dataset...");
+		NormalizeMidrange dnm = new NormalizeMidrange(0.5, 1);
+		dnm.filter(ds);
+
 		LibSVM svm = new LibSVM();
 		svm_parameter svm_para = (svm_parameter) svm.getParameters().clone();
-
-		//		svm_para.kernel_type = 0;
-		//		svm_para.gamma = 0.1;
-		//		svm_para.C = 10;
+		
+		FeatureScoring fs = new GainRatio();
+		RankingFromScoring rfs = new RankingFromScoring(fs);
+		rfs.build(ds);
+//		svm_para.kernel_type = 2;
+//		svm_para.gamma = 0.1;
+//		svm_para.C = 1;
 
 		System.out.println("kernel type: " + svm_para.kernel_type);
 		svm.setParameters(svm_para);
