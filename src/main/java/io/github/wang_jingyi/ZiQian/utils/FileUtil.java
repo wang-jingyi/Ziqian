@@ -75,10 +75,10 @@ public class FileUtil {
 		//true = append file
 		try {
 			FileWriter fw = new FileWriter(filepath, true);
-		    BufferedWriter bw = new BufferedWriter(fw);
-		    PrintWriter out = new PrintWriter(bw);
-		    out.println(str);
-		    out.close();
+			BufferedWriter bw = new BufferedWriter(fw);
+			PrintWriter out = new PrintWriter(bw);
+			out.println(str);
+			out.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -100,8 +100,67 @@ public class FileUtil {
 		writer.close();
 	}
 
+	// each list is a value of one variable
+	public static void writeSplitDataToCSV(String fp, List<String> head, List<List<String>> data) throws IOException{
+		FileWriter writer = new FileWriter(fp); 
+		long dataLength = data.get(0).size();
+
+		// write header
+		for(int i=0; i<head.size(); i++){
+			if(i==head.size()-1){
+				writer.write(head.get(i) + "\n");
+			}
+			else{
+				writer.write(head.get(i) + ",");
+			}
+		}
+
+		// write data
+		for(int i=0; i<dataLength; i++){
+			for(int j=0; j<head.size(); j++){
+				if(j==head.size()-1){ // last value of a line
+					writer.write(data.get(j).get(i) + "\n");
+				}
+				else{
+					writer.write(data.get(j).get(i) + ",");
+				}
+			}
+		}
+		writer.close();
+	}
+
 	public static void writeDataToCSV(String filepath, List<List<String>> data) throws IOException{
 		FileWriter writer = new FileWriter(filepath); 
+		for(List<String> strs: data) {
+			int counter = 1;
+			for(String s : strs){
+				if(counter!=strs.size()){
+					writer.write(s + ",");
+					counter++;
+				}
+				else{
+					writer.write(s);
+				}
+			}
+			writer.write("\n");
+		}
+		writer.close();
+	}
+
+	public static void writeDataToCSV(String filepath, List<String> head, List<List<String>> data) throws IOException{
+		FileWriter writer = new FileWriter(filepath); 
+
+		// write header
+		for(int i=0; i<head.size(); i++){
+			if(i==head.size()-1){
+				writer.write(head.get(i) + "\n");
+			}
+			else{
+				writer.write(head.get(i) + ",");
+			}
+		}
+		
+		// write data
 		for(List<String> strs: data) {
 			int counter = 1;
 			for(String s : strs){

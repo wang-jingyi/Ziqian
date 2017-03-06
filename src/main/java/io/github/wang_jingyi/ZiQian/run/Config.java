@@ -17,13 +17,13 @@ public class Config {
 
 	/**  set initially  **/
 	public static boolean abstraction = true; // if abstraction is deployed, used when translating models to .pm
-	public static final boolean SWAT = true; // take extra care of swat, simulation is done differently
+	public static final boolean SWAT = false; // take extra care of swat, simulation is done differently
 	public static final boolean EGL = false; // egl case
 //			public static final String MODEL_NAME = "nand";
 //		public static String MODEL_NAME = "egl";
-//	public static String MODEL_NAME = "crowds";
-			public static final String MODEL_NAME = "swat";
-//		public static final String MODEL_SETTING = "TotalRuns=5,CrowdSize=20";
+	public static String MODEL_NAME = "crowds";
+//			public static final String MODEL_NAME = "swat";
+		public static final String MODEL_SETTING = "TotalRuns=5,CrowdSize=5";
 //			public static final String MODEL_SETTING = "N=60,K=3";
 //		public static String MODEL_SETTING = "L=2,N=5";
 	public static int ELG_L = 2;
@@ -31,15 +31,15 @@ public class Config {
 	public static final int SWAT_SAMPLE_STEP = 5; // in ms
 	public static final int SWAT_RECORD_STEP = 1; // in s
 	public static final int SWAT_RUNNING_TIME = 1; // in minutes
-	public static final String MODEL_SETTING = SWAT_SAMPLE_STEP + "," + SWAT_RECORD_STEP;
+//	public static final String MODEL_SETTING = SWAT_SAMPLE_STEP + "," + SWAT_RECORD_STEP;
 	public static final int STEP_SIZE = 1;
 	public static final int DATA_SIZE = 20000; // data size of learning
 	public static final int CONVERGE_TEST_DATA_SIZE = 50000; // data size of learning for convergence test
 	public static int PROPERTY_INDEX = 1; // index of the property in the property file
 	public static int BOUNDED_STEP = -1; // bounded step of the property, -1 if unbounded
 	public static double SAFETY_THRESHOLD = 0.3; // safety threshold of safety property
-	public static boolean TERMINATE_SAMPLE = false; // if a sample would terminate
-	public static boolean LOOP_FIRST = false; // if loop is put in front of spurious transitions
+	public static boolean TERMINATE_SAMPLE = true; // if a sample would terminate
+	public static boolean LOOP_FIRST = true; // if loop is put in front of spurious transitions
 	public static boolean SELECTIVE_DATA_COLLECTION = false; // if all data is collected or each one a trace
 	public static String LEARN_METHOD = "AA";
 

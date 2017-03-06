@@ -1,6 +1,7 @@
 package io.github.wang_jingyi.ZiQian.utils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -143,4 +144,8 @@ public class NumberUtil {
     	return nzl;
     }
      
+    public static List<String> extractNumbersFromString(String str){
+		str = str.replaceAll("[^0-9]+", " ");
+		return Arrays.asList(str.trim().split(" "));
+	}
 }

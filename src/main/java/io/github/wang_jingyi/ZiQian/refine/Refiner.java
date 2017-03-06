@@ -196,6 +196,7 @@ public class Refiner{
 		
 		FeatureScoring fs = new GainRatio();
 		RankingFromScoring rfs = new RankingFromScoring(fs);
+		
 		rfs.build(ds);
 //		svm_para.kernel_type = 2;
 //		svm_para.gamma = 0.1;

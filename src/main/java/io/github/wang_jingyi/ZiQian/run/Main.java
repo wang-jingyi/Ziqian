@@ -1,11 +1,5 @@
 package io.github.wang_jingyi.ZiQian.run;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
 import io.github.wang_jingyi.ZiQian.CheckLearned;
 import io.github.wang_jingyi.ZiQian.Input;
 import io.github.wang_jingyi.ZiQian.Predicate;
@@ -14,6 +8,7 @@ import io.github.wang_jingyi.ZiQian.PredicateSet;
 import io.github.wang_jingyi.ZiQian.TruePredicate;
 import io.github.wang_jingyi.ZiQian.VariablesValueInfo;
 import io.github.wang_jingyi.ZiQian.evolution.LearnMergeEvolutions;
+import io.github.wang_jingyi.ZiQian.example.CrowdPositive;
 import io.github.wang_jingyi.ZiQian.exceptions.PrismNoResultException;
 import io.github.wang_jingyi.ZiQian.exceptions.SimulationException;
 import io.github.wang_jingyi.ZiQian.prism.ExtractPrismData;
@@ -29,10 +24,14 @@ import io.github.wang_jingyi.ZiQian.sample.HypothesisTest;
 import io.github.wang_jingyi.ZiQian.sample.Simulation;
 import io.github.wang_jingyi.ZiQian.sample.SprtTest;
 import io.github.wang_jingyi.ZiQian.sample.TestEnvironment;
-import io.github.wang_jingyi.ZiQian.swat.Overflow;
 import io.github.wang_jingyi.ZiQian.swat.SwatSimulation;
-import io.github.wang_jingyi.ZiQian.swat.Underflow;
 import io.github.wang_jingyi.ZiQian.utils.FileUtil;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class Main {
 	
@@ -92,9 +91,9 @@ public class Main {
 //		pres.add(new NandReliable(20));
 //		pres.add(new EglFormulaA());
 //		pres.add(new EglFormulaB());
-//		pres.add(new CrowdPositive());
-		pres.add(new Underflow());
-		pres.add(new Overflow());
+		pres.add(new CrowdPositive());
+//		pres.add(new Underflow());
+//		pres.add(new Overflow());
 		
 		AlgoProfile.predicates = pres;
 		
