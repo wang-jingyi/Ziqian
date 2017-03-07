@@ -1,4 +1,9 @@
-package io.github.wang_jingyi.ZiQian.run;
+package io.github.wang_jingyi.ZiQian.swat;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import io.github.wang_jingyi.ZiQian.CheckLearned;
 import io.github.wang_jingyi.ZiQian.Input;
@@ -8,7 +13,6 @@ import io.github.wang_jingyi.ZiQian.PredicateSet;
 import io.github.wang_jingyi.ZiQian.TruePredicate;
 import io.github.wang_jingyi.ZiQian.VariablesValueInfo;
 import io.github.wang_jingyi.ZiQian.evolution.LearnMergeEvolutions;
-import io.github.wang_jingyi.ZiQian.example.CrowdPositive;
 import io.github.wang_jingyi.ZiQian.exceptions.PrismNoResultException;
 import io.github.wang_jingyi.ZiQian.exceptions.SimulationException;
 import io.github.wang_jingyi.ZiQian.prism.ExtractPrismData;
@@ -21,66 +25,19 @@ import io.github.wang_jingyi.ZiQian.sample.Counterexample;
 import io.github.wang_jingyi.ZiQian.sample.CounterexampleGenerator;
 import io.github.wang_jingyi.ZiQian.sample.CounterexamplePath;
 import io.github.wang_jingyi.ZiQian.sample.HypothesisTest;
-import io.github.wang_jingyi.ZiQian.sample.Simulation;
 import io.github.wang_jingyi.ZiQian.sample.SprtTest;
 import io.github.wang_jingyi.ZiQian.sample.TestEnvironment;
-import io.github.wang_jingyi.ZiQian.swat.SwatSimulation;
-import io.github.wang_jingyi.ZiQian.utils.FileUtil;
+import io.github.wang_jingyi.ZiQian.swat.property.OverHigh;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
-public class Main {
+public class SwatMain {
 	
-	public static void main(String[] args) throws FileNotFoundException, ClassNotFoundException, IOException, SimulationException {
-		
-		Config.initConfig();
-		FileUtil.cleanDirectory(Config.OUTPUT_MODEL_PATH);
-		FileUtil.cleanDirectory(Config.TESTING_PATH);
-		Config.writePropertyLearnFile();
-		
-		if(FileUtil.filesInDir(Config.DATA_PATH).size()<1){
-			if(Config.SWAT){
-				for(int i=1; i<=100; i++){
-					System.out.println("simulation: " + i);
-					int time =  1 + new Random().nextInt(5);
-					SwatSimulation.simulate(Config.SWAT_SAMPLE_STEP, Config.SWAT_RECORD_STEP, time, Config.DATA_PATH, i);
-				}
-			}
-			else{
-				for(int i=1; i<=1000; i++){
-					System.out.println("simulation: " + i);
-					Simulation sim = new Simulation(Config.ORIG_MODEL_FILE, Config.DATA_PATH, "path"+i, Config.MODEL_SETTING);
-					sim.run();
-				}
-			}
-		}
-		
-		if(FileUtil.filesInDir(Config.DATA_PATH).size()<1){
-			throw new SimulationException();
-		}
+public static void main(String[] args) throws FileNotFoundException, ClassNotFoundException, IOException, SimulationException {
 		
 		List<String> varsSet 
-		= PrismPathData.extractPathVars(Config.DATA_PATH);
-//				= new ArrayList<>();
-//		varsSet.add("new");
-//		varsSet.add("runCount");
-//		varsSet.add("run");
-//		varsSet.add("lastSeen");
-//		varsSet.add("good");
-//		varsSet.add("bad");
-//		varsSet.add("recordLast");
-//		varsSet.add("badObserve");
-//		varsSet.add("done");
-//		varsSet.add("observe0");
+		= PrismPathData.extractPathVars(SwatConfig.DATA_PATH);
 		
-		
-		System.out.println("data path: " + Config.DATA_PATH) ;
 		TimeProfile.mainStartTime = System.nanoTime();
-		ExtractPrismData epd = new ExtractPrismData(Config.DATA_PATH, Config.DATA_SIZE, Config.STEP_SIZE);
+		ExtractPrismData epd = new ExtractPrismData(SwatConfig.DATA_PATH, SwatConfig.DATA_SIZE, SwatConfig.STEP_SIZE);
 		VariablesValueInfo vvl = epd.getVariablesValueInfo(varsSet);
 		
 		AlgoProfile.vars = vvl.getVars();	
@@ -88,12 +45,7 @@ public class Main {
 		
 		List<Predicate> pres = new ArrayList<>();
 		pres.add(new TruePredicate());
-//		pres.add(new NandReliable(20));
-//		pres.add(new EglFormulaA());
-//		pres.add(new EglFormulaB());
-		pres.add(new CrowdPositive());
-//		pres.add(new Underflow("LIT301",250));
-//		pres.add(new Overflow("LS602",580));
+		pres.add(new OverHigh("LIT101",800));
 		
 		AlgoProfile.predicates = pres;
 		
@@ -126,7 +78,7 @@ public class Main {
 		PredicateAbstraction pa = new PredicateAbstraction(pres);
 		Input data = pa.abstractInput(vvl.getVarsValues());
 		
-		String modelName = Config.MODEL_NAME + iteration;
+		String modelName = "SWAT_" + iteration;
 		
 //		ModelSelection gs = new PrefixMergeGoldenSearch(Math.pow(2, -6), Math.pow(2, 6)); //
 //		LearningDTMC bestDTMC = gs.selectCriterion(data);
@@ -140,7 +92,7 @@ public class Main {
 		
 		// format to .pm file
 		System.out.println("formatting the model to .pm file for model checking...");
-		FormatPrismModel fpm = new FormatPrismModel("dtmc", Config.OUTPUT_MODEL_PATH , modelName);
+		FormatPrismModel fpm = new FormatPrismModel("dtmc", SwatConfig.OUTPUT_MODEL_PATH, modelName);
 		fpm.translateToFormat(bestDTMC.getPrismModel(), data);
 		
 		if(bestDTMC.getPrismModel().getNumOfPrismStates()==larModelSize){
@@ -151,8 +103,8 @@ public class Main {
 			larModelSize = bestDTMC.getPrismModel().getNumOfPrismStates();
 		}
 		
-		CheckLearned cl = new CheckLearned(Config.OUTPUT_MODEL_PATH + "/" + modelName + ".pm" , 
-				Config.PROPERTY_LEARN_FILE, Config.PROPERTY_INDEX);
+		CheckLearned cl = new CheckLearned(SwatConfig.OUTPUT_MODEL_PATH + "/" + modelName + ".pm" , 
+				SwatConfig.PROPERTY_LEARN_FILE, SwatConfig.PROPERTY_INDEX);
 		try {
 			cl.check();
 		} catch (PrismNoResultException e) {
@@ -160,13 +112,12 @@ public class Main {
 		}
 		
 		CounterexampleGenerator counterg = new CounterexampleGenerator(bestDTMC.getPrismModel(),  // generate counterexamples
-				Config.BOUNDED_STEP, Config.SAFETY_THRESHOLD);
+				SwatConfig.BOUNDED_STEP, SwatConfig.SAFETY_THRESHOLD);
 		List<CounterexamplePath> counterPaths = counterg.generateCounterexamples();
 		
 		System.out.println("hypothesis testing...");
 		
-		te.init(ps, Config.ORIG_MODEL_FILE, Config.MODEL_SETTING,
-				Config.TESTING_PATH);
+		te.init(ps, null, null, null);
 		
 //		HypothesisTest sst = new SingleSampleTest(1);
 		HypothesisTest sst = new SprtTest(0.2, 0.1, 0.1, 0.1);
@@ -197,5 +148,5 @@ public class Main {
 		
 		return larModelSize;
 	}
-	
+
 }

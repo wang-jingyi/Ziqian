@@ -1,4 +1,4 @@
-package io.github.wang_jingyi.ZiQian.swat;
+package io.github.wang_jingyi.ZiQian.swat.property;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -7,21 +7,23 @@ import java.util.List;
 import io.github.wang_jingyi.ZiQian.Predicate;
 import io.github.wang_jingyi.ZiQian.VariablesValue;
 
-public class Overflow implements Predicate, Serializable{
+public class OverHigh implements Predicate, Serializable{
 	
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 262212472467613540L;
-	List<String> vars = new ArrayList<>();
+	private List<String> vars = new ArrayList<>();
+	private int threshold;
 	
-	public Overflow() {
-		vars.add("LS602");
+	public OverHigh(String tankSensor, int threshold) {
+		this.vars.add(tankSensor);
+		this.threshold = threshold;
 	}
 	
 	@Override
 	public String getPredicateName() {
-		return "overflow";
+		return "over";
 	}
 
 	@Override
@@ -35,7 +37,7 @@ public class Overflow implements Predicate, Serializable{
 			return false;
 		}
 		double sensorValue = vv.getVarValue(vars.get(0)).getRawIntValue();
-		if(sensorValue>580){
+		if(sensorValue>threshold){
 			return true;
 		}
 		return false;
