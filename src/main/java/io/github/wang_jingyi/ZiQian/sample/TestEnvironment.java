@@ -18,7 +18,7 @@ public class TestEnvironment {
 	private String modelPath;
 	private String modelConfig;
 
-	private String outputFilePath;
+	private String outputFilePath; 
 	private int simulationCount = 0; // total number of sampling
 	
 	private TestEnvironment(){

@@ -23,7 +23,7 @@ public class OverHigh implements Predicate, Serializable{
 	
 	@Override
 	public String getPredicateName() {
-		return "over";
+		return "swat_error";
 	}
 
 	@Override

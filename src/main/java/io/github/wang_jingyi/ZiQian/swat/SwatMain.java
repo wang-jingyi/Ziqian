@@ -33,8 +33,10 @@ public class SwatMain {
 	
 public static void main(String[] args) throws FileNotFoundException, ClassNotFoundException, IOException, SimulationException {
 		
+		SwatConfig.writePropertyLearnFile();
+
 		List<String> varsSet 
-		= PrismPathData.extractPathVars(SwatConfig.DATA_PATH);
+		= PrismPathData.extractPathVars(SwatConfig.DATA_PATH, SwatConfig.DELIMITER);
 		
 		TimeProfile.mainStartTime = System.nanoTime();
 		ExtractPrismData epd = new ExtractPrismData(SwatConfig.DATA_PATH, SwatConfig.DATA_SIZE, SwatConfig.STEP_SIZE);

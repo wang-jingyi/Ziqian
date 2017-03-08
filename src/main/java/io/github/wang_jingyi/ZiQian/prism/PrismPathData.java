@@ -202,15 +202,15 @@ public class PrismPathData {
 		return executions;
 	}
 	
-	public static List<String> extractPathVars(String dirPath) throws IOException{
+	public static List<String> extractPathVars(String dirPath, String delimter) throws IOException{
 		List<String> vars = new ArrayList<>();
 		for(String s : FileUtil.filesInDir(dirPath)){
 			FileReader reader = new FileReader(s);
 			BufferedReader br = new BufferedReader(reader);
 			String str = br.readLine(); // first line of file
 			String str2 = br.readLine(); // second line of file
-			String[] firstLine = str.split(" "); // take care of the delimiter here
-			String[] secondLine = str2.split(" ");
+			String[] firstLine = str.split(delimter); // take care of the delimiter here
+			String[] secondLine = str2.split(delimter);
 			for(int i=0; i<firstLine.length; i++){ // extract variable 'action' and 'step' as they're irrelevant
 				if(Character.isDigit(secondLine[i].charAt(0)) || secondLine[i].equalsIgnoreCase("true") || 
 						secondLine[i].equalsIgnoreCase("false")){ // only add variables who are numbers, true or false

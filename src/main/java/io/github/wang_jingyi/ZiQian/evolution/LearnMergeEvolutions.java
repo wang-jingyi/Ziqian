@@ -44,6 +44,7 @@ public class LearnMergeEvolutions implements LearningDTMC{
 		TimeProfile.dataPrefixStartTime = System.nanoTime();
 		dp = new DataPrefix(data);
 		dp.execute();
+		dp.printPrefixTreeInfo();
 		TimeProfile.dataPrefixExes++;
 		TimeProfile.dataPrefixEndTime = System.nanoTime();
 		System.out.println("Executing evolutionary merging process...");

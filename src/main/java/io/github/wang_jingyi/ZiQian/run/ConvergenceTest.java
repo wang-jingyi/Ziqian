@@ -35,7 +35,7 @@ public class ConvergenceTest {
 		//		}
 
 
-		List<String> varsSet = PrismPathData.extractPathVars(Config.DATA_PATH);
+		List<String> varsSet = PrismPathData.extractPathVars(Config.DATA_PATH, Config.DELIMTER);
 		//
 		ExtractPrismData epd_lot = new ExtractPrismData(Config.DATA_PATH, Config.CONVERGE_TEST_DATA_SIZE, Config.STEP_SIZE);
 		VariablesValueInfo vvi_lot = epd_lot.getVariablesValueInfo(varsSet);

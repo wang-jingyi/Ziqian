@@ -112,7 +112,7 @@ public class DataProcessor {
 				}
 			}
 		}
-		FileUtil.writeSplitDataToCSV(targetFilePath, sensors, dataset);
+		FileUtil.writeSplitDataToCSV(targetFilePath, sensors, dataset, " ");
 		System.out.println("writing complete...");
 	}
 
@@ -132,7 +132,7 @@ public class DataProcessor {
 				if(lineCount>=lengthOfData){break;}
 			}
 			System.out.println("writing path + " + pathCount);
-			FileUtil.writeDataToCSV(targetDirPath + "/path_"+pathCount+".csv", vars, pathData);
+			FileUtil.writeDataToCSV(targetDirPath + "/path_"+pathCount+".csv", vars, pathData, " ");
 			pathCount++;
 		}
 
@@ -178,11 +178,11 @@ public class DataProcessor {
 		//		String time2 = "6/7/2015 06:13:33 AM";
 		//		System.out.println("compare: " + compareTime(time1, time2));
 		
-		String sourcePath = "/Users/jingyi/Documents/swat_dataset/original/06072015";
-		String dirpath = "/Users/jingyi/Documents/swat_dataset/original/06072015/paths";
+		String sourcePath = System.getProperty("user.home") + "/swat_dataset/original/06072015";
+		String dirpath = System.getProperty("user.home") + "/swat_dataset/original/06072015/paths";
 		FileUtil.createDir(dirpath);
 		FileUtil.cleanDirectory(dirpath);
-		String targetfilepath = "/Users/jingyi/Documents/swat_dataset/original/06072015.csv";
+		String targetfilepath = System.getProperty("user.home") + "/swat_dataset/original/06072015.csv";
 		extractHASERealData(sourcePath, targetfilepath);
 		
 		List<String> sensors= new ArrayList<String>();

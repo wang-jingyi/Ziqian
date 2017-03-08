@@ -30,7 +30,7 @@ public class DataPrefix implements Serializable{
 	private static final long serialVersionUID = -6227008075940159101L;
 	private List<List<String>> sortedPrefixes = new ArrayList<>();
 	private List<Integer> sortedPrefixCounts = new ArrayList<>(); // occurrence of prefix
-	private List<Integer> sortedPrefixFinalCount = new ArrayList<>(); // occurrence of prefix as final
+	private List<Integer> sortedPrefixFinalCount = new ArrayList<>(); // occurrence of prefix as the end of a trace
 	private List<List<Integer>> nextSymbolFrequency = new ArrayList<>();
 	private List<List<Integer>> nextSymbolIndex = new ArrayList<>();
 	private Input data;
@@ -84,7 +84,11 @@ public class DataPrefix implements Serializable{
 //		checkDataPrefix();
 	}
 
-
+	public void printPrefixTreeInfo(){
+		System.out.println("------Prefix tree information------");
+		System.out.println("Total number of prefixes: " + prefixesTotalNum);
+		System.out.println("Total number of initial states: " + initStates.size());
+	}
 
 
 	public List<String> getInitSigmas() {
@@ -186,7 +190,7 @@ public class DataPrefix implements Serializable{
 	public List<List<String>> getSortedPrefixes() {
 		return sortedPrefixes;
 	}
-
+	
 	private void insertPrefix(List<String> nextPrefix, List<String> obs) {
 
 		boolean finalPrefix = false;

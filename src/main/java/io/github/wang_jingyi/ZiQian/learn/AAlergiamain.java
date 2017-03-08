@@ -39,6 +39,7 @@ public class AAlergiamain implements LearningDTMC{
 			TimeProfile.dataPrefixExes++; // record how many times is dataPrefixes calculated
 			dp = new DataPrefix(data);
 			dp.execute();
+			dp.printPrefixTreeInfo();
 			FileUtil.writeObject(Config.PROJECT_ROOT + "/tmp/dataPrefix.ser", dp);
 			LearningProfile.prefixCalculated = true;
 			TimeProfile.dataPrefixEndTime = System.nanoTime();

@@ -64,7 +64,7 @@ public class Main {
 		}
 		
 		List<String> varsSet 
-		= PrismPathData.extractPathVars(Config.DATA_PATH);
+		= PrismPathData.extractPathVars(Config.DATA_PATH, Config.DELIMTER);
 //				= new ArrayList<>();
 //		varsSet.add("new");
 //		varsSet.add("runCount");

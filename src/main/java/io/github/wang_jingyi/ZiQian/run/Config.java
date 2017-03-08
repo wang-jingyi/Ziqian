@@ -61,6 +61,7 @@ public class Config {
 	// property setting
 	public static String PROPERTY_LEARN_FILE = OUTPUT_MODEL_PATH + "/" + MODEL_NAME + "_learn.pctl";
 	public static String PROPERTY_FILE = PlatformDependent.MODEL_ROOT + "/lar/" + MODEL_NAME + "/" + MODEL_NAME + ".pctl";
+	public static String DELIMTER = " ";
 
 
 	// algorithm settings

@@ -3,6 +3,7 @@ package io.github.wang_jingyi.ZiQian.prism;
 import io.github.wang_jingyi.ZiQian.FormatVariablesValue;
 import io.github.wang_jingyi.ZiQian.VariablesValue;
 import io.github.wang_jingyi.ZiQian.VariablesValueInfo;
+import io.github.wang_jingyi.ZiQian.run.Config;
 
 import java.io.IOException;
 import java.util.List;
@@ -21,7 +22,7 @@ public class ExtractPrismData implements FormatVariablesValue{
 
 	@Override
 	public VariablesValueInfo getVariablesValueInfo() throws IOException {
-		List<String> vars = PrismPathData.extractPathVars(dataPath);
+		List<String> vars = PrismPathData.extractPathVars(dataPath, Config.DELIMTER);
 		List<List<VariablesValue>> vvs = PrismPathData.extractMEData(dataPath, vars, dataSize, stepSize);
 		List<Integer> varsLength = PrismPathData.updateMEVarsLength(vvs);
 		return new VariablesValueInfo(vars, varsLength, vvs);
