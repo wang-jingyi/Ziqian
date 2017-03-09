@@ -1,10 +1,5 @@
 package io.github.wang_jingyi.ZiQian.swat;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import io.github.wang_jingyi.ZiQian.CheckLearned;
 import io.github.wang_jingyi.ZiQian.Input;
 import io.github.wang_jingyi.ZiQian.Predicate;
@@ -25,9 +20,15 @@ import io.github.wang_jingyi.ZiQian.sample.Counterexample;
 import io.github.wang_jingyi.ZiQian.sample.CounterexampleGenerator;
 import io.github.wang_jingyi.ZiQian.sample.CounterexamplePath;
 import io.github.wang_jingyi.ZiQian.sample.HypothesisTest;
+import io.github.wang_jingyi.ZiQian.sample.Sampler;
 import io.github.wang_jingyi.ZiQian.sample.SprtTest;
 import io.github.wang_jingyi.ZiQian.sample.TestEnvironment;
 import io.github.wang_jingyi.ZiQian.swat.property.OverHigh;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SwatMain {
 	
@@ -57,7 +58,7 @@ public static void main(String[] args) throws FileNotFoundException, ClassNotFou
 		
 		int iteration = 0;
 		int larModelSize = 0;
-		while(iteration<20){
+		while(iteration<2){
 			iteration++;
 			AlgoProfile.runTimeLog.append("-------------------------------------" + "iteration: " + iteration + "-------------------------------------");
 			System.out.println("-------------------------------------" + "iteration: " + iteration + "-------------------------------------");
@@ -119,13 +120,14 @@ public static void main(String[] args) throws FileNotFoundException, ClassNotFou
 		
 		System.out.println("hypothesis testing...");
 		
-		te.init(ps, null, null, null);
+		Sampler sampler = new SwatSampler(); // use real data
+		te.init(ps, sampler);
 		
 //		HypothesisTest sst = new SingleSampleTest(1);
 		HypothesisTest sst = new SprtTest(0.2, 0.1, 0.1, 0.1);
-		Counterexample ce = new Counterexample(bestDTMC.getPrismModel(), counterPaths, te, sst);
+		Counterexample ce = new Counterexample(bestDTMC.getPrismModel(), counterPaths, sst);
 		System.out.println("analyzing counterexample...");
-		ce.analyze();
+		ce.analyze(te);
 		
 		System.out.println("refine the predicate set...");
 		

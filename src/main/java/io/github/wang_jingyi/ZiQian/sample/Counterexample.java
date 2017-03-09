@@ -26,15 +26,13 @@ public class Counterexample implements SplitPointFinder{
 	private PrismModel pm;
 	private List<Double> transProbInCps = new ArrayList<>();
 	private List<Double> testedTransProbInCps = new ArrayList<>();
-	private TestEnvironment te;
 	private HypothesisTest ht;
 	private List<SplittingPoint> allSplittingPoints;
 	private List<SplittingPoint> sortedSplittingPoints; // splitting point with probability deviation 0 is not included
 
-	public Counterexample(PrismModel pm, List<CounterexamplePath> cps, TestEnvironment te, HypothesisTest ht) {
+	public Counterexample(PrismModel pm, List<CounterexamplePath> cps, HypothesisTest ht) {
 		this.pm = pm;
 		this.counterPaths = cps;
-		this.te = te;
 		this.ht = ht;
 		updateLongestPaths();
 	}
@@ -42,7 +40,6 @@ public class Counterexample implements SplitPointFinder{
 	public Counterexample(PrismModel pm, String cpFilePath, TestEnvironment te, HypothesisTest ht) {
 		this.pm = pm;
 		this.counterPaths = CounterexampleOps.extractCounterexample(cpFilePath);
-		this.te = te;
 		this.ht = ht;
 		updateLongestPaths();
 	}
@@ -55,16 +52,16 @@ public class Counterexample implements SplitPointFinder{
 		}
 	}
 
-	public void analyze() throws ClassNotFoundException, IOException{
-		if(ht.testHypothesis(ht.getProbBound(), this)){
+	public void analyze(TestEnvironment te) throws ClassNotFoundException, IOException{
+		if(ht.testHypothesis(ht.getProbBound(), te, this)){
 			System.out.println("the property is voilated.");
 			System.out.println("counterexample wrote to file."); // to do
 			System.exit(0);
 		}
 		else{
 			allSplittingPoints = findAllSplittingPoints();
-			calCETransProbs();
-			testedTransProbInCps = ht.getTestedTransitionProb(this);
+			calCETransProbs(te);
+			testedTransProbInCps = ht.getTestedTransitionProb(te, this);
 			sortedSplittingPoints = findSplitingStates(pm);
 		}
 	}
@@ -114,15 +111,11 @@ public class Counterexample implements SplitPointFinder{
 		return pm;
 	}
 
-	private void calCETransProbs() throws IOException{
+	private void calCETransProbs(TestEnvironment te) throws IOException{
 		for(SplittingPoint sp : allSplittingPoints){
 			transProbInCps.add(calTransitionProb(sp, pm));
 		}
-		testedTransProbInCps = ht.getTestedTransitionProb(this);
-	}
-
-	public TestEnvironment getTestEnvironment() {
-		return te;
+		testedTransProbInCps = ht.getTestedTransitionProb(te, this);
 	}
 
 	private boolean CheckValidity(CounterexamplePath cp, List<String> pathData, PrismModel pm) throws FileNotFoundException, ClassNotFoundException, IOException{

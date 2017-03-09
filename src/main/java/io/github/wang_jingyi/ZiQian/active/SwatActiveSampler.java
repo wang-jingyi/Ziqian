@@ -1,7 +1,8 @@
 package io.github.wang_jingyi.ZiQian.active;
 
 import io.github.wang_jingyi.ZiQian.run.Config;
-import io.github.wang_jingyi.ZiQian.swat.SwatSimulation;
+import io.github.wang_jingyi.ZiQian.sample.Sampler;
+import io.github.wang_jingyi.ZiQian.swat.SwatSampler;
 import io.github.wang_jingyi.ZiQian.utils.FileUtil;
 
 import java.io.FileNotFoundException;
@@ -9,15 +10,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class SwatSampler implements Sampler {
+public class SwatActiveSampler implements ActiveSampler{
 
 
 	private SwatSensorAbstraction ssa;
 	private String tracePath;
-	private int fileCount;
 	private int sampleTime; // in minute
 
-	public SwatSampler(SwatSensorAbstraction ssa, String tracePath, int sampleTime) {
+	public SwatActiveSampler(SwatSensorAbstraction ssa, String tracePath, int sampleTime) {
 		this.ssa = ssa;
 		this.tracePath = tracePath;
 		this.sampleTime = sampleTime;
@@ -56,13 +56,12 @@ public class SwatSampler implements Sampler {
 
 		// acquire abstract trace using SwatAbstraction
 		assert sampleTime>0 : "no sample taken";
-		SwatSimulation.simulate(Config.SWAT_SAMPLE_STEP, Config.SWAT_RECORD_STEP, sampleTime, tracePath, fileCount);
-		String newTracePath = tracePath + "/path_" + fileCount +".txt";
-
+		Sampler sampler = new SwatSampler(false, tracePath, Config.SWAT_SAMPLE_STEP, Config.SWAT_RECORD_STEP, Config.SWAT_RUNNING_TIME);
+		sampler.sample();
+		String newTracePath = sampler.getLastestSample();
 		SwatTrace st = new SwatTrace(newTracePath);
 		try {
 			st.collectTraceFromPath(ssa);
-			fileCount ++;
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

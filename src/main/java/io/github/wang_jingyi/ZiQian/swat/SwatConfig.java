@@ -2,11 +2,12 @@ package io.github.wang_jingyi.ZiQian.swat;
 
 import java.io.FileNotFoundException;
 
+import io.github.wang_jingyi.ZiQian.run.PlatformDependent;
 import io.github.wang_jingyi.ZiQian.utils.FileUtil;
 
 public class SwatConfig {
 	
-	public static String SWAT_EVALUATION_ROOT = System.getProperty("user.home") + "/swat_evaluation";
+	public static String SWAT_EVALUATION_ROOT = PlatformDependent.SWAT_EVALUATION_PATH;
 	public static String DATE = "06072015";
 	public static String MODEL_PATH = SWAT_EVALUATION_ROOT + "/" + DATE;
 	public static String DATA_PATH = MODEL_PATH + "/paths";

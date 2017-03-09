@@ -48,19 +48,19 @@ public class Config {
 	public static List<Integer> varsLength = new ArrayList<>();
 
 	// model, learning setting
-	public static String ORIG_MODEL_FILE = PlatformDependent.MODEL_ROOT + "/lar/" + MODEL_NAME + "/" + MODEL_NAME + ".pm";
+	public static String ORIG_MODEL_FILE = PlatformDependent.CAV_MODEL_ROOT + "/lar/" + MODEL_NAME + "/" + MODEL_NAME + ".pm";
 	public static String modelPath = "/lar/"+MODEL_NAME+"/" + MODEL_SETTING +"/paths";
-	public static String DATA_PATH = PlatformDependent.MODEL_ROOT + modelPath;
-	public static String DATA_PATH_LOT = PlatformDependent.MODEL_ROOT + modelPath +"/lot";
-	public static String OUTPUT_MODEL_PATH = PlatformDependent.MODEL_ROOT + "/lar/" + MODEL_NAME + "/" + 
+	public static String DATA_PATH = PlatformDependent.CAV_MODEL_ROOT + modelPath;
+	public static String DATA_PATH_LOT = PlatformDependent.CAV_MODEL_ROOT + modelPath +"/lot";
+	public static String OUTPUT_MODEL_PATH = PlatformDependent.CAV_MODEL_ROOT + "/lar/" + MODEL_NAME + "/" + 
 			MODEL_SETTING + "/lar_models/thres_" + SAFETY_THRESHOLD;
-	public static String TESTING_PATH = PlatformDependent.MODEL_ROOT + "/lar/" + MODEL_NAME + "/" + MODEL_SETTING + "/lar_paths";
-	public static String AA_OUTPUT_PATH = PlatformDependent.MODEL_ROOT + "/lar/" + MODEL_NAME + "/" + MODEL_SETTING + "/AA";
-	public static String GA_OUTPUT_PATH = PlatformDependent.MODEL_ROOT + "/lar/" + MODEL_NAME + "/" + MODEL_SETTING + "/GA";
+	public static String TESTING_PATH = PlatformDependent.CAV_MODEL_ROOT + "/lar/" + MODEL_NAME + "/" + MODEL_SETTING + "/lar_paths";
+	public static String AA_OUTPUT_PATH = PlatformDependent.CAV_MODEL_ROOT + "/lar/" + MODEL_NAME + "/" + MODEL_SETTING + "/AA";
+	public static String GA_OUTPUT_PATH = PlatformDependent.CAV_MODEL_ROOT + "/lar/" + MODEL_NAME + "/" + MODEL_SETTING + "/GA";
 
 	// property setting
 	public static String PROPERTY_LEARN_FILE = OUTPUT_MODEL_PATH + "/" + MODEL_NAME + "_learn.pctl";
-	public static String PROPERTY_FILE = PlatformDependent.MODEL_ROOT + "/lar/" + MODEL_NAME + "/" + MODEL_NAME + ".pctl";
+	public static String PROPERTY_FILE = PlatformDependent.CAV_MODEL_ROOT + "/lar/" + MODEL_NAME + "/" + MODEL_NAME + ".pctl";
 	public static String DELIMTER = " ";
 
 

@@ -102,7 +102,7 @@ public class ExampleMain {
 		// define estimator, initial distribution getter
 //		Estimator estimator = new LaplaceEstimator();
 		Estimator estimator = new EFEstimator();
-		Sampler sampler = new MarkovChainSampler(mc);
+		ActiveSampler sampler = new MarkovChainSampler(mc);
 		InitialDistGetter idoidg = new InitialDistributionOptimizer(mc.getNodeNumber(), validInitStates, ALConfig.stateNumber);
 		InitialDistGetter origidg = new OriginalInitialDistribution(validInitStates, validInitDist);
 
@@ -133,7 +133,7 @@ public class ExampleMain {
 		List<Double> rsreach = new ArrayList<>();
 		
 		Reachability reach = new Reachability(MatrixUtils.createRealMatrix(matrix), validInitStates, validInitDist, targetStates,
-				PlatformDependent.MODEL_ROOT + "/active/" + modelName, modelName , ALConfig.stateNumber);
+				PlatformDependent.CAV_MODEL_ROOT + "/active/" + modelName, modelName , ALConfig.stateNumber);
 		List<Double> actualReach = reach.computeReachability();
 
 		for(int ss : sampleSize){
@@ -165,10 +165,10 @@ public class ExampleMain {
 					rm += MetricComputing.calculateMSE(MatrixUtils.createRealMatrix(matrix), rdsample.getEstimatedTransitionMatrix());
 					
 					Reachability ircompute = new Reachability(idosample.getEstimatedTransitionMatrix(), validInitStates, validInitDist, targetStates,
-							PlatformDependent.MODEL_ROOT + "/active/"+ modelName, modelName + "_ido_" + ss + "_" + i, ALConfig.stateNumber);
+							PlatformDependent.CAV_MODEL_ROOT + "/active/"+ modelName, modelName + "_ido_" + ss + "_" + i, ALConfig.stateNumber);
 					List<Double> idoReach = ircompute.computeReachability();
 					Reachability rscompute = new Reachability(rdsample.getEstimatedTransitionMatrix(), validInitStates, validInitDist, targetStates,
-							PlatformDependent.MODEL_ROOT + "/active/" + modelName, modelName + "_rs_" + ss + "_" + i, ALConfig.stateNumber);
+							PlatformDependent.CAV_MODEL_ROOT + "/active/" + modelName, modelName + "_rs_" + ss + "_" + i, ALConfig.stateNumber);
 					List<Double> rsReach= rscompute.computeReachability();
 					
 					System.out.println("actual reach: " + actualReach);

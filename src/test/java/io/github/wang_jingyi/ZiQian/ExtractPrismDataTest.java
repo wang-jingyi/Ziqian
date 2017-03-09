@@ -21,6 +21,8 @@ import io.github.wang_jingyi.ZiQian.sample.Counterexample;
 import io.github.wang_jingyi.ZiQian.sample.CounterexampleGenerator;
 import io.github.wang_jingyi.ZiQian.sample.CounterexamplePath;
 import io.github.wang_jingyi.ZiQian.sample.HypothesisTest;
+import io.github.wang_jingyi.ZiQian.sample.PrismSampler;
+import io.github.wang_jingyi.ZiQian.sample.Sampler;
 import io.github.wang_jingyi.ZiQian.sample.SprtTest;
 import io.github.wang_jingyi.ZiQian.sample.TestEnvironment;
 
@@ -31,7 +33,7 @@ public class ExtractPrismDataTest {
 	public void testExtractData() throws IOException, ClassNotFoundException, PrismNoResultException{
 		String modelPath = "/crowds/TotalRuns=5,CrowdSize=10/paths";
 		int dataSize = Integer.MAX_VALUE;
-		ExtractPrismData epd = new ExtractPrismData(PlatformDependent.MODEL_ROOT+modelPath, dataSize, 1);
+		ExtractPrismData epd = new ExtractPrismData(PlatformDependent.CAV_MODEL_ROOT+modelPath, dataSize, 1);
 		VariablesValueInfo vvl = epd.getVariablesValueInfo();
 		
 		AlgoProfile.vars = vvl.getVars();
@@ -66,10 +68,10 @@ public class ExtractPrismDataTest {
 		
 		// format to .pm file
 		System.out.println("Formatting the model to .pm file for model checking...");
-		FormatPrismModel fpm = new FormatPrismModel("dtmc", PlatformDependent.MODEL_ROOT + "/crowds" , modelName);
+		FormatPrismModel fpm = new FormatPrismModel("dtmc", PlatformDependent.CAV_MODEL_ROOT + "/crowds" , modelName);
 		fpm.translateToFormat(bestDTMC.getPrismModel(), data);
 		
-		CheckLearned cl = new CheckLearned(PlatformDependent.MODEL_ROOT + "/crowds/"+modelName+".pm" , PlatformDependent.MODEL_ROOT + "/crowds/crowds_learn.pctl", 1);
+		CheckLearned cl = new CheckLearned(PlatformDependent.CAV_MODEL_ROOT + "/crowds/"+modelName+".pm" , PlatformDependent.CAV_MODEL_ROOT + "/crowds/crowds_learn.pctl", 1);
 		cl.check();
 		
 		CounterexampleGenerator counterg = new CounterexampleGenerator(bestDTMC.getPrismModel(), -1, 0.15);
@@ -78,19 +80,20 @@ public class ExtractPrismDataTest {
 		System.out.println("hypothesis testing...");
 		
 		TestEnvironment te = TestEnvironment.te;
-		te.init(ps, PlatformDependent.MODEL_ROOT+"/crowds/crowds.pm", "TotalRuns=5,CrowdSize=10",
-				PlatformDependent.MODEL_ROOT+"/crowds/testPaths");
+		Sampler sampler = new PrismSampler(PlatformDependent.CAV_MODEL_ROOT+"/crowds/crowds.pm", PlatformDependent.CAV_MODEL_ROOT+"/crowds/testPaths"
+				,"TotalRuns=5,CrowdSize=10");
+		te.init(ps, sampler);
 //		HypothesisTest sst = new SingleSampleTest(5);
 		HypothesisTest sst = new SprtTest(0.2, 0.1, 0.1, 0.1);
-		Counterexample ce = new Counterexample(bestDTMC.getPrismModel(), counterPaths, te, sst);
+		Counterexample ce = new Counterexample(bestDTMC.getPrismModel(), counterPaths, sst);
 		System.out.println("analyzing counterexample...");
-		ce.analyze();
+		ce.analyze(te);
 		
 		System.out.println("splitting point: " + ce.getSortedSplittingPoints().get(0).getCurrentStateId() + "->" + ce.getSortedSplittingPoints().get(0).getNextStateId());
 		
 		Refiner refiner = new Refiner(ce.getSortedSplittingPoints(), vvl, pres, bestDTMC.getPrismModel());
 		List<String> dps = new ArrayList<>();
-		dps.add(PlatformDependent.MODEL_ROOT+"/crowds/testPaths");
+		dps.add(PlatformDependent.CAV_MODEL_ROOT+"/crowds/testPaths");
 		Predicate newPredicate = refiner.refine();
 		pres.add(newPredicate);
 		AlgoProfile.newIteration = true;

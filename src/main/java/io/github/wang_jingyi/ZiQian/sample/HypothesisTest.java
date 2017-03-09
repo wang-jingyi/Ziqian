@@ -5,9 +5,9 @@ import java.util.List;
 
 public interface HypothesisTest {
 	
-	public boolean testHypothesis(double p, Counterexample ce) throws IOException, ClassNotFoundException;
+	public boolean testHypothesis(double p, TestEnvironment te, Counterexample ce) throws IOException, ClassNotFoundException;
 	
-	public List<Double> getTestedTransitionProb(Counterexample ce) throws IOException;
+	public List<Double> getTestedTransitionProb(TestEnvironment te, Counterexample ce) throws IOException;
 	
 	public double getProbBound();
 }

@@ -21,10 +21,11 @@ import io.github.wang_jingyi.ZiQian.sample.Counterexample;
 import io.github.wang_jingyi.ZiQian.sample.CounterexampleGenerator;
 import io.github.wang_jingyi.ZiQian.sample.CounterexamplePath;
 import io.github.wang_jingyi.ZiQian.sample.HypothesisTest;
-import io.github.wang_jingyi.ZiQian.sample.Simulation;
+import io.github.wang_jingyi.ZiQian.sample.PrismSampler;
+import io.github.wang_jingyi.ZiQian.sample.Sampler;
 import io.github.wang_jingyi.ZiQian.sample.SprtTest;
 import io.github.wang_jingyi.ZiQian.sample.TestEnvironment;
-import io.github.wang_jingyi.ZiQian.swat.SwatSimulation;
+import io.github.wang_jingyi.ZiQian.swat.SwatSampler;
 import io.github.wang_jingyi.ZiQian.utils.FileUtil;
 
 import java.io.FileNotFoundException;
@@ -47,14 +48,15 @@ public class Main {
 				for(int i=1; i<=100; i++){
 					System.out.println("simulation: " + i);
 					int time =  1 + new Random().nextInt(5);
-					SwatSimulation.simulate(Config.SWAT_SAMPLE_STEP, Config.SWAT_RECORD_STEP, time, Config.DATA_PATH, i);
+					Sampler sampler = new SwatSampler(false, Config.DATA_PATH, Config.SWAT_SAMPLE_STEP, Config.SWAT_RECORD_STEP, Config.SWAT_RUNNING_TIME);
+					sampler.sample();
 				}
 			}
 			else{
 				for(int i=1; i<=1000; i++){
-					System.out.println("simulation: " + i);
-					Simulation sim = new Simulation(Config.ORIG_MODEL_FILE, Config.DATA_PATH, "path"+i, Config.MODEL_SETTING);
-					sim.run();
+					System.out.println("-sample: " + i);
+					Sampler sampler = new PrismSampler(Config.ORIG_MODEL_FILE, Config.DATA_PATH, Config.MODEL_SETTING);
+					sampler.sample();
 				}
 			}
 		}
@@ -165,14 +167,14 @@ public class Main {
 		
 		System.out.println("hypothesis testing...");
 		
-		te.init(ps, Config.ORIG_MODEL_FILE, Config.MODEL_SETTING,
-				Config.TESTING_PATH);
+		Sampler sampler = new PrismSampler(Config.ORIG_MODEL_FILE, Config.TESTING_PATH, Config.MODEL_SETTING);
+		te.init(ps,sampler);
 		
 //		HypothesisTest sst = new SingleSampleTest(1);
 		HypothesisTest sst = new SprtTest(0.2, 0.1, 0.1, 0.1);
-		Counterexample ce = new Counterexample(bestDTMC.getPrismModel(), counterPaths, te, sst);
+		Counterexample ce = new Counterexample(bestDTMC.getPrismModel(), counterPaths, sst);
 		System.out.println("analyzing counterexample...");
-		ce.analyze();
+		ce.analyze(te);
 		
 		System.out.println("refine the predicate set...");
 		

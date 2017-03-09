@@ -31,7 +31,7 @@ public class SwatApproMatrix {
 		ALConfig.boundedSteps = ALConfig.stateNumber;
 		
 		String name_suffix = "state_" + ALConfig.stateNumber;
-		String result_root = PlatformDependent.MODEL_ROOT +  "/active/swat/" + "swat_"+Config.SWAT_SAMPLE_STEP+"_"+
+		String result_root = PlatformDependent.CAV_MODEL_ROOT +  "/active/swat/" + "swat_"+Config.SWAT_SAMPLE_STEP+"_"+
 				Config.SWAT_RECORD_STEP + "/" + name_suffix;
 		
 		List<String> swatPathRoot = new ArrayList<String>();
