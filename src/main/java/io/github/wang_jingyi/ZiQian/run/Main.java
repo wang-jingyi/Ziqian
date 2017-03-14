@@ -4,7 +4,6 @@ import io.github.wang_jingyi.ZiQian.CheckLearned;
 import io.github.wang_jingyi.ZiQian.Input;
 import io.github.wang_jingyi.ZiQian.Predicate;
 import io.github.wang_jingyi.ZiQian.PredicateAbstraction;
-import io.github.wang_jingyi.ZiQian.PredicateSet;
 import io.github.wang_jingyi.ZiQian.TruePredicate;
 import io.github.wang_jingyi.ZiQian.VariablesValueInfo;
 import io.github.wang_jingyi.ZiQian.evolution.LearnMergeEvolutions;
@@ -82,7 +81,7 @@ public class Main {
 		
 		System.out.println("data path: " + Config.DATA_PATH) ;
 		TimeProfile.mainStartTime = System.nanoTime();
-		ExtractPrismData epd = new ExtractPrismData(Config.DATA_PATH, Config.DATA_SIZE, Config.STEP_SIZE);
+		ExtractPrismData epd = new ExtractPrismData(Config.DATA_PATH, Config.DATA_SIZE, Config.STEP_SIZE, Config.DELIMTER);
 		VariablesValueInfo vvl = epd.getVariablesValueInfo(varsSet);
 		
 		AlgoProfile.vars = vvl.getVars();	
@@ -124,7 +123,6 @@ public class Main {
 	
 	private static int run(VariablesValueInfo vvl, List<Predicate> pres, int iteration, int larModelSize, TestEnvironment te) throws FileNotFoundException, ClassNotFoundException, IOException{
 		
-		PredicateSet ps = new PredicateSet(pres);
 		PredicateAbstraction pa = new PredicateAbstraction(pres);
 		Input data = pa.abstractInput(vvl.getVarsValues());
 		
@@ -136,7 +134,7 @@ public class Main {
 
 		LearnMergeEvolutions bestDTMC = new LearnMergeEvolutions();
 		bestDTMC.learn(data);
-		bestDTMC.PrismModelTranslation(data, ps, modelName);
+		bestDTMC.PrismModelTranslation(data, pres, modelName);
 //		
 		
 		
@@ -168,7 +166,7 @@ public class Main {
 		System.out.println("hypothesis testing...");
 		
 		Sampler sampler = new PrismSampler(Config.ORIG_MODEL_FILE, Config.TESTING_PATH, Config.MODEL_SETTING);
-		te.init(ps,sampler);
+		te.init(pres,sampler);
 		
 //		HypothesisTest sst = new SingleSampleTest(1);
 		HypothesisTest sst = new SprtTest(0.2, 0.1, 0.1, 0.1);

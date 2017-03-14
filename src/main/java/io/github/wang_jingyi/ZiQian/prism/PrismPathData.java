@@ -20,12 +20,12 @@ public class PrismPathData {
 	 * @ para: dataPath is a single file path
 	 * @ para: variables to extract
 	 * */
-	public static List<VariablesValue>  extractSEData(String dataPath, List<String> vars, int ds, int stepSize) throws IOException{
+	public static List<VariablesValue>  extractSEData(String dataPath, List<String> vars, int ds, int stepSize, String delimiter) throws IOException{
 		List<VariablesValue> values = new ArrayList<VariablesValue>();
 		FileReader reader = new FileReader(dataPath);
 		BufferedReader br = new BufferedReader(reader);
 		String str = br.readLine(); // first line of file
-		String[] firstLine = str.split(" ");
+		String[] firstLine = str.split(delimiter);
 
 		int[] varInd = new int[vars.size()]; // store the index of each variable
 		for(int j=0; j<vars.size(); j++){
@@ -41,7 +41,7 @@ public class PrismPathData {
 		while((str = br.readLine()) != null){ // read each line of data from file
 			lineCount++;
 			if(lineCount%stepSize==0){
-				String[] strs = str.split(" ");
+				String[] strs = str.split(delimiter);
 				VariablesValue rivv = new VariablesValue(vars);
 				for(int i=0; i<varInd.length; i++){
 					if(strs.length < vars.size()){ // make sure each variable has a value
@@ -60,7 +60,7 @@ public class PrismPathData {
 		return values;
 	}
 
-	public static List<List<VariablesValue>> extractMEData(String dirPath, List<String> vars, int dataSize, int stepSize) throws IOException{
+	public static List<List<VariablesValue>> extractMEData(String dirPath, List<String> vars, int dataSize, int stepSize, String delimiter) throws IOException{
 		List<List<VariablesValue>> mv = new ArrayList<List<VariablesValue>>();
 		int totalSize = 0;
 		List<String> fus = FileUtil.filesInDir(dirPath);
@@ -72,7 +72,7 @@ public class PrismPathData {
 				ds = new Random().nextInt(2*dataSize/fus.size());
 			}
 			
-			List<VariablesValue> v = extractSEData(s, vars, ds, stepSize);
+			List<VariablesValue> v = extractSEData(s, vars, ds, stepSize, delimiter);
 			mv.add(v);
 			totalSize = totalSize + v.size();
 			if(totalSize>=dataSize){

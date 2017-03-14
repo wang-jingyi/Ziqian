@@ -1,7 +1,7 @@
 package io.github.wang_jingyi.ZiQian.evolution;
 
 import io.github.wang_jingyi.ZiQian.Input;
-import io.github.wang_jingyi.ZiQian.PredicateSet;
+import io.github.wang_jingyi.ZiQian.Predicate;
 import io.github.wang_jingyi.ZiQian.learn.DataPrefix;
 import io.github.wang_jingyi.ZiQian.learn.LearningDTMC;
 import io.github.wang_jingyi.ZiQian.prism.PrismModel;
@@ -119,7 +119,7 @@ public class LearnMergeEvolutions implements LearningDTMC{
 //		numOfStates = validStateIndex.size();
 //	}
 	
-	public void PrismModelTranslation(Input data, PredicateSet presSet, String modelName) {
+	public void PrismModelTranslation(Input data, List<Predicate> predicates, String modelName) {
 		List<PrismState> prismStates = new ArrayList<PrismState>(); // list of prism states
 		List<PrismState> initialStates = new ArrayList<PrismState>(); // list of initial states
 		
@@ -253,7 +253,7 @@ public class LearnMergeEvolutions implements LearningDTMC{
 		pm.setNumOfPrismStates(prismStates.size());
 		pm.setPrismStates(prismStates);
 		pm.setInitialStates(initialStates);
-		pm.setPredicates(presSet.getPredicates());
+		pm.setPredicates(predicates);
 	}
 
 	@Override

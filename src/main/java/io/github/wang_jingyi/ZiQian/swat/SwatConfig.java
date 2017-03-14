@@ -8,18 +8,18 @@ import io.github.wang_jingyi.ZiQian.utils.FileUtil;
 public class SwatConfig {
 	
 	public static String SWAT_EVALUATION_ROOT = PlatformDependent.SWAT_EVALUATION_PATH;
-	public static String DATE = "06072015";
-	public static String MODEL_PATH = SWAT_EVALUATION_ROOT + "/" + DATE;
-	public static String DATA_PATH = MODEL_PATH + "/paths";
-	public static int DATA_SIZE = 10000;
-	public static int STEP_SIZE = 1;
+	public static String BATCH = "data_batch_1";
+	public static String MODEL_PATH = SWAT_EVALUATION_ROOT + "/" + BATCH;
+	public static String DATA_PATH = MODEL_PATH + "/normal_traces";
+	public static int DATA_SIZE = 5000;
+	public static int STEP_SIZE = 100;
 	
 	public static String OUTPUT_MODEL_PATH = MODEL_PATH + "/output";
 	public static String PROPERTY_LEARN_FILE = MODEL_PATH + "/swat.pctl";
 	public static int PROPERTY_INDEX = 1;
 	public static int BOUNDED_STEP = -1;
 	public static double SAFETY_THRESHOLD = 0.9;
-	public static String DELIMITER = " ";
+	public static String DELIMITER = ",";
 	
 	
 	public static void writePropertyLearnFile() throws FileNotFoundException{

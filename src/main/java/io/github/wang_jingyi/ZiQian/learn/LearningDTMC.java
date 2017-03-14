@@ -1,11 +1,12 @@
 package io.github.wang_jingyi.ZiQian.learn;
 
 import io.github.wang_jingyi.ZiQian.Input;
-import io.github.wang_jingyi.ZiQian.PredicateSet;
+import io.github.wang_jingyi.ZiQian.Predicate;
 import io.github.wang_jingyi.ZiQian.prism.PrismModel;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.List;
 
 
 /*
@@ -18,7 +19,7 @@ import java.io.IOException;
 public interface LearningDTMC {
 	
 	public void learn(Input data) throws FileNotFoundException, IOException, ClassNotFoundException;
-	public void PrismModelTranslation(Input data, PredicateSet ps, String modelName);
+	public void PrismModelTranslation(Input data, List<Predicate> ps, String modelName);
 	public PrismModel getPrismModel();
 	
 }

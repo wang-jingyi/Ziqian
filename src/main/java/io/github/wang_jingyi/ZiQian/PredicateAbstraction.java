@@ -9,8 +9,16 @@ public class PredicateAbstraction implements Abstraction{
 
 	List<Predicate> predicates;
 
+	public List<Predicate> getPredicates() {
+		return predicates;
+	}
+
 	public PredicateAbstraction(List<Predicate> pres) {
 		this.predicates = pres;
+	}
+	
+	public void addNewPredicate(Predicate newPres){
+		predicates.add(newPres);
 	}
 	
 	public Input abstractInput(List<List<VariablesValue>> vvll){
@@ -28,7 +36,8 @@ public class PredicateAbstraction implements Abstraction{
 				}
 			}
 		}
-		System.out.println("alphabet: " + alpha);
+		System.out.println("------Data information------");
+		System.out.println("-Alphabet: " + alpha + ",		alphabet size: " + alpha.size());
 		return new Input(alpha, obss);
 	}
 

@@ -31,7 +31,7 @@ public class CounterExtractionTest {
 	public void testCounterExtraction() throws IOException, ClassNotFoundException, PrismNoResultException{
 		String modelPath = "/crowds/TotalRuns=5,CrowdSize=10/paths";
 		int dataSize = Integer.MAX_VALUE;
-		ExtractPrismData epd = new ExtractPrismData(PlatformDependent.CAV_MODEL_ROOT+modelPath, dataSize,1);
+		ExtractPrismData epd = new ExtractPrismData(PlatformDependent.CAV_MODEL_ROOT+modelPath, dataSize,1, " ");
 		VariablesValueInfo vvl = epd.getVariablesValueInfo();
 		
 		AlgoProfile.vars = vvl.getVars();
@@ -41,13 +41,12 @@ public class CounterExtractionTest {
 		pres.add(new TruePredicate());
 		pres.add(new CrowdPositive());
 		
-		PredicateSet ps = new PredicateSet(pres);
 		PredicateAbstraction pa = new PredicateAbstraction(pres);
 		Input data = pa.abstractInput(vvl.getVarsValues());
 		
 		ModelSelection gs = new AAlergia(Math.pow(2, -6), Math.pow(2, 6)); //
 		LearningDTMC bestDTMC = gs.selectCriterion(data);
-		bestDTMC.PrismModelTranslation(data, ps, "Crowd"); //
+		bestDTMC.PrismModelTranslation(data, pres, "Crowd"); //
 
 		int iteration = 0;
 		String modelName = "testCrowd" + iteration;
@@ -68,7 +67,7 @@ public class CounterExtractionTest {
 		TestEnvironment te = TestEnvironment.te;
 		Sampler sampler = new PrismSampler(PlatformDependent.CAV_MODEL_ROOT+"/crowds/crowds.pm", PlatformDependent.CAV_MODEL_ROOT+"/crowds/testPaths"
 				,"TotalRuns=5,CrowdSize=10");
-		te.init(ps, sampler);
+		te.init(pres, sampler);
 //		HypothesisTest sst = new SingleSampleTest(5);
 		HypothesisTest sst = new SprtTest(0.2, 0.1, 0.1, 0.1);
 		Counterexample ce = new Counterexample(bestDTMC.getPrismModel(), counterPaths, sst);

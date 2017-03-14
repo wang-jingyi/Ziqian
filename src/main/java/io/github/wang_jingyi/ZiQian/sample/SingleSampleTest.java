@@ -36,7 +36,7 @@ public class SingleSampleTest implements HypothesisTest{
 				System.out.println("-sample: " + (i+1));
 				te.getSampler().sample();
 				List<VariablesValue> vvs = PrismPathData.extractSEData(te.getSampler().getLastestSample(), 
-						AlgoProfile.vars,Integer.MAX_VALUE,SwatConfig.STEP_SIZE); // variables values of last simulation
+						AlgoProfile.vars,Integer.MAX_VALUE,SwatConfig.STEP_SIZE, SwatConfig.DELIMITER); // variables values of last simulation
 				if(te.test(vvs,ce)){
 					System.out.println("--sample " + i + " is a counterexample path.");
 					cpCounter++;
@@ -46,7 +46,7 @@ public class SingleSampleTest implements HypothesisTest{
 		else{ // testing from training data
 			int counter = 0;
 			for(String trainingFile : FileUtil.filesInDir(SwatConfig.DATA_PATH)){
-				List<VariablesValue> vvs = PrismPathData.extractSEData(trainingFile, AlgoProfile.vars, Integer.MAX_VALUE, SwatConfig.STEP_SIZE);
+				List<VariablesValue> vvs = PrismPathData.extractSEData(trainingFile, AlgoProfile.vars, Integer.MAX_VALUE, SwatConfig.STEP_SIZE, SwatConfig.DELIMITER);
 				if(te.test(vvs, ce)){
 					System.out.println("--sample " +  counter + " is a counterexample path.");
 					cpCounter++;
@@ -99,8 +99,8 @@ public class SingleSampleTest implements HypothesisTest{
 
 		for(String path : paths){
 			List<VariablesValue> vvs = PrismPathData.extractSEData(path, AlgoProfile.vars,Integer.MAX_VALUE, 
-					Config.STEP_SIZE); // variables values of last simulation
-			PredicateAbstraction pa = new PredicateAbstraction(te.getPredicateSet().getPredicates());
+					Config.STEP_SIZE, Config.DELIMTER); // variables values of last simulation
+			PredicateAbstraction pa = new PredicateAbstraction(te.getPredicates());
 			List<String> absExs = pa.abstractList(vvs);
 
 			PrismState currentPS = pm.getInitialStates().get(0);

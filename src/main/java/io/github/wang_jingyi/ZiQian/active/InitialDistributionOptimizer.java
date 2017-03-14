@@ -163,7 +163,10 @@ public class InitialDistributionOptimizer implements InitialDistGetter{
 		//		}
 		return sol;
 	}
-
+	
+	public List<Integer> getValidInitialStates() {
+		return validInitialStates;
+	}
 
 	@Override
 	public void setValidInitialStates(List<Integer> validInitialStates) {

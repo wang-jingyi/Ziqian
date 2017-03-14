@@ -40,7 +40,7 @@ public class SprtTest implements HypothesisTest{
 				sampleSize++;
 				System.out.println("New sample: " + sampleSize);
 				List<VariablesValue> vvs = PrismPathData.extractSEData(te.getSampler().getLastestSample(), 
-						AlgoProfile.vars,Integer.MAX_VALUE,SwatConfig.STEP_SIZE); // variables values of last simulation
+						AlgoProfile.vars,Integer.MAX_VALUE,SwatConfig.STEP_SIZE,SwatConfig.DELIMITER); // variables values of last simulation
 				if(te.test(vvs,ce)){ // the sample is in the counterexample
 					bi++;
 				}
@@ -48,7 +48,7 @@ public class SprtTest implements HypothesisTest{
 			else{ // testing from training data
 				int counter = 0;
 				for(String trainingFile : FileUtil.filesInDir(SwatConfig.DATA_PATH)){
-					List<VariablesValue> vvs = PrismPathData.extractSEData(trainingFile, AlgoProfile.vars, Integer.MAX_VALUE, SwatConfig.STEP_SIZE);
+					List<VariablesValue> vvs = PrismPathData.extractSEData(trainingFile, AlgoProfile.vars, Integer.MAX_VALUE, SwatConfig.STEP_SIZE, SwatConfig.DELIMITER);
 					if(te.test(vvs, ce)){
 						System.out.println("--sample " +  counter + " is a counterexample path.");
 						bi++;

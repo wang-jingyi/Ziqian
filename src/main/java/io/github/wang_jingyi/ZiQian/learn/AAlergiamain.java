@@ -1,11 +1,11 @@
 package io.github.wang_jingyi.ZiQian.learn;
 
 import io.github.wang_jingyi.ZiQian.Input;
-import io.github.wang_jingyi.ZiQian.PredicateSet;
+import io.github.wang_jingyi.ZiQian.Predicate;
 import io.github.wang_jingyi.ZiQian.prism.PrismModel;
 import io.github.wang_jingyi.ZiQian.prism.PrismState;
-import io.github.wang_jingyi.ZiQian.profile.LearningProfile;
 import io.github.wang_jingyi.ZiQian.profile.AlgoProfile;
+import io.github.wang_jingyi.ZiQian.profile.LearningProfile;
 import io.github.wang_jingyi.ZiQian.profile.TimeProfile;
 import io.github.wang_jingyi.ZiQian.run.Config;
 import io.github.wang_jingyi.ZiQian.utils.FileUtil;
@@ -341,7 +341,7 @@ public class AAlergiamain implements LearningDTMC{
 	}
 	
 	@Override
-	public void PrismModelTranslation(Input data, PredicateSet presSet, String modelName) {
+	public void PrismModelTranslation(Input data, List<Predicate> predicates, String modelName) {
 		List<PrismState> prismStates = new ArrayList<PrismState>(); // list of prism states
 		List<PrismState> initialStates = new ArrayList<PrismState>(); // list of initial states
 		List<List<Integer>> nextStateIdx = new ArrayList<List<Integer>>();
@@ -423,7 +423,7 @@ public class AAlergiamain implements LearningDTMC{
 		
 		probabilisticPrefixAutomata.setPrismStates(prismStates);
 		probabilisticPrefixAutomata.setInitialStates(initialStates);
-		probabilisticPrefixAutomata.setPredicates(presSet.getPredicates());
+		probabilisticPrefixAutomata.setPredicates(predicates);
 		probabilisticPrefixAutomata.setNumOfPrismStates(numOfStates);
 	}
 

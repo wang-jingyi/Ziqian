@@ -61,12 +61,11 @@ public class SunExampleTest {
 		Predicate pre = new SunExamplePredicate();
 		List<Predicate> pres = new ArrayList<Predicate>();
 		pres.add(pre);
-		PredicateSet ps = new PredicateSet(pres);
 		String modelName = "sunexample";
 
 		ModelSelection gs = new AAlergia(Math.pow(2, -6), Math.pow(2, 6)); //
 		LearningDTMC bestDTMC = gs.selectCriterion(data);
-		bestDTMC.PrismModelTranslation(data, ps, "sunexample"); //
+		bestDTMC.PrismModelTranslation(data, pres, "sunexample"); //
 
 		// format to .pm file
 		System.out.println("formatting the model to .pm file for model checking...");
