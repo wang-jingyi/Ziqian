@@ -58,7 +58,7 @@ public class SwatActiveSampler implements ActiveSampler{
 		assert sampleTime>0 : "no sample taken";
 		Sampler sampler = new SwatSampler(false, tracePath, Config.SWAT_SAMPLE_STEP, Config.SWAT_RECORD_STEP, Config.SWAT_RUNNING_TIME);
 		sampler.sample();
-		String newTracePath = sampler.getLastestSample();
+		String newTracePath = sampler.getLatestSample();
 		SwatTrace st = new SwatTrace(newTracePath);
 		try {
 			st.collectTraceFromPath(ssa);

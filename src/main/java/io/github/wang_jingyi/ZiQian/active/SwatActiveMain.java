@@ -3,7 +3,7 @@ package io.github.wang_jingyi.ZiQian.active;
 import gurobi.GRBException;
 import io.github.wang_jingyi.ZiQian.profile.TimeProfile;
 import io.github.wang_jingyi.ZiQian.run.Config;
-import io.github.wang_jingyi.ZiQian.run.GlobalVars;
+import io.github.wang_jingyi.ZiQian.run.GlobalConfigs;
 import io.github.wang_jingyi.ZiQian.run.PlatformDependent;
 import io.github.wang_jingyi.ZiQian.utils.FileUtil;
 import io.github.wang_jingyi.ZiQian.utils.ListUtil;
@@ -83,8 +83,8 @@ public class SwatActiveMain {
 			sts.add(st);
 		}
 		
-		System.out.println("max sensor values in the trace: " + NumberUtil.ArrayToString(GlobalVars.maxSensorValues));
-		System.out.println("min sensor values in the trace: " + NumberUtil.ArrayToString(GlobalVars.minSensorValues));
+		System.out.println("max sensor values in the trace: " + NumberUtil.ArrayToString(GlobalConfigs.maxSensorValues));
+		System.out.println("min sensor values in the trace: " + NumberUtil.ArrayToString(GlobalConfigs.minSensorValues));
 		
 		List<List<Integer>> abstractTraces = new ArrayList<List<Integer>>();
 		for(int i=0; i<sts.size(); i++){

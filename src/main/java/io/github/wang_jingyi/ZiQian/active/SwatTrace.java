@@ -1,6 +1,6 @@
 package io.github.wang_jingyi.ZiQian.active;
 
-import io.github.wang_jingyi.ZiQian.run.GlobalVars;
+import io.github.wang_jingyi.ZiQian.run.GlobalConfigs;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -49,12 +49,12 @@ public class SwatTrace {
 				}
 				for(int i=0; i<sensorValues.length; i++){
 					sensorValues[i] = Double.valueOf(svs[ALConfig.sensorIndex.get(i)]);
-					if(sensorValues[i]>GlobalVars.maxSensorValues[i]){
-						GlobalVars.maxSensorValues[i] = sensorValues[i];
+					if(sensorValues[i]>GlobalConfigs.maxSensorValues[i]){
+						GlobalConfigs.maxSensorValues[i] = sensorValues[i];
 					}
 					
-					if(sensorValues[i]<GlobalVars.minSensorValues[i]){
-						GlobalVars.minSensorValues[i] = sensorValues[i];
+					if(sensorValues[i]<GlobalConfigs.minSensorValues[i]){
+						GlobalConfigs.minSensorValues[i] = sensorValues[i];
 					}
 				}
  				st.add(ssa.swatAbstraction(sensorValues));

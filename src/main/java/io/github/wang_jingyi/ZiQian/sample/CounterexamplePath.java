@@ -6,8 +6,6 @@ import java.util.List;
 public class CounterexamplePath{
 	
 	private List<Integer> counterPath = new ArrayList<>(); //  
-	
-
 	public List<Integer> testedTransitionCount = new ArrayList<>();
 	public int concretePathCount;
 	

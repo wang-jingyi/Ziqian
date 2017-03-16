@@ -5,10 +5,8 @@ import io.github.wang_jingyi.ZiQian.prism.PrismState;
 import io.github.wang_jingyi.ZiQian.utils.IntegerUtil;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.jgrapht.GraphPath;
@@ -36,33 +34,33 @@ public class CounterexampleGenerator {
 		DefaultDirectedWeightedGraph<Integer, DefaultWeightedEdge> graph = PRISMModelToGraph();
 		int endingVertex = findAbsorbingState(graph);
 
-		//		List<Integer> stateWithLoops = new ArrayList<>();
-		//		List<Double> loopWeights = new ArrayList<>();
-		//		for(int vertex: graph.vertexSet()){ 			// find loops with weights in ascending order 
-		//			for(DefaultWeightedEdge edge : graph.outgoingEdgesOf(vertex)){
-		//				double weight = graph.getEdgeWeight(edge);
-		//				if(graph.getEdgeTarget(edge)==vertex && weight!=0){ // self loop with probability 1 is not considered
-		//					if(stateWithLoops.size()==0){
-		//						loopWeights.add(weight);
-		//						stateWithLoops.add(vertex);
-		//						continue;
-		//					}
-		//					
-		//					for(int i=0;i<loopWeights.size();i++){
-		//						if(i==stateWithLoops.size()-1){
-		//							loopWeights.add(weight);
-		//							stateWithLoops.add(vertex);
-		//						}
-		//						else if(weight<loopWeights.get(i)){
-		//							loopWeights.set(i, weight);
-		//							stateWithLoops.set(i, vertex);
-		//						}
-		//					}
-		//				}
-		//			}
-		//		}
-		//		System.out.println("state with loops: " + stateWithLoops);
-		//		System.out.println("loop weights: " + loopWeights);
+		List<Integer> stateWithLoops = new ArrayList<>();
+		List<Double> loopWeights = new ArrayList<>();
+		for(int vertex: graph.vertexSet()){ 			// find loops with weights in ascending order 
+			for(DefaultWeightedEdge edge : graph.outgoingEdgesOf(vertex)){
+				double weight = graph.getEdgeWeight(edge);
+				if(graph.getEdgeTarget(edge)==vertex && weight!=0){ // self loop with probability 1 is not considered
+					if(stateWithLoops.size()==0){
+						loopWeights.add(weight);
+						stateWithLoops.add(vertex);
+						continue;
+					}
+
+					for(int i=0;i<loopWeights.size();i++){
+						if(i==stateWithLoops.size()-1){
+							loopWeights.add(weight);
+							stateWithLoops.add(vertex);
+						}
+						else if(weight<loopWeights.get(i)){
+							loopWeights.set(i, weight);
+							stateWithLoops.set(i, vertex);
+						}
+					}
+				}
+			}
+		}
+//		System.out.println("-state with loops: " + stateWithLoops);
+//		System.out.println("-loop weights: " + loopWeights);
 
 
 		List<CounterexamplePath> cps = new ArrayList<>();
@@ -83,13 +81,12 @@ public class CounterexampleGenerator {
 				}
 				if(accProb>=probabilityBound){
 					cps = graphPathToCounterexample(gcps);
+					System.out.println("-Total probability of counterexample: " + accProb);
 					break;
 				}
 				if(accProb==lastAccProb){ // probability measure dont increase anymore, have to add loops
-					//					cps = addCounterexamplePathsWithLoops(gcps, stateWithLoops, loopWeights, accProb);
+					cps.addAll(addCounterexamplePathsWithLoops(gcps, stateWithLoops, loopWeights, accProb));
 					containLoops = true;
-					cps = graphPathToCounterexample(gcps);
-					cps.addAll(addLoopGraphPathToCounterexample(gcps, graph));
 					break;
 				}
 				else{
@@ -115,10 +112,8 @@ public class CounterexampleGenerator {
 					break;
 				}
 				if(accProb==lastAccProb){ // probability measure dont increase anymore, have to add loops
-					//					cps = addCounterexamplePathsWithLoops(gcps, stateWithLoops, loopWeights, accProb);
+					cps.addAll(addCounterexamplePathsWithLoops(gcps, stateWithLoops, loopWeights, accProb));
 					containLoops = true;
-					cps = graphPathToCounterexample(gcps);
-					cps.addAll(addLoopGraphPathToCounterexample(gcps, graph));
 					break;
 				}
 				else{
@@ -127,98 +122,101 @@ public class CounterexampleGenerator {
 				}
 			}
 		}
+//		System.out.println("counterexample : " + cps);
+		System.out.println("- Total number of paths in the counterexample: " + cps.size());
 		return cps;
 	}
 
-	//	private List<CounterexamplePath> addCounterexamplePathsWithLoops(List<GraphPath<Integer, DefaultWeightedEdge>> gcps,List<Integer> stateWithLoops, List<Double> loopWeights, double accProb){
-	//		
-	//		List<CounterexamplePath> cps = graphPathToCounterexample(gcps); // first add all paths without loops;
-	//		List<LoopPoint> loopPoints = new ArrayList<>(); // maintain a list of loop points in ascending order
-	//		for(GraphPath<Integer, DefaultWeightedEdge> gp : gcps){
-	//			double weight = gp.getWeight();
-	//			List<Integer> path = Graphs.getPathVertexList(gp);
-	//			for(int v : path){
-	//				int loopIndex = IntegerUtil.indexInList(v, stateWithLoops); 
-	//				if(loopIndex!=-1){
-	//					double addedWeight = weight + loopWeights.get(loopIndex);
-	//					LoopPoint lp = new LoopPoint(path, v, addedWeight);
-	//					loopPoints = insertLoopPoint(loopPoints, lp);
-	//				}
-	//			}
-	//		}
-	//		while(accProb<probabilityBound){ // add loops to accumulate probability mass to exceed the probability bound
-	//			
-	//			LoopPoint currentLP = loopPoints.get(0);
-	//			
-	//			accProb += weightToProbability(currentLP.addedWeight); // add a loop with highest probability to accumulate probability
-	//			
-	//			List<Integer> loopPath = currentLP.path;
-	//			List<Integer> clonedLoopPath = IntegerUtil.cloneList(loopPath);
-	//			
-	//			double weight = loopWeights.get(IntegerUtil.indexInList(currentLP.vertex, stateWithLoops));
-	//			double newAddedWeight = currentLP.addedWeight + weight; // udpate added weight
-	//			
-	//			for(int j=0; j<loopPath.size(); j++){
-	//				int tmp = loopPath.get(j);
-	//				if(tmp==currentLP.vertex){
-	//					clonedLoopPath.add(j, tmp);
-	//					break;
-	//				}
-	//			}
-	//			
-	//			// update counterexample paths
-	//			List<Integer> tmpPath = IntegerUtil.cloneList(clonedLoopPath);
-	//			tmpPath = IntegerUtil.removeLastElement(tmpPath);
-	////			System.out.println("add counterexample path: " + tmpPath);
-	//			cps.add(new CounterexamplePath(tmpPath));
-	//			
-	//			// update loop points
-	//			LoopPoint newLoopPoint = new LoopPoint(clonedLoopPath, currentLP.vertex, newAddedWeight);
-	//			loopPoints.remove(0);
-	//			loopPoints = insertLoopPoint(loopPoints, newLoopPoint);
-	//			break;
-	//		}
-	//		return cps;
-	//	}
+	private List<CounterexamplePath> addCounterexamplePathsWithLoops(List<GraphPath<Integer, DefaultWeightedEdge>> gcps,
+			List<Integer> stateWithLoops, List<Double> loopWeights, double accProb){
+
+		List<CounterexamplePath> cps = graphPathToCounterexample(gcps); // first add all paths without loops;
+		List<LoopPoint> loopPoints = new ArrayList<>(); // maintain a list of loop points in ascending order
+		for(GraphPath<Integer, DefaultWeightedEdge> gp : gcps){
+			double weight = gp.getWeight();
+			List<Integer> path = Graphs.getPathVertexList(gp);
+			for(int v : path){
+				int loopIndex = IntegerUtil.indexInList(v, stateWithLoops); 
+				if(loopIndex!=-1){
+					double addedWeight = weight + loopWeights.get(loopIndex);
+					LoopPoint lp = new LoopPoint(path, v, addedWeight);
+					loopPoints = insertLoopPoint(loopPoints, lp);
+				}
+			}
+		}
+		while(accProb<probabilityBound){ // add loops to accumulate probability mass to exceed the probability bound
+
+			LoopPoint currentLP = loopPoints.get(0);
+
+			accProb += weightToProbability(currentLP.addedWeight); // add a loop with highest probability to accumulate probability
+
+			List<Integer> loopPath = currentLP.path;
+			List<Integer> clonedLoopPath = IntegerUtil.cloneList(loopPath);
+
+			double weight = loopWeights.get(IntegerUtil.indexInList(currentLP.vertex, stateWithLoops));
+			double newAddedWeight = currentLP.addedWeight + weight; // udpate added weight
+
+			for(int j=0; j<loopPath.size(); j++){
+				int tmp = loopPath.get(j);
+				if(tmp==currentLP.vertex){
+					clonedLoopPath.add(j, tmp);
+					break;
+				}
+			}
+			
+			// update counterexample paths
+			List<Integer> tmpPath = IntegerUtil.cloneList(clonedLoopPath);
+			tmpPath = IntegerUtil.removeLastElement(tmpPath);
+//			System.out.println("add counterexample path: " + tmpPath);
+			cps.add(new CounterexamplePath(tmpPath));
+
+			// update loop points
+			LoopPoint newLoopPoint = new LoopPoint(clonedLoopPath, currentLP.vertex, newAddedWeight);
+			loopPoints.remove(0);
+			loopPoints = insertLoopPoint(loopPoints, newLoopPoint);
+		}
+		System.out.println("- Total probability of counterexample: " + accProb);
+		return cps;
+	}
 
 
 	public boolean isContainLoops() {
 		return containLoops;
 	}
 
-	private List<CounterexamplePath> addLoopGraphPathToCounterexample(List<GraphPath<Integer, DefaultWeightedEdge>> gcps,
-			DefaultDirectedWeightedGraph<Integer, DefaultWeightedEdge> graph){
-		List<CounterexamplePath> cps = new ArrayList<>();
-		boolean loopAdded = false;
-		
-		for(GraphPath<Integer, DefaultWeightedEdge> gp : gcps){
-
-			Map<Integer, Integer> addPoints = new HashMap<Integer, Integer>();
-			
-			List<Integer> path = Graphs.getPathVertexList(gp);
-			IntegerUtil.removeLastElement(path);
-			for(int i=0; i<path.size(); i++){
-				int vertex = path.get(i);
-				for(DefaultWeightedEdge edge : graph.outgoingEdgesOf(vertex)){
-					double weight = graph.getEdgeWeight(edge);
-					if(graph.getEdgeTarget(edge)==vertex && weight!=0){ // self loop with probability 1 is not considered
-						loopAdded = true;
-						addPoints.put(i, vertex);
-					}
-				}
-			}
-			
-			if(loopAdded){
-				int count = 0;
-				for(int j : addPoints.keySet()){
-					path.add(j+count,addPoints.get(j));
-					count ++;
-				}
-				cps.add(new CounterexamplePath(path));
-			}
-		}
-		return cps;
-	}
+//	private List<CounterexamplePath> addLoopGraphPathToCounterexample(List<GraphPath<Integer, DefaultWeightedEdge>> gcps,
+//			DefaultDirectedWeightedGraph<Integer, DefaultWeightedEdge> graph){
+//		List<CounterexamplePath> cps = new ArrayList<>();
+//		boolean loopAdded = false;
+//
+//		for(GraphPath<Integer, DefaultWeightedEdge> gp : gcps){
+//
+//			Map<Integer, Integer> addPoints = new HashMap<Integer, Integer>();
+//
+//			List<Integer> path = Graphs.getPathVertexList(gp);
+//			IntegerUtil.removeLastElement(path);
+//			for(int i=0; i<path.size(); i++){
+//				int vertex = path.get(i);
+//				for(DefaultWeightedEdge edge : graph.outgoingEdgesOf(vertex)){
+//					double weight = graph.getEdgeWeight(edge);
+//					if(graph.getEdgeTarget(edge)==vertex && weight!=0){ // self loop with probability 1 is not considered
+//						loopAdded = true;
+//						addPoints.put(i, vertex);
+//					}
+//				}
+//			}
+//
+//			if(loopAdded){
+//				int count = 0;
+//				for(int j : addPoints.keySet()){
+//					path.add(j+count,addPoints.get(j));
+//					count ++;
+//				}
+//				cps.add(new CounterexamplePath(path));
+//			}
+//		}
+//		return cps;
+//	}
 
 	private double weightToProbability(double weight){
 		return (double)1/Math.pow(10, weight);
@@ -230,7 +228,6 @@ public class CounterexampleGenerator {
 		for(GraphPath<Integer, DefaultWeightedEdge> gp : gcps){
 			List<Integer> path = Graphs.getPathVertexList(gp);
 			IntegerUtil.removeLastElement(path);
-			//			System.out.println("add counterexample path: " + path);
 			CounterexamplePath cp = new CounterexamplePath(path);
 			cps.add(cp);
 		}
@@ -248,22 +245,22 @@ public class CounterexampleGenerator {
 		}
 	}
 
-//	private List<LoopPoint> insertLoopPoint(List<LoopPoint> origLoopPoints, LoopPoint lp){
-//		if(origLoopPoints.size()==0){
-//			origLoopPoints.add(lp);
-//			return origLoopPoints;
-//		}
-//
-//		for(int i=0; i<origLoopPoints.size(); i++){
-//			if(origLoopPoints.size()==0 || i==origLoopPoints.size()-1){
-//				origLoopPoints.add(lp);
-//			}
-//			else if(origLoopPoints.get(i).addedWeight>lp.addedWeight){
-//				origLoopPoints.set(i, lp);
-//			}
-//		}
-//		return origLoopPoints;
-//	}
+	private List<LoopPoint> insertLoopPoint(List<LoopPoint> origLoopPoints, LoopPoint lp){
+		if(origLoopPoints.size()==0){
+			origLoopPoints.add(lp);
+			return origLoopPoints;
+		}
+
+		for(int i=0; i<origLoopPoints.size(); i++){
+			if(origLoopPoints.size()==0 || i==origLoopPoints.size()-1){
+				origLoopPoints.add(lp);
+			}
+			else if(origLoopPoints.get(i).addedWeight>lp.addedWeight){
+				origLoopPoints.set(i, lp);
+			}
+		}
+		return origLoopPoints;
+	}
 
 	// absorbing state has the largest index
 	private int findAbsorbingState(DefaultDirectedWeightedGraph<Integer, DefaultWeightedEdge> graph){
@@ -315,7 +312,7 @@ public class CounterexampleGenerator {
 		}
 		graph.addVertex(absorbingStateId);
 
-		System.out.println("vertex set: "  + graph.vertexSet());
+//		System.out.println("vertex set: "  + graph.vertexSet());
 
 		for(int vertex : graph.vertexSet()){
 			if(vertex==collopsedStatesId || vertex==absorbingStateId){

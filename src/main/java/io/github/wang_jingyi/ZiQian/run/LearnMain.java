@@ -21,8 +21,6 @@ public class LearnMain {
 
 	public static void main(String[] args) throws IOException, ClassNotFoundException{
 		
-		TimeProfile.mainStartTime = System.nanoTime();
-		
 		ExtractPrismData epd = new ExtractPrismData(Config.DATA_PATH, Config.DATA_SIZE, 1, Config.DELIMTER);
 		VariablesValueInfo vvl = epd.getVariablesValueInfo();
 		
@@ -68,7 +66,6 @@ public class LearnMain {
 			System.out.println("formatting the model to .pm file for model checking...");
 			FormatPrismModel fpm = new FormatPrismModel("dtmc", Config.AA_OUTPUT_PATH, Config.MODEL_NAME+Config.DATA_SIZE);
 			fpm.translateToFormat(bestDTMC.getPrismModel(), data);
-			TimeProfile.mainEndTime = System.nanoTime();
 			TimeProfile.outputTimeProfile(Config.AA_OUTPUT_PATH+"/time_profile_"+Config.DATA_SIZE+".txt");
 		}
 		
@@ -81,7 +78,6 @@ public class LearnMain {
 			System.out.println("formatting the model to .pm file for model checking...");
 			FormatPrismModel fpm = new FormatPrismModel("dtmc", Config.GA_OUTPUT_PATH, Config.MODEL_NAME+Config.DATA_SIZE);
 			fpm.translateToFormat(bestDTMC.getPrismModel(), data);
-			TimeProfile.mainEndTime = System.nanoTime();
 			TimeProfile.outputTimeProfile(Config.GA_OUTPUT_PATH+"/time_profile_"+Config.DATA_SIZE+".txt");
 		}
 		

@@ -13,7 +13,7 @@ public class JavaTest {
 		list1.add(1);
 		List<Integer> list2 = new ArrayList<Integer>();
 		list2.add(1);
-		System.out.println("test: " + list1.equals(list2));
+		System.out.println("test integer list: " + list1.equals(list2));
 	}
 
 	

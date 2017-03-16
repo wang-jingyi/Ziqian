@@ -1,6 +1,6 @@
 package io.github.wang_jingyi.ZiQian.active;
 
-import io.github.wang_jingyi.ZiQian.run.GlobalVars;
+import io.github.wang_jingyi.ZiQian.run.GlobalConfigs;
 import io.github.wang_jingyi.ZiQian.utils.NumberUtil;
 
 import org.junit.Test;
@@ -13,7 +13,7 @@ public class SwatUpdateStateTest {
 				  { 2, 3},
 				  { 3, 1}
 				};
-		int stateNumber = frequencyMatrix.length + GlobalVars.newStateNumber;
+		int stateNumber = frequencyMatrix.length + GlobalConfigs.newStateNumber;
 		int[][] newfrequencyMatrix = new int[stateNumber][stateNumber];
 		System.arraycopy(frequencyMatrix, 0, newfrequencyMatrix, 0, newfrequencyMatrix.length);
 		frequencyMatrix = newfrequencyMatrix;

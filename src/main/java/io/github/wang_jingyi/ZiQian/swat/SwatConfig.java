@@ -18,7 +18,7 @@ public class SwatConfig {
 	public static String PROPERTY_LEARN_FILE = MODEL_PATH + "/swat.pctl";
 	public static int PROPERTY_INDEX = 1;
 	public static int BOUNDED_STEP = -1;
-	public static double SAFETY_THRESHOLD = 0.9;
+	public static double SAFETY_THRESHOLD = 0.1;
 	public static String DELIMITER = ",";
 	
 	

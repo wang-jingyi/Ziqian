@@ -1,0 +1,12 @@
+
+++++++ Running time profile for the run starting at 2017/03/16 16:11:17 ++++++
+--- Time for whole algorithm: 5.953021 s
+=== Time for each iteration: [5.952196] s ===
+::: Divided time for each iteration :::
+- Time for learning: [0.639758] s
+- Time for counterexample generation: [0.031899] s
+- Time for hypothesis testing: [0.03389] s
+- Time for identifying spurious transtions: [0.040098] s
+- Time for generating a new predicate: [1.946841] s
+
+

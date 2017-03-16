@@ -67,7 +67,7 @@ public class CounterExtractionTest {
 		TestEnvironment te = TestEnvironment.te;
 		Sampler sampler = new PrismSampler(PlatformDependent.CAV_MODEL_ROOT+"/crowds/crowds.pm", PlatformDependent.CAV_MODEL_ROOT+"/crowds/testPaths"
 				,"TotalRuns=5,CrowdSize=10");
-		te.init(pres, sampler);
+		te.init(pres, sampler,data," ",1);
 //		HypothesisTest sst = new SingleSampleTest(5);
 		HypothesisTest sst = new SprtTest(0.2, 0.1, 0.1, 0.1);
 		Counterexample ce = new Counterexample(bestDTMC.getPrismModel(), counterPaths, sst);

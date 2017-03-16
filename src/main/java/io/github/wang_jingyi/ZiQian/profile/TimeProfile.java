@@ -3,112 +3,73 @@ package io.github.wang_jingyi.ZiQian.profile;
 import io.github.wang_jingyi.ZiQian.utils.FileUtil;
 
 import java.io.FileNotFoundException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 
 public class TimeProfile {
 	
-	public static long mainStartTime;
-	public static long mainEndTime;
-	public static long mainTime;
+	public static double main_time;
+	public static long main_start_time;
+	public static long main_end_time;
 	
-	public static long iterationEndTime;
-	public static long iterationTime;
+	public static List<Double> iteration_times = new ArrayList<Double>();
+	public static long iteration_start_time;
+	public static long iteration_end_time;
 	
-	public static long simulationStartTime;
-	public static long simulationEndTime;
-	public static long simulationTime;
+	public static List<Double> learning_times = new ArrayList<Double>();
+	public static long learning_start_time;
+	public static long learning_end_time;
 	
-	public static long extractDataStartTime;
-	public static long extractDataEndTime;
-	public static long extractDataTime;
+	public static List<Double> ce_generation_times = new ArrayList<Double>();
+	public static long ce_generation_start_time;
+	public static long ce_generation_end_time;
 	
-	public static long learnStartTime;
-	public static long learnEndTime;
-	public static long learnTime;
+	public static List<Double> hypothesis_testing_times = new ArrayList<Double>();
+	public static long ht_start_time;
+	public static long ht_end_time;
 	
-	public static long dataPrefixStartTime;
-	public static long dataPrefixEndTime;
-	public static long dataPrefixTime;
-	public static int dataPrefixExes = 0;
+	public static List<Double> spurious_check_times = new ArrayList<Double>();
+	public static long spurious_start_time;
+	public static long spurious_end_time;
 	
-	public static long coreStartTime;
-	public static long coreEndTime;
-	public static long coreTime;
-	
-	public static long translateStartTime;
-	public static long translateEndTime;
-	public static long translateTime;
-	
-	public static long formatPMStartTime;
-	public static long formatPMEndTime;
-	public static long formatPMTime;
-	
-	public static long sampleStartTime;
-	public static long sampleEndTime;
-	
+	public static List<Double> refine_times = new ArrayList<Double>();
+	public static long refine_start_time;
+	public static long refine_end_time;
+		
 	public static StringBuilder sb = new StringBuilder();
 	
 	public static void outputTimeProfile() throws FileNotFoundException{
-//		simulationTime = simulationEndTime-simulationStartTime;
-//		extractDataTime = extractDataEndTime-extractDataStartTime;
-//		learnTime = learnEndTime-learnStartTime; // whole process learn 
-//		dataPrefixTime = dataPrefixEndTime-dataPrefixStartTime; // calculate the prefix tree
-//		coreTime = coreEndTime-coreStartTime; // including prefix tree calculation and learning 
-//		translateTime = translateEndTime-translateStartTime; // translate to PM model 
-//		formatPMTime = formatPMEndTime-formatPMStartTime; // format to .pm file
-//		mainTime = mainEndTime-mainStartTime; 
 		
-//		String filePath = gc.getLearnTypeFolder() + "/time_profile_" + gc.getObsLength() + ".txt";
-//		FileIOs.writeStringToFile(filePath, sb.toString());
-		
-//		System.out.println("Time for simulation: " + nanoToSeconds(simulationTime) + " s.");
-//		System.out.println("Time for extracting relavent data: " + nanoToSeconds(extractDataTime) + " s." );
-//		System.out.println("Time for the whole process of learning: " + nanoToSeconds(learnTime) + "s.");
-//		System.out.println("Time for preparing data prefixes information: " + nanoToSeconds(dataPrefixTime) + " s.");
-//		System.out.println("Numbers of preparing data prefixes information: " + dataPrefixExes + ".");
-//		System.out.println("Time for core learning: " + nanoToSeconds(coreTime) + " s.");
-//		System.out.println("Time for translate learned model to prism format: " + nanoToSeconds(translateTime) + " s.");
-//		System.out.println("Time for formating learned model to .pm file: " + nanoToSeconds(formatPMTime) + " s.");
-		
+		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+		Date date = new Date();
+		sb.append("\n++++++ Running time profile for the run starting at " + dateFormat.format(date) + " ++++++\n");
+		sb.append("--- Time for whole algorithm: " + main_time + " s\n");
+		sb.append("=== Time for each iteration: " + iteration_times + " s ===\n");
+		sb.append("::: Divided time for each iteration :::\n");
+		sb.append("- Time for learning: " + learning_times + " s\n");
+		sb.append("- Time for counterexample generation: " + ce_generation_times + " s\n");
+		sb.append("- Time for hypothesis testing: " + hypothesis_testing_times + " s\n");
+		sb.append("- Time for identifying spurious transtions: " + spurious_check_times + " s\n");
+		sb.append("- Time for generating a new predicate: " + refine_times + " s\n\n");
+		System.out.println(sb.toString());
 	}
 	
 	
 	public static void outputTimeProfile(String filePath) throws FileNotFoundException{
-//		simulationTime = simulationEndTime-simulationStartTime;
-//		extractDataTime = extractDataEndTime-extractDataStartTime;
-//		learnTime = learnEndTime-learnStartTime; // whole process learn 
-//		dataPrefixTime = dataPrefixEndTime-dataPrefixStartTime; // calculate the prefix tree
-//		coreTime = coreEndTime-coreStartTime; // including prefix tree calculation and learning 
-//		translateTime = translateEndTime-translateStartTime; // translate to PM model 
-//		formatPMTime = formatPMEndTime-formatPMStartTime; // format to .pm file
-		mainTime = mainEndTime - mainStartTime;
-		
-//		sb.append("Time for simulation: " + nanoToSeconds(simulationTime) + " s.\n");
-//		sb.append("Time for extracting relavent data: " + nanoToSeconds(extractDataTime) + " s.\n");
-//		sb.append("Time for the whole process of learning: " + nanoToSeconds(learnTime) + "s.\n");
-//		sb.append("Learned model size: " + RunProfile.learnedModelSize + ".\n");
-//		sb.append("Time for preparing data prefixes information: " + nanoToSeconds(dataPrefixTime) + " s.\n");
-//		sb.append("Total number of prefixes:" + RunProfile.prefixCount + ".\n");
-//		sb.append("Time for core learning: " + nanoToSeconds(coreTime) + " s.\n");
-//		sb.append("Time for translate learned model to prism format: " + nanoToSeconds(translateTime) + " s.\n");
-//		sb.append("Time for formating learned model to .pm file: " + nanoToSeconds(formatPMTime) + " s.\n");
-		System.out.println("Time for the whole algorithm: " + nanoToSeconds(mainTime) + " s.\n");
-		sb.append("Time for the whole algorithm: " + nanoToSeconds(mainTime) + " s.\n");
 		FileUtil.writeStringToFile(filePath, sb.toString());
-		
-//		System.out.println("Time for simulation: " + nanoToSeconds(simulationTime) + " s.");
-//		System.out.println("Time for extracting relavent data: " + nanoToSeconds(extractDataTime) + " s." );
-//		System.out.println("Time for the whole process of learning: " + nanoToSeconds(learnTime) + "s.");
-//		System.out.println("Time for preparing data prefixes information: " + nanoToSeconds(dataPrefixTime) + " s.");
-//		System.out.println("Numbers of preparing data prefixes information: " + dataPrefixExes + ".");
-//		System.out.println("Time for core learning: " + nanoToSeconds(coreTime) + " s.");
-//		System.out.println("Time for translate learned model to prism format: " + nanoToSeconds(translateTime) + " s.");
-//		System.out.println("Time for formating learned model to .pm file: " + nanoToSeconds(formatPMTime) + " s.");
-		
 	}
 	
 	public static double nanoToSeconds(long elapsedTime){
 		return (double)elapsedTime / 1000000000.0;
+	}
+
+
+	public static double millisToSeconds(long elapsedTime) {
+		return (double)elapsedTime;
 	}
 	
 	

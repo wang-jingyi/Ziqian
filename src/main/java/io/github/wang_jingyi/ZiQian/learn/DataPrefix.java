@@ -85,9 +85,9 @@ public class DataPrefix implements Serializable{
 	}
 
 	public void printPrefixTreeInfo(){
-		System.out.println("------Prefix tree information------");
-		System.out.println("-Total number of prefixes: " + prefixesTotalNum);
-		System.out.println("-Total number of initial states: " + initStates.size());
+		System.out.println("------ Prefix tree information ------");
+		System.out.println("- Total number of prefixes: " + prefixesTotalNum);
+		System.out.println("- Total number of initial states: " + initStates.size());
 	}
 
 

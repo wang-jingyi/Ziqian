@@ -7,7 +7,7 @@ public class PrismSampler implements Sampler{
 	private String modelPath;
 	private String simulationConfig; // "none" if unspecified
 	private String outputFilePath;
-	private String lastestSampleFilePath;
+	private String latestSampleFilePath;
 	private int simulationLength = Integer.MAX_VALUE;
 	private int simulationCount = 0;
 	
@@ -20,24 +20,24 @@ public class PrismSampler implements Sampler{
 	@Override
 	public void sample(){
 		String[] commandParas = new String[]{};
-		lastestSampleFilePath = outputFilePath+"/"+"path_" + simulationCount + ".txt";
+		latestSampleFilePath = outputFilePath+"/"+"path_" + simulationCount + ".txt";
 		if(simulationConfig.equals("none")){
 			commandParas = new String[]{Config.PRISM_PATH,
 					modelPath,
-					"-simpath",Integer.toString(simulationLength), lastestSampleFilePath};
+					"-simpath",Integer.toString(simulationLength), latestSampleFilePath};
 		}
 		else{
 			commandParas = new String[]{Config.PRISM_PATH,
 					modelPath,"-const", simulationConfig,
-					"-simpath",Integer.toString(simulationLength), lastestSampleFilePath};
+					"-simpath",Integer.toString(simulationLength), latestSampleFilePath};
 		}
 		ShellInteraction.executeCommand(commandParas);
 		
 	}
 
 	@Override
-	public String getLastestSample() {
-		return lastestSampleFilePath;
+	public String getLatestSample() {
+		return latestSampleFilePath;
 	}
 
 	@Override

@@ -14,7 +14,6 @@ import io.github.wang_jingyi.ZiQian.prism.ExtractPrismData;
 import io.github.wang_jingyi.ZiQian.prism.FormatPrismModel;
 import io.github.wang_jingyi.ZiQian.prism.PrismPathData;
 import io.github.wang_jingyi.ZiQian.profile.AlgoProfile;
-import io.github.wang_jingyi.ZiQian.profile.TimeProfile;
 import io.github.wang_jingyi.ZiQian.refine.Refiner;
 import io.github.wang_jingyi.ZiQian.sample.Counterexample;
 import io.github.wang_jingyi.ZiQian.sample.CounterexampleGenerator;
@@ -80,7 +79,6 @@ public class Main {
 		
 		
 		System.out.println("data path: " + Config.DATA_PATH) ;
-		TimeProfile.mainStartTime = System.nanoTime();
 		ExtractPrismData epd = new ExtractPrismData(Config.DATA_PATH, Config.DATA_SIZE, Config.STEP_SIZE, Config.DELIMTER);
 		VariablesValueInfo vvl = epd.getVariablesValueInfo(varsSet);
 		
@@ -110,10 +108,6 @@ public class Main {
 			System.out.println("-------------------------------------" + "iteration: " + iteration + "-------------------------------------");
 			System.out.println("number of predicates: " + pres.size());
 			larModelSize = run(vvl,pres,iteration,larModelSize,te);
-			TimeProfile.iterationEndTime = System.nanoTime();
-			TimeProfile.iterationTime = TimeProfile.iterationEndTime - TimeProfile.mainStartTime;
-			System.out.println("iteration " + iteration + " time is: " + TimeProfile.nanoToSeconds(TimeProfile.iterationTime));
-			TimeProfile.sb.append("iteration " + iteration + " time is: " + TimeProfile.nanoToSeconds(TimeProfile.iterationTime) + "\n");
 		}
 		
 		System.out.println("End of the program.");
@@ -166,7 +160,7 @@ public class Main {
 		System.out.println("hypothesis testing...");
 		
 		Sampler sampler = new PrismSampler(Config.ORIG_MODEL_FILE, Config.TESTING_PATH, Config.MODEL_SETTING);
-		te.init(pres,sampler);
+		te.init(pres,sampler,data,Config.DELIMTER,Config.STEP_SIZE);
 		
 //		HypothesisTest sst = new SingleSampleTest(1);
 		HypothesisTest sst = new SprtTest(0.2, 0.1, 0.1, 0.1);

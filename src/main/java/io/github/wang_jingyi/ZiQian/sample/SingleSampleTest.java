@@ -6,9 +6,6 @@ import io.github.wang_jingyi.ZiQian.prism.PrismModel;
 import io.github.wang_jingyi.ZiQian.prism.PrismPathData;
 import io.github.wang_jingyi.ZiQian.prism.PrismState;
 import io.github.wang_jingyi.ZiQian.profile.AlgoProfile;
-import io.github.wang_jingyi.ZiQian.run.Config;
-import io.github.wang_jingyi.ZiQian.swat.SwatConfig;
-import io.github.wang_jingyi.ZiQian.utils.FileUtil;
 import io.github.wang_jingyi.ZiQian.utils.IntegerUtil;
 import io.github.wang_jingyi.ZiQian.utils.StringUtil;
 
@@ -33,29 +30,30 @@ public class SingleSampleTest implements HypothesisTest{
 		int cpCounter = 0;
 		if(te.getSampler().isObtainingNewSample()){ // testing from new samples
 			for(int i=0; i<sampleSize; i++){
-				System.out.println("-sample: " + (i+1));
+				System.out.println("- Sample: " + (i+1));
 				te.getSampler().sample();
-				List<VariablesValue> vvs = PrismPathData.extractSEData(te.getSampler().getLastestSample(), 
-						AlgoProfile.vars,Integer.MAX_VALUE,SwatConfig.STEP_SIZE, SwatConfig.DELIMITER); // variables values of last simulation
-				if(te.test(vvs,ce)){
-					System.out.println("--sample " + i + " is a counterexample path.");
+				List<VariablesValue> vvs = PrismPathData.extractSEData(te.getSampler().getLatestSample(), 
+						AlgoProfile.vars,Integer.MAX_VALUE,te.getData_step_size(),te.getData_delimiter()); // variables values of last simulation
+				PredicateAbstraction pa = new PredicateAbstraction(te.getPredicates());
+				List<String> concrete_trace = pa.abstractList(vvs);
+				if(te.test(concrete_trace,ce)){
+					System.out.println("- Sample " + i + " is a counterexample path");
 					cpCounter++;
 				}
 			}
 		}
 		else{ // testing from training data
 			int counter = 0;
-			for(String trainingFile : FileUtil.filesInDir(SwatConfig.DATA_PATH)){
-				List<VariablesValue> vvs = PrismPathData.extractSEData(trainingFile, AlgoProfile.vars, Integer.MAX_VALUE, SwatConfig.STEP_SIZE, SwatConfig.DELIMITER);
-				if(te.test(vvs, ce)){
-					System.out.println("--sample " +  counter + " is a counterexample path.");
+			for(List<String> concrete_trace : te.getTraining_data().getObservations()){
+				if(te.test(concrete_trace, ce)){
+					System.out.println("- Sample " +  counter + " is a counterexample path");
 					cpCounter++;
 				}
 				counter++;
 				if(counter>=sampleSize){break;} 
 			}
 		}
-		System.out.println("-sample complete");
+		System.out.println("- Sample complete");
 		if(pValueHZero(sampleSize, p, cpCounter) < pValueHOne(sampleSize, p, cpCounter)){
 			return true;
 		}
@@ -76,8 +74,8 @@ public class SingleSampleTest implements HypothesisTest{
 		return pvalue;
 	}
 
-
-	static List<Double> calculateTestedTranstionProb(TestEnvironment te, Counterexample ce) throws IOException{
+	// this function can be further refined to be faster	
+	public static List<Double> calculateTestedTranstionProb(TestEnvironment te, Counterexample ce) throws IOException{
 		List<SplittingPoint> sps = ce.getAllSplittingPoints();
 		PrismModel pm = ce.getPrismModel();
 
@@ -93,18 +91,9 @@ public class SingleSampleTest implements HypothesisTest{
 			spCounts.put(sp, 0);
 		}
 
-		List<String> paths = new ArrayList<String>();
-		paths.addAll(FileUtil.filesInDir(SwatConfig.DATA_PATH)); // training data files 
-		//		paths.addAll(FileUtil.filesInDir(te.getSampler().getOutputFilePath())); // testing files data
-
-		for(String path : paths){
-			List<VariablesValue> vvs = PrismPathData.extractSEData(path, AlgoProfile.vars,Integer.MAX_VALUE, 
-					Config.STEP_SIZE, Config.DELIMTER); // variables values of last simulation
-			PredicateAbstraction pa = new PredicateAbstraction(te.getPredicates());
-			List<String> absExs = pa.abstractList(vvs);
-
+		for(List<String> concrete_trace : te.getTraining_data().getObservations()){
 			PrismState currentPS = pm.getInitialStates().get(0);
-			for(int i=1; i<absExs.size()-1; i++){
+			for(int i=1; i<concrete_trace.size()-1; i++){
 				int currentID = currentPS.getId();
 				if(startingStateCounts.containsKey(currentID)){
 					int currentCount = startingStateCounts.get(currentID);
@@ -115,12 +104,12 @@ public class SingleSampleTest implements HypothesisTest{
 					startingStateCounts.put(currentID, 1);
 				}
 
-				int nextStateID = StringUtil.getStringIndex(absExs.get(i), currentPS.getSigmas());
+				int nextStateID = StringUtil.getStringIndex(concrete_trace.get(i), currentPS.getSigmas());
 				if(nextStateID==-1){
-					System.out.println("new transition happens.");
+					System.out.println("- New transition happens.");
 					continue;
 				}
-				assert nextStateID!=-1 : "concrete path not in the model.";
+//				assert nextStateID!=-1 : "- Concrete trace not in the model.";
 				PrismState nextPS = currentPS.getNextStates().get(nextStateID);
 				int nextID = nextPS.getId();
 

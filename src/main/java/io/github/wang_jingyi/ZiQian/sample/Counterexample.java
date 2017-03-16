@@ -2,7 +2,8 @@ package io.github.wang_jingyi.ZiQian.sample;
 
 import io.github.wang_jingyi.ZiQian.prism.PrismModel;
 import io.github.wang_jingyi.ZiQian.prism.PrismState;
-import io.github.wang_jingyi.ZiQian.run.Config;
+import io.github.wang_jingyi.ZiQian.profile.TimeProfile;
+import io.github.wang_jingyi.ZiQian.run.GlobalConfigs;
 import io.github.wang_jingyi.ZiQian.utils.MapUtil;
 import io.github.wang_jingyi.ZiQian.utils.StringUtil;
 
@@ -16,7 +17,7 @@ import java.util.Map;
 
 /*
  * includes all the information of a counterexample,
- * to find the state transition to split 
+ * to find the spurious state transitions to split 
  * */
 
 public class Counterexample implements SplitPointFinder{
@@ -39,7 +40,7 @@ public class Counterexample implements SplitPointFinder{
 
 	public Counterexample(PrismModel pm, String cpFilePath, TestEnvironment te, HypothesisTest ht) {
 		this.pm = pm;
-		this.counterPaths = CounterexampleOps.extractCounterexample(cpFilePath);
+		this.counterPaths = CounterexampleOperations.extractCounterexample(cpFilePath);
 		this.ht = ht;
 		updateLongestPaths();
 	}
@@ -53,16 +54,36 @@ public class Counterexample implements SplitPointFinder{
 	}
 
 	public void analyze(TestEnvironment te) throws ClassNotFoundException, IOException{
-		if(ht.testHypothesis(ht.getProbBound(), te, this)){
-			System.out.println("the property is voilated.");
-			System.out.println("counterexample wrote to file."); // to do
+		
+		TimeProfile.ht_start_time = System.nanoTime();
+		boolean result = ht.testHypothesis(ht.getProbBound(), te, this);
+		TimeProfile.ht_end_time = System.nanoTime();
+		TimeProfile.hypothesis_testing_times.add(TimeProfile.nanoToSeconds(TimeProfile.ht_end_time
+				-TimeProfile.ht_start_time));
+		
+		if(result){
+			System.out.println("- Result: the counterexample is actual with certain confidence");
+			System.out.println("- Counterexample wrote to file."); // to do
+			System.out.println("====== The property is voilated ======");
+			TimeProfile.iteration_end_time = System.nanoTime();
+			TimeProfile.iteration_times.add(TimeProfile.nanoToSeconds(TimeProfile.iteration_end_time-TimeProfile.iteration_start_time));
+			TimeProfile.main_end_time = System.nanoTime();
+			TimeProfile.main_time = TimeProfile.nanoToSeconds(TimeProfile.main_end_time-TimeProfile.main_start_time);
+			TimeProfile.outputTimeProfile();
+			TimeProfile.outputTimeProfile(GlobalConfigs.PROJECT_ROOT+"/time_profile.txt");
 			System.exit(0);
 		}
 		else{
+			System.out.println("- Result: the counterexample is spurious");
+			System.out.println("------ Find spurious transitions ------");
+			TimeProfile.spurious_start_time = System.nanoTime();
 			allSplittingPoints = findAllSplittingPoints();
 			calCETransProbs(te);
 			testedTransProbInCps = ht.getTestedTransitionProb(te, this);
 			sortedSplittingPoints = findSplitingStates(pm);
+			TimeProfile.spurious_end_time = System.nanoTime();
+			TimeProfile.spurious_check_times.add(TimeProfile.nanoToSeconds(TimeProfile.spurious_end_time
+					-TimeProfile.spurious_start_time));
 		}
 	}
 
@@ -95,12 +116,37 @@ public class Counterexample implements SplitPointFinder{
 
 	public boolean checkMembership(List<String> sample) throws FileNotFoundException, ClassNotFoundException, IOException{ // check if a sampled abstract path is in counterexample
 		for(CounterexamplePath cp : counterPaths){
-			if(CheckValidity(cp, sample, pm)){
+			List<Integer> state_path = getStatePath(sample, pm);
+			if(state_path.equals(cp.getCounterPath())){
 				cp.concretePathCount++;
 				return true;
 			}
 		}
 		return false;
+	}
+	
+	// given a trace, get its abstract state trace
+	private List<Integer> getStatePath(List<String> sample, PrismModel pm) {
+		
+		List<Integer> state_trace = new ArrayList<Integer>();
+		int next_symbol_index = -1;
+		int current_state_index = 1;
+		PrismState current_state = pm.getPrismStates().get(current_state_index-1);
+		state_trace.add(pm.getPrismStates().get(current_state_index-1).getId());
+		
+		for(int i=0; i<sample.size()-1; i++){
+			String tmps = sample.get(i+1);
+			List<String> next_symbols = current_state.getSigmas();
+			next_symbol_index = StringUtil.getStringIndex(tmps, next_symbols);
+			if(next_symbol_index==-1){
+				return state_trace; // return, new transition happens
+			}
+			else{
+				current_state = current_state.getNextStates().get(next_symbol_index);
+				state_trace.add(current_state.getId());
+			}
+		}
+		return state_trace;
 	}
 
 	public List<CounterexamplePath> getCounterPaths() {
@@ -116,31 +162,6 @@ public class Counterexample implements SplitPointFinder{
 			transProbInCps.add(calTransitionProb(sp, pm));
 		}
 		testedTransProbInCps = ht.getTestedTransitionProb(te, this);
-	}
-
-	private boolean CheckValidity(CounterexamplePath cp, List<String> pathData, PrismModel pm) throws FileNotFoundException, ClassNotFoundException, IOException{
-		List<Integer> path = cp.getCounterPath();
-		
-		if(pathData.size()<=1){
-			return false;
-		}
-		
-		for(int i=0; i<path.size()-1; i++){
-			String tmps = pathData.get(i+1);
-			int j = StringUtil.getStringIndex(tmps, pm.getPrismStates().get(path.get(i)).getSigmas());
-			if(j==-1){
-				return false;
-			}
-			else{
-				int curCount = cp.testedTransitionCount.get(i); // record transition appearance
-				cp.testedTransitionCount.set(i,curCount+1);
-				int k = pm.getPrismStates().get(path.get(i)).getNextStates().get(j).getId();
-				if(k!=path.get(i)+1){
-					return false;
-				}
-			}
-		}
-		return true;
 	}
 
 	public List<SplittingPoint> getAllSplittingPoints() {
@@ -159,7 +180,7 @@ public class Counterexample implements SplitPointFinder{
 			}
 			probDeviation.put(allSplittingPoints.get(i), deviation);
 		}
-		System.out.println("probability deviation of splitting point: " + probDeviation);
+		System.out.println("- Probability deviation of splitting point: " + probDeviation);
 
 		LinkedHashMap<SplittingPoint, Double> sortedMap = (LinkedHashMap<SplittingPoint, Double>) MapUtil.sortByValue(probDeviation);
 		for(SplittingPoint sp : sortedMap.keySet()){
@@ -167,28 +188,28 @@ public class Counterexample implements SplitPointFinder{
 		}
 		
 		List<SplittingPoint> finalsps = new ArrayList<>();
-		if(Config.LOOP_FIRST){
-			// put splitting points of loops in front
-			List<Integer> loops = new ArrayList<>();
-			for(int i=0; i<sps.size(); i++){ // find looping splitting point 
-				SplittingPoint sp = sps.get(i);
-				if(sp.getCurrentStateId()==sp.getNextStateId()){
-					loops.add(i);
-					finalsps.add(sp);
-				}
-			}
-			
-			int tmp = 0;
-			for(int k=0; k<loops.size(); k++){
-				int j = loops.get(k);
-				sps.remove(j-tmp);
-				tmp ++;
-			}
-		}
+//		if(Config.LOOP_FIRST){
+//			// put splitting points of loops in front
+//			List<Integer> loops = new ArrayList<>();
+//			for(int i=0; i<sps.size(); i++){ // find looping splitting point 
+//				SplittingPoint sp = sps.get(i);
+//				if(sp.getCurrentStateId()==sp.getNextStateId()){
+//					loops.add(i);
+//					finalsps.add(sp);
+//				}
+//			}
+//			
+//			int tmp = 0;
+//			for(int k=0; k<loops.size(); k++){
+//				int j = loops.get(k);
+//				sps.remove(j-tmp);
+//				tmp ++;
+//			}
+//		}
 		finalsps.addAll(sps);
 
-		System.out.println("splitting points: " + sps);
-		System.out.println("maximum deviation: " + probDeviation.get(sps.get(0)));
+		System.out.println("- Splitting points: " + sps);
+		System.out.println("- Maximum deviation: " + probDeviation.get(sps.get(0)));
 		return finalsps;
 	}
 

@@ -1,5 +1,11 @@
-package io.github.wang_jingyi.ZiQian;
+package io.github.wang_jingyi.ZiQian.run;
 
+import io.github.wang_jingyi.ZiQian.CheckLearned;
+import io.github.wang_jingyi.ZiQian.DTMCLearner;
+import io.github.wang_jingyi.ZiQian.Input;
+import io.github.wang_jingyi.ZiQian.Predicate;
+import io.github.wang_jingyi.ZiQian.PredicateAbstraction;
+import io.github.wang_jingyi.ZiQian.VariablesValueInfo;
 import io.github.wang_jingyi.ZiQian.evolution.LearnMergeEvolutions;
 import io.github.wang_jingyi.ZiQian.exceptions.PrismNoResultException;
 import io.github.wang_jingyi.ZiQian.exceptions.UnsupportedLearningTypeException;
@@ -7,6 +13,7 @@ import io.github.wang_jingyi.ZiQian.learn.AAlergia;
 import io.github.wang_jingyi.ZiQian.learn.LearningDTMC;
 import io.github.wang_jingyi.ZiQian.prism.FormatPrismModel;
 import io.github.wang_jingyi.ZiQian.profile.AlgoProfile;
+import io.github.wang_jingyi.ZiQian.profile.TimeProfile;
 import io.github.wang_jingyi.ZiQian.refine.Refiner;
 import io.github.wang_jingyi.ZiQian.sample.Counterexample;
 import io.github.wang_jingyi.ZiQian.sample.CounterexampleGenerator;
@@ -35,6 +42,11 @@ public class LAR {
 	private String MODEL_NAME;
 	private String LEARNING_TYPE;
 	private int LARModelSize;
+	private double error_alpha;
+	private double error_beta;
+	private double confidence_inteval;
+	private String data_delimiter;
+	private int data_step_size;
 	
 	
 	public LAR() {
@@ -46,7 +58,11 @@ public class LAR {
 		
 		int iteration = 0;
 		while(iteration<maximumIteration){
+			iteration++;
+			TimeProfile.iteration_start_time = System.nanoTime();;
+			System.out.println("****** Iteration : " + iteration + " ******");
 			
+			TimeProfile.learning_start_time = System.nanoTime();;
 			PredicateAbstraction pa = new PredicateAbstraction(property);
 			Input data = pa.abstractInput(vvi.getVarsValues());
 			
@@ -66,13 +82,21 @@ public class LAR {
 			
 			LearningDTMC bestDTMC = learner.getLearner();
 			bestDTMC.PrismModelTranslation(data, pa.getPredicates(), modelName);
-			System.out.println("formatting the model to .pm file for model checking...");
+			System.out.println("------ Writing learned model into PRISM format ------");
 			FormatPrismModel fpm = new FormatPrismModel("dtmc", OUTPUT_MODEL_PATH, modelName);
 			fpm.translateToFormat(bestDTMC.getPrismModel(), data);
+			System.out.println("- Learned model wrote to : " + OUTPUT_MODEL_PATH + "/" + modelName + ".pm");
+			TimeProfile.learning_end_time = System.nanoTime();;
+			TimeProfile.learning_times.add(TimeProfile.nanoToSeconds(TimeProfile.learning_end_time
+					-TimeProfile.learning_start_time));
 			
 			// update LAR model size
 			if(bestDTMC.getPrismModel().getNumOfPrismStates()==LARModelSize){
-				System.out.println("cannot split states any more, verification fails.");
+				System.out.println("====== Cannot obtain a new linear predicate, verification fails ======");
+				TimeProfile.main_end_time = System.nanoTime();;
+				TimeProfile.main_time = TimeProfile.nanoToSeconds(TimeProfile.main_end_time-TimeProfile.main_start_time);
+				TimeProfile.outputTimeProfile();
+				TimeProfile.outputTimeProfile(GlobalConfigs.PROJECT_ROOT+"/time_profile.txt");
 				System.exit(0);
 			}
 			else{
@@ -87,20 +111,25 @@ public class LAR {
 				e.printStackTrace();
 			}
 			
+			System.out.println("------ Generating counterexample ------");
+			TimeProfile.ce_generation_start_time = System.nanoTime();;
 			CounterexampleGenerator counterg = new CounterexampleGenerator(bestDTMC.getPrismModel(),  // generate counterexamples
 					boundedSteps, safetyBound);
 			List<CounterexamplePath> counterPaths = counterg.generateCounterexamples();
+			TimeProfile.ce_generation_end_time = System.nanoTime();;
+			TimeProfile.ce_generation_times.add(TimeProfile.nanoToSeconds(TimeProfile.ce_generation_end_time
+					-TimeProfile.ce_generation_start_time));
 			
-			System.out.println("hypothesis testing...");
-			te.init(property, sampler);
+			System.out.println("------ Hypothesis testing of counterexample ------");
+			te.init(property, sampler, data, data_delimiter, data_step_size);
 //			HypothesisTest sst = new SingleSampleTest(1);
-			HypothesisTest sst = new SprtTest(0.2, 0.1, 0.1, 0.1);
+			HypothesisTest sst = new SprtTest(safetyBound, error_alpha, error_beta, confidence_inteval);
 			Counterexample ce = new Counterexample(bestDTMC.getPrismModel(), counterPaths, sst);
-			System.out.println("analyzing counterexample...");
 			ce.analyze(te);
 			
-			System.out.println("refine the predicate set...");
+			System.out.println("------ Refine the predicate set ------");
 			
+			TimeProfile.refine_start_time = System.nanoTime();;
 			Refiner refiner = new Refiner(ce.getSortedSplittingPoints(), vvi, property, bestDTMC.getPrismModel());
 //			List<String> dataPaths = new ArrayList<>();
 //			dataPaths.add(Config.DATA_PATH);
@@ -109,13 +138,25 @@ public class LAR {
 //			Dataset ds = refiner.collectDataFromPaths(dataPaths, ps.getPredicates(), 
 //					ce.getSortedSplittingPoints(), bestDTMC.getPrismModel());
 			Predicate newPredicate = refiner.refine();
+			TimeProfile.refine_end_time = System.nanoTime();;
+			TimeProfile.refine_times.add(TimeProfile.nanoToSeconds(TimeProfile.refine_end_time
+					-TimeProfile.refine_start_time));
 			
 			if(newPredicate==null){
-				System.out.println("fail to learn a new predicate...");
+				TimeProfile.iteration_end_time = System.nanoTime();
+				TimeProfile.iteration_times.add(TimeProfile.nanoToSeconds
+						(TimeProfile.iteration_end_time-TimeProfile.iteration_start_time));
+				System.out.println("======= Fail to learn a new predicate, verification fails ======");
+				TimeProfile.main_end_time = System.nanoTime();;
+				TimeProfile.main_time = TimeProfile.nanoToSeconds(TimeProfile.main_end_time-TimeProfile.main_start_time);
+				TimeProfile.outputTimeProfile();
+				TimeProfile.outputTimeProfile(GlobalConfigs.PROJECT_ROOT+"/time_profile.txt");
 				System.exit(0);
 			}
 			
 			property.add(newPredicate);
+			TimeProfile.iteration_end_time = System.nanoTime();
+			TimeProfile.iteration_times.add(TimeProfile.nanoToSeconds(TimeProfile.iteration_end_time-TimeProfile.iteration_start_time));
 			AlgoProfile.predicates = property;
 			AlgoProfile.newIteration = true;
 		}
@@ -264,6 +305,49 @@ public class LAR {
 		this.safetyBound = safetyBound;
 	}
 
+	public double getError_alpha() {
+		return error_alpha;
+	}
 
+
+	public double getError_beta() {
+		return error_beta;
+	}
+
+
+	public void setError_alpha(double error_alpha) {
+		this.error_alpha = error_alpha;
+	}
+
+
+	public void setError_beta(double error_beta) {
+		this.error_beta = error_beta;
+	}
+	
+	public double getConfidence_inteval() {
+		return confidence_inteval;
+	}
+
+
+	public void setConfidence_inteval(double confidence_inteval) {
+		this.confidence_inteval = confidence_inteval;
+	}
+	
+	public String getData_delimiter() {
+		return data_delimiter;
+	}
+
+	public void setData_delimiter(String data_delimiter) {
+		this.data_delimiter = data_delimiter;
+	}
+	
+	public int getData_step_size() {
+		return data_step_size;
+	}
+
+
+	public void setData_step_size(int data_step_size) {
+		this.data_step_size = data_step_size;
+	}
 
 }

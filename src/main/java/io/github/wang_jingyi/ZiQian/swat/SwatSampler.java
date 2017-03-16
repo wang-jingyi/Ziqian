@@ -43,7 +43,7 @@ public class SwatSampler implements Sampler{
 	}
 
 	@Override
-	public String getLastestSample() {
+	public String getLatestSample() {
 		return latestFilePath;
 	}
 
