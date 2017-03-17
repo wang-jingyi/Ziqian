@@ -60,7 +60,7 @@ public class LAR {
 		while(iteration<maximumIteration){
 			iteration++;
 			TimeProfile.iteration_start_time = System.nanoTime();;
-			System.out.println("****** Iteration : " + iteration + " ******");
+			System.out.println("\n****** Iteration : " + iteration + " ******\n");
 			
 			TimeProfile.learning_start_time = System.nanoTime();;
 			PredicateAbstraction pa = new PredicateAbstraction(property);
@@ -86,6 +86,7 @@ public class LAR {
 			FormatPrismModel fpm = new FormatPrismModel("dtmc", OUTPUT_MODEL_PATH, modelName);
 			fpm.translateToFormat(bestDTMC.getPrismModel(), data);
 			System.out.println("- Learned model wrote to : " + OUTPUT_MODEL_PATH + "/" + modelName + ".pm");
+			System.out.println("- Number of states in the learned model: " + bestDTMC.getPrismModel().getNumOfPrismStates());
 			TimeProfile.learning_end_time = System.nanoTime();;
 			TimeProfile.learning_times.add(TimeProfile.nanoToSeconds(TimeProfile.learning_end_time
 					-TimeProfile.learning_start_time));
@@ -159,6 +160,7 @@ public class LAR {
 			TimeProfile.iteration_times.add(TimeProfile.nanoToSeconds(TimeProfile.iteration_end_time-TimeProfile.iteration_start_time));
 			AlgoProfile.predicates = property;
 			AlgoProfile.newIteration = true;
+			AlgoProfile.iterationCount++;
 		}
 		
 	} 

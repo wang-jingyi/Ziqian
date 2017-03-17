@@ -60,7 +60,7 @@ public class TimeProfile {
 	
 	
 	public static void outputTimeProfile(String filePath) throws FileNotFoundException{
-		FileUtil.writeStringToFile(filePath, sb.toString());
+		FileUtil.appendStringToFile(filePath, sb.toString());
 	}
 	
 	public static double nanoToSeconds(long elapsedTime){

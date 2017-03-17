@@ -182,7 +182,8 @@ public class Counterexample implements SplitPointFinder{
 		}
 		System.out.println("- Probability deviation of splitting point: " + probDeviation);
 
-		LinkedHashMap<SplittingPoint, Double> sortedMap = (LinkedHashMap<SplittingPoint, Double>) MapUtil.sortByValue(probDeviation);
+		LinkedHashMap<SplittingPoint, Double> sortedMap = 
+				(LinkedHashMap<SplittingPoint, Double>) MapUtil.sortByValue(probDeviation);
 		for(SplittingPoint sp : sortedMap.keySet()){
 			sps.add(sp);
 		}
@@ -208,7 +209,7 @@ public class Counterexample implements SplitPointFinder{
 //		}
 		finalsps.addAll(sps);
 
-		System.out.println("- Splitting points: " + sps);
+//		System.out.println("- Splitting points: " + sps);
 		System.out.println("- Maximum deviation: " + probDeviation.get(sps.get(0)));
 		return finalsps;
 	}
