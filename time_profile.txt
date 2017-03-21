@@ -192,3 +192,16 @@
 - Time for generating a new predicate: [1.660792] s
 
 
+
+++++++ Running time profile for the run starting at 2017/03/21 16:37:48 ++++++
+--- Time for whole algorithm: 4.797422289 s
+=== Time for each iteration: [4.796394117] s ===
+::: Divided time for each iteration :::
+- Time for learning: [0.907823939] s
+- Time for PRISM model checking: [2.076461308] s
+- Time for counterexample generation: [0.040197954] s
+- Time for hypothesis testing: [0.004825034] s
+- Time for identifying spurious transtions: [0.01814443] s
+- Time for generating a new predicate: [1.745085227] s
+
+
