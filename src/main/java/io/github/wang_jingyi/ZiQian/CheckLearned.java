@@ -6,6 +6,7 @@ import io.github.wang_jingyi.ZiQian.profile.AlgoProfile;
 import io.github.wang_jingyi.ZiQian.profile.TimeProfile;
 import io.github.wang_jingyi.ZiQian.run.Config;
 import io.github.wang_jingyi.ZiQian.run.GlobalConfigs;
+import io.github.wang_jingyi.ZiQian.run.PlatformDependent;
 import io.github.wang_jingyi.ZiQian.sample.ShellInteraction;
 import io.github.wang_jingyi.ZiQian.utils.FileUtil;
 
@@ -27,9 +28,21 @@ public class CheckLearned {
 	public void check() throws IOException, PrismNoResultException{
 		System.out.println("------ PRISM model checking ------");
 		// first check if the given property holds
-		String[] prismCommandParas = new String[]{Config.PRISM_PATH,
-				prismFilePath, propertyFilePath, "-prop", String.valueOf(propertyIndex)};
-		String result = ShellInteraction.executeCommand(prismCommandParas);
+		String os_type = System.getProperty("os.name");
+		String[] prismCommandParas = new String[]{};
+		String winCommand = "";
+		String result = "";
+		if(os_type.startsWith("Windows")){
+			winCommand = "cmd /c cd " + PlatformDependent.PRISM_PATH + " &&prism.bat " + prismFilePath + " -prop" + String.valueOf(propertyIndex);
+			result = ShellInteraction.executeCommand(winCommand);
+		}
+		else if(os_type.startsWith("Mac")||os_type.startsWith("Ubuntu")){
+			prismCommandParas = new String[]{PlatformDependent.PRISM_PATH,
+					prismFilePath, propertyFilePath, "-prop", String.valueOf(propertyIndex)};
+			result = ShellInteraction.executeCommand(prismCommandParas);
+		}
+		
+		
 //		System.out.println(result);
 		
 		TimeProfile.pmc_end_time = System.nanoTime();
@@ -55,7 +68,12 @@ public class CheckLearned {
 		else{
 			throw new PrismNoResultException();
 		}
-		
 	}
+	
+	
+	public static void main(String[] args){
+		System.out.println(System.getProperty("os.name"));
+	}
+	
 	
 }
