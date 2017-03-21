@@ -12,7 +12,7 @@ public class UnsupportedLearningTypeException extends Exception{
 	}
 
 	private void messaging(){
-		System.out.println("The set learning algorithm is not supported yet.");
+		System.out.println("- The set learning algorithm is not supported, supported learning algorithms are AA, GA");
 	}
 	
 }

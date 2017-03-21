@@ -24,6 +24,10 @@ public class TimeProfile {
 	public static long learning_start_time;
 	public static long learning_end_time;
 	
+	public static List<Double> prism_model_check_times = new ArrayList<Double>();
+	public static long pmc_start_time;
+	public static long pmc_end_time;
+	
 	public static List<Double> ce_generation_times = new ArrayList<Double>();
 	public static long ce_generation_start_time;
 	public static long ce_generation_end_time;
@@ -51,6 +55,7 @@ public class TimeProfile {
 		sb.append("=== Time for each iteration: " + iteration_times + " s ===\n");
 		sb.append("::: Divided time for each iteration :::\n");
 		sb.append("- Time for learning: " + learning_times + " s\n");
+		sb.append("- Time for PRISM model checking: " + prism_model_check_times + " s\n");
 		sb.append("- Time for counterexample generation: " + ce_generation_times + " s\n");
 		sb.append("- Time for hypothesis testing: " + hypothesis_testing_times + " s\n");
 		sb.append("- Time for identifying spurious transtions: " + spurious_check_times + " s\n");

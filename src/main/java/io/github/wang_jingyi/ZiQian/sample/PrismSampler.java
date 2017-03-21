@@ -16,7 +16,7 @@ public class PrismSampler implements Sampler{
 		this.outputFilePath = outputFilePath;
 		this.simulationConfig = simulationConfig;
 	}
-	
+
 	@Override
 	public void sample(){
 		String[] commandParas = new String[]{};
@@ -49,5 +49,10 @@ public class PrismSampler implements Sampler{
 	public boolean isObtainingNewSample() {
 		return true;
 	}
+	
+	public void setSimulationLength(int simulationLength) {
+		this.simulationLength = simulationLength;
+	}
+
 	
 }

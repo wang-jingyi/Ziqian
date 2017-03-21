@@ -3,7 +3,7 @@ package io.github.wang_jingyi.ZiQian.run;
 public class GlobalConfigs {
 	
 	public static String PROJECT_ROOT = System.getProperty("user.dir");
-	public static boolean SELECTIVE_DATA_COLLECTION = true;
+	public static boolean SELECTIVE_DATA_COLLECTION = false;
 	public static boolean TERMINATE_SAMPLE = false;
 	public static String OUTPUT_MODEL_PATH = "";
 	

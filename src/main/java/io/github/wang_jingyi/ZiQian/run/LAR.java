@@ -9,6 +9,7 @@ import io.github.wang_jingyi.ZiQian.VariablesValueInfo;
 import io.github.wang_jingyi.ZiQian.evolution.LearnMergeEvolutions;
 import io.github.wang_jingyi.ZiQian.exceptions.PrismNoResultException;
 import io.github.wang_jingyi.ZiQian.exceptions.UnsupportedLearningTypeException;
+import io.github.wang_jingyi.ZiQian.exceptions.UnsupportedTestingTypeException;
 import io.github.wang_jingyi.ZiQian.learn.AAlergia;
 import io.github.wang_jingyi.ZiQian.learn.LearningDTMC;
 import io.github.wang_jingyi.ZiQian.prism.FormatPrismModel;
@@ -19,7 +20,9 @@ import io.github.wang_jingyi.ZiQian.sample.Counterexample;
 import io.github.wang_jingyi.ZiQian.sample.CounterexampleGenerator;
 import io.github.wang_jingyi.ZiQian.sample.CounterexamplePath;
 import io.github.wang_jingyi.ZiQian.sample.HypothesisTest;
+import io.github.wang_jingyi.ZiQian.sample.ModelTesting;
 import io.github.wang_jingyi.ZiQian.sample.Sampler;
+import io.github.wang_jingyi.ZiQian.sample.SingleSampleTest;
 import io.github.wang_jingyi.ZiQian.sample.SprtTest;
 import io.github.wang_jingyi.ZiQian.sample.TestEnvironment;
 
@@ -41,6 +44,8 @@ public class LAR {
 	private double safetyBound;
 	private String MODEL_NAME;
 	private String LEARNING_TYPE;
+	private String TESTING_TYPE;
+	private int sstSampleSize = 1000;
 	private int LARModelSize;
 	private double error_alpha;
 	private double error_beta;
@@ -54,7 +59,7 @@ public class LAR {
 	}
 	
 	
-	public void execute() throws ClassNotFoundException, IOException, UnsupportedLearningTypeException{
+	public void execute() throws ClassNotFoundException, IOException, UnsupportedLearningTypeException, UnsupportedTestingTypeException{
 		
 		int iteration = 0;
 		while(iteration<maximumIteration){
@@ -104,6 +109,7 @@ public class LAR {
 				LARModelSize = bestDTMC.getPrismModel().getNumOfPrismStates();
 			}
 			
+			TimeProfile.pmc_start_time = System.nanoTime();
 			CheckLearned cl = new CheckLearned(OUTPUT_MODEL_PATH + "/" + modelName + ".pm" , 
 					PROPERTY_LEARN_FILE, PROPERTY_INDEX);
 			try {
@@ -123,6 +129,17 @@ public class LAR {
 			
 			System.out.println("------ Hypothesis testing of counterexample ------");
 			te.init(property, sampler, data, data_delimiter, data_step_size);
+			ModelTesting mt = new ModelTesting();
+			if(TESTING_TYPE.equalsIgnoreCase("sst")){
+				mt.setHypothesisTesting(new SingleSampleTest(100));
+			}
+			else if(TESTING_TYPE.equalsIgnoreCase("sprt")){
+				mt.setHypothesisTesting(new SprtTest(safetyBound, error_alpha, error_beta, confidence_inteval));
+			}
+			else{
+				throw new UnsupportedTestingTypeException();
+			}
+			
 //			HypothesisTest sst = new SingleSampleTest(1);
 			HypothesisTest sst = new SprtTest(safetyBound, error_alpha, error_beta, confidence_inteval);
 			Counterexample ce = new Counterexample(bestDTMC.getPrismModel(), counterPaths, sst);
@@ -351,5 +368,23 @@ public class LAR {
 	public void setData_step_size(int data_step_size) {
 		this.data_step_size = data_step_size;
 	}
+	
+	public String getTESTING_TYPE() {
+		return TESTING_TYPE;
+	}
 
+
+	public void setTESTING_TYPE(String tESTING_TYPE) {
+		TESTING_TYPE = tESTING_TYPE;
+	}
+
+
+	public int getSstSampleSize() {
+		return sstSampleSize;
+	}
+
+
+	public void setSstSampleSize(int sstSampleSize) {
+		this.sstSampleSize = sstSampleSize;
+	}
 }

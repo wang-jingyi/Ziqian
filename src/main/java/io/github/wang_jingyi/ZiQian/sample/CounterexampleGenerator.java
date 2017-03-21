@@ -19,11 +19,15 @@ import org.jgrapht.alg.KShortestPaths;
 import org.jgrapht.graph.DefaultDirectedWeightedGraph;
 import org.jgrapht.graph.DefaultWeightedEdge;
 
+/*
+ * Given a PrismModel, a time step and a probability bound,
+ * calculate a minimum set of paths whose probability measure is larger than the probability bound 
+ * */
 
 public class CounterexampleGenerator {
 
 	private PrismModel prismModel;
-	private int boundedStep; // bounded step should be -1 if unbounded
+	private int boundedStep; // bounded step is -1 if unbounded
 	private double probabilityBound; // probability threshold of path set
 	private boolean containLoops; // if the counterexample paths contain loops
 
@@ -40,11 +44,10 @@ public class CounterexampleGenerator {
 
 		Map<Integer, Double> loops = new HashMap<Integer, Double>();
 
-		// to polish, too slow and memory consuming
-		for(int vertex: graph.vertexSet()){ 			// find loops with weights in ascending order 
+		for(int vertex: graph.vertexSet()){ // find loops with weights in ascending order 
 			for(DefaultWeightedEdge edge : graph.outgoingEdgesOf(vertex)){
 				double weight = graph.getEdgeWeight(edge);
-				if(graph.getEdgeTarget(edge)==vertex && weight!=0){ // self loop with probability 1 is not considered
+				if(graph.getEdgeTarget(edge)==vertex && weight!=0){ // self loop with probability 1 is not included
 					loops.put(vertex, weightToProbability(weight));
 				}
 			}
@@ -250,8 +253,6 @@ public class CounterexampleGenerator {
 			graph.addVertex(collopsedStatesId);
 		}
 		graph.addVertex(absorbingStateId);
-
-		//		System.out.println("vertex set: "  + graph.vertexSet());
 
 		for(int vertex : graph.vertexSet()){
 			if(vertex==collopsedStatesId || vertex==absorbingStateId){

@@ -12,7 +12,7 @@ public class SimulationException extends Exception {
 	}
 	
 	private void messaging(){
-		System.out.println("Simulation error, no output files...");
+		System.out.println("- Simulation error, no output traces");
 	}
 
 }

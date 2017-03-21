@@ -50,7 +50,6 @@ public class Refiner{
 		for(int i=0; i<spuriousTransitions.size(); i++){
 			System.out.println("--- Current splitting point: " + spuriousTransitions.get(i).toString());
 			Dataset ds = collectDataSet(vvi.getVarsValues(), predicates, spuriousTransitions.get(i), pm);
-			//			ds = normalizeDataset(ds);
 			if(ds==null){ // if the dataset is null, i.e., only has one label, then it's not classifiable
 				continue;
 			}

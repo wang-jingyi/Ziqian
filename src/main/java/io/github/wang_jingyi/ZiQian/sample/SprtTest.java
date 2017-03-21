@@ -51,7 +51,7 @@ public class SprtTest implements HypothesisTest{
 				int counter = 0;
 				for(List<String> concrete_trace : te.getTraining_data().getObservations()){
 					if(te.test(concrete_trace, ce)){ // the sample is in the counterexample
-						System.out.println("- Sample " +  counter + " is a counterexample path.");
+						System.out.println("- Sample " +  counter + " is a counterexample path");
 						bi++;
 					}
 					counter++;

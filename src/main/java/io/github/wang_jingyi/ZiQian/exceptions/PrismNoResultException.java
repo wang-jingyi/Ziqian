@@ -12,6 +12,6 @@ public class PrismNoResultException extends Exception {
 	}
 	
 	private void messaging(){
-		System.out.println("PRISM is not generating correct results...");
+		System.out.println("- PRISM is not generating correct results");
 	}
 }

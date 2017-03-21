@@ -5,6 +5,7 @@ import io.github.wang_jingyi.ZiQian.TruePredicate;
 import io.github.wang_jingyi.ZiQian.VariablesValueInfo;
 import io.github.wang_jingyi.ZiQian.exceptions.SimulationException;
 import io.github.wang_jingyi.ZiQian.exceptions.UnsupportedLearningTypeException;
+import io.github.wang_jingyi.ZiQian.exceptions.UnsupportedTestingTypeException;
 import io.github.wang_jingyi.ZiQian.prism.ExtractPrismData;
 import io.github.wang_jingyi.ZiQian.prism.PrismPathData;
 import io.github.wang_jingyi.ZiQian.profile.AlgoProfile;
@@ -21,7 +22,8 @@ import java.util.List;
 
 public class SwatMain {
 	
-public static void main(String[] args) throws FileNotFoundException, ClassNotFoundException, IOException, SimulationException, UnsupportedLearningTypeException {
+public static void main(String[] args) throws FileNotFoundException, ClassNotFoundException, IOException, 
+SimulationException, UnsupportedLearningTypeException, UnsupportedTestingTypeException {
 		
 		SwatConfig.writePropertyLearnFile();
 		
@@ -43,31 +45,34 @@ public static void main(String[] args) throws FileNotFoundException, ClassNotFou
 		TestEnvironment te = TestEnvironment.te;
 		
 		LAR lar = new LAR();
-		lar.setDATA_PATH(SwatConfig.DATA_PATH);
-		lar.setLEARNING_TYPE("AA");
-		lar.setMODEL_NAME("swat");
-		lar.setOUTPUT_MODEL_PATH(SwatConfig.OUTPUT_MODEL_PATH);
-		GlobalConfigs.OUTPUT_MODEL_PATH = lar.getOUTPUT_MODEL_PATH();
-		lar.setProperty(pres);
-		lar.setPROPERTY_INDEX(SwatConfig.PROPERTY_INDEX);
-		lar.setSampler(new SwatSampler());
-		lar.setTe(te);
-		lar.setVvi(vvi);
-		lar.setBoundedSteps(-1);
-		lar.setPROPERTY_LEARN_FILE(SwatConfig.PROPERTY_LEARN_FILE);
-		lar.setSafetyBound(SwatConfig.SAFETY_THRESHOLD);
-		lar.setError_alpha(0.05);
-		lar.setError_beta(0.05);
-		lar.setConfidence_inteval(0.01);
-		lar.setData_step_size(SwatConfig.STEP_SIZE);
-		lar.setData_delimiter(SwatConfig.DELIMITER);
+		lar.setDATA_PATH(SwatConfig.DATA_PATH); // path of training data
+		lar.setLEARNING_TYPE("AA"); // learning algorithm
+		lar.setMODEL_NAME("swat"); // model name
+		lar.setOUTPUT_MODEL_PATH(SwatConfig.OUTPUT_MODEL_PATH); // path of output models
+		GlobalConfigs.OUTPUT_MODEL_PATH = lar.getOUTPUT_MODEL_PATH(); 
+		lar.setProperty(pres); // property to verify, initial predicate set
+		lar.setSampler(new SwatSampler()); // set sampler for new traces
+		lar.setTe(te); // set testing environment
+		lar.setVvi(vvi); // set variable values information
+		lar.setBoundedSteps(-1); // unbounded property
+		lar.setPROPERTY_LEARN_FILE(SwatConfig.PROPERTY_LEARN_FILE); // path of property file
+		lar.setPROPERTY_INDEX(SwatConfig.PROPERTY_INDEX); // index of property in the property file
+		lar.setSafetyBound(SwatConfig.SAFETY_THRESHOLD); // safety threshold of the property
+		lar.setTESTING_TYPE("sprt"); // hypothesis testing type (sprt in this case)
+		lar.setError_alpha(0.05); // type_1 error for sprt
+		lar.setError_beta(0.05); // type_2 error for sprt
+		lar.setConfidence_inteval(0.01); // confidence inteval for sprt
+//		lar.setTESTING_TYPE("sst"); // hypothesis testing type (sst in this case)
+//		lar.setSstSampleSize(100); // sample size for sst
+		lar.setData_step_size(SwatConfig.STEP_SIZE); // sampling step size of data
+		lar.setData_delimiter(SwatConfig.DELIMITER); // delimiter of data file 
 		
 		TimeProfile.main_start_time = System.nanoTime();
-		lar.execute();
+		lar.execute(); // execute LAR
 		TimeProfile.main_end_time = System.nanoTime();
 		TimeProfile.main_time = TimeProfile.nanoToSeconds(TimeProfile.main_end_time-TimeProfile.main_start_time);
-		TimeProfile.outputTimeProfile();
-		TimeProfile.outputTimeProfile(GlobalConfigs.PROJECT_ROOT+"/time_profile.txt");
+		TimeProfile.outputTimeProfile(); // output time profile
+		TimeProfile.outputTimeProfile(GlobalConfigs.PROJECT_ROOT+"/time_profile.txt"); // write time profile to file
 		System.out.println("End of the program.");
 		
 	}

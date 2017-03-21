@@ -26,13 +26,15 @@ public class CheckLearned {
 	
 	public void check() throws IOException, PrismNoResultException{
 		System.out.println("------ PRISM model checking ------");
-		
 		// first check if the given property holds
 		String[] prismCommandParas = new String[]{Config.PRISM_PATH,
 				prismFilePath, propertyFilePath, "-prop", String.valueOf(propertyIndex)};
-//		System.out.println("- PRISM commands: " + StringUtil.arrayToString(prismCommandParas));
 		String result = ShellInteraction.executeCommand(prismCommandParas);
 //		System.out.println(result);
+		
+		TimeProfile.pmc_end_time = System.nanoTime();
+		TimeProfile.prism_model_check_times.add
+		(TimeProfile.nanoToSeconds(TimeProfile.pmc_end_time-TimeProfile.pmc_start_time));
 		
 		if(result.contains("Result: false")){ // if prism returns
 			System.out.println("- PRISM result: false");
