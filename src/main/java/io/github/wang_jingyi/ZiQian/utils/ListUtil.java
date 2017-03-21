@@ -145,4 +145,12 @@ public class ListUtil {
 		System.out.println("ds: " + ds) ;
 	}
 
+	public static List<String> arrayToList(String[] strs) {
+		List<String> result = new ArrayList<String>();
+		for(String s : strs){
+			result.add(s);
+		}
+		return result;
+	}
+
 }

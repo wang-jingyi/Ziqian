@@ -33,9 +33,9 @@ public class ResultProcessor {
 	@SuppressWarnings("unchecked")
 	public static void computeSwatResult(int state_number, int new_sample_number, double thres) throws FileNotFoundException, ClassNotFoundException, IOException{
 		String name_suffix = "state_" + state_number;
-		String actual_result_root = PlatformDependent.MODEL_ROOT +  "/active/swat/" + "swat_"+Config.SWAT_SAMPLE_STEP+"_"+
+		String actual_result_root = PlatformDependent.CAV_MODEL_ROOT +  "/active/swat/" + "swat_"+Config.SWAT_SAMPLE_STEP+"_"+
 				Config.SWAT_RECORD_STEP + "/" + name_suffix;
-		String result_root = PlatformDependent.MODEL_ROOT +  "/active/swat/" + "swat_"+Config.SWAT_SAMPLE_STEP+"_"+
+		String result_root = PlatformDependent.CAV_MODEL_ROOT +  "/active/swat/" + "swat_"+Config.SWAT_SAMPLE_STEP+"_"+
 				Config.SWAT_RECORD_STEP + "/" + name_suffix + "/new_" + new_sample_number;
 		String ido_result_root = result_root+"/ido";
 		String rs_result_root = result_root+"/rs";
@@ -63,8 +63,8 @@ public class ResultProcessor {
 		double[] diff = new double[2];
 		
 		for(int i=0; i<repeat; i++){
-			String pm = PlatformDependent.MODEL_ROOT +"/active/rmc/" + model +"/rmc_"+statesize+"_"+i+".pm";
-			String pctl = PlatformDependent.MODEL_ROOT +"/active/rmc/" + model +"/rmc_"+statesize+"_"+i+".pctl";
+			String pm = PlatformDependent.CAV_MODEL_ROOT +"/active/rmc/" + model +"/rmc_"+statesize+"_"+i+".pm";
+			String pctl = PlatformDependent.CAV_MODEL_ROOT +"/active/rmc/" + model +"/rmc_"+statesize+"_"+i+".pctl";
 			System.out.println("compute actual reachability...");
 			
 			List<Double> actual = new ArrayList<Double>();
@@ -79,8 +79,8 @@ public class ResultProcessor {
 				
 			}
 			
-			String idopm = PlatformDependent.MODEL_ROOT +"/active/rmc/" + model +"/rmc_"+statesize+"_"+i+"_ido_"+samplesize+"_"+i+".pm";
-			String rspm = PlatformDependent.MODEL_ROOT +"/active/rmc/" + model +"/rmc_"+statesize+"_"+i+"_rs_"+samplesize+"_"+i+".pm";
+			String idopm = PlatformDependent.CAV_MODEL_ROOT +"/active/rmc/" + model +"/rmc_"+statesize+"_"+i+"_ido_"+samplesize+"_"+i+".pm";
+			String rspm = PlatformDependent.CAV_MODEL_ROOT +"/active/rmc/" + model +"/rmc_"+statesize+"_"+i+"_rs_"+samplesize+"_"+i+".pm";
 			System.out.println("compute ido reachability...");
 			
 			List<Double> ido = new ArrayList<Double>();

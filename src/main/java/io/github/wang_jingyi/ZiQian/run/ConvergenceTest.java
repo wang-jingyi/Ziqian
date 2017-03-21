@@ -1,22 +1,21 @@
 package io.github.wang_jingyi.ZiQian.run;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.List;
-
 import io.github.wang_jingyi.ZiQian.Input;
 import io.github.wang_jingyi.ZiQian.Predicate;
 import io.github.wang_jingyi.ZiQian.PredicateAbstraction;
-import io.github.wang_jingyi.ZiQian.PredicateSet;
 import io.github.wang_jingyi.ZiQian.VariablesValueInfo;
+import io.github.wang_jingyi.ZiQian.learn.AAlergia;
 import io.github.wang_jingyi.ZiQian.learn.LearningDTMC;
 import io.github.wang_jingyi.ZiQian.learn.ModelSelection;
-import io.github.wang_jingyi.ZiQian.learn.AAlergia;
 import io.github.wang_jingyi.ZiQian.prism.ExtractPrismData;
 import io.github.wang_jingyi.ZiQian.prism.FormatPrismModel;
 import io.github.wang_jingyi.ZiQian.prism.PrismPathData;
 import io.github.wang_jingyi.ZiQian.profile.TimeProfile;
 import io.github.wang_jingyi.ZiQian.utils.FileUtil;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.List;
 
 public class ConvergenceTest {
 
@@ -35,9 +34,9 @@ public class ConvergenceTest {
 		//		}
 
 
-		List<String> varsSet = PrismPathData.extractPathVars(Config.DATA_PATH);
+		List<String> varsSet = PrismPathData.extractPathVars(Config.DATA_PATH, Config.DELIMTER);
 		//
-		ExtractPrismData epd_lot = new ExtractPrismData(Config.DATA_PATH, Config.CONVERGE_TEST_DATA_SIZE, Config.STEP_SIZE);
+		ExtractPrismData epd_lot = new ExtractPrismData(Config.DATA_PATH, Config.CONVERGE_TEST_DATA_SIZE, Config.STEP_SIZE, Config.DELIMTER);
 		VariablesValueInfo vvi_lot = epd_lot.getVariablesValueInfo(varsSet);
 
 		long start_time = System.nanoTime();
@@ -50,19 +49,18 @@ public class ConvergenceTest {
 
 	private static void learn(List<Predicate> pres, VariablesValueInfo vvi, String name) throws IOException, ClassNotFoundException{
 
-		PredicateSet ps = new PredicateSet(pres);
 		PredicateAbstraction pa = new PredicateAbstraction(pres);
 		Input data = pa.abstractInput(vvi.getVarsValues());
 
 		String modelName = Config.MODEL_NAME + "_" + name;
 
-				ModelSelection gs = new AAlergia(Math.pow(2, -6), Math.pow(2, 6)); //
-				LearningDTMC bestDTMC = gs.selectCriterion(data);
-				bestDTMC.PrismModelTranslation(data, ps, modelName); //
+		ModelSelection gs = new AAlergia(Math.pow(2, -6), Math.pow(2, 6)); //
+		LearningDTMC bestDTMC = gs.selectCriterion(data);
+		bestDTMC.PrismModelTranslation(data, pres, modelName); //
 
-//		LearnMergeEvolutions bestDTMC = new LearnMergeEvolutions();
-//		bestDTMC.learn(data);
-//		bestDTMC.PrismModelTranslation(data, ps, modelName);
+		//		LearnMergeEvolutions bestDTMC = new LearnMergeEvolutions();
+		//		bestDTMC.learn(data);
+		//		bestDTMC.PrismModelTranslation(data, ps, modelName);
 
 		// format to .pm file
 		System.out.println("formatting the model to .pm file for model checking...");

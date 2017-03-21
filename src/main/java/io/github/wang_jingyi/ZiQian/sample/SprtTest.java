@@ -1,5 +1,10 @@
 package io.github.wang_jingyi.ZiQian.sample;
 
+import io.github.wang_jingyi.ZiQian.PredicateAbstraction;
+import io.github.wang_jingyi.ZiQian.VariablesValue;
+import io.github.wang_jingyi.ZiQian.prism.PrismPathData;
+import io.github.wang_jingyi.ZiQian.profile.AlgoProfile;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -19,28 +24,45 @@ public class SprtTest implements HypothesisTest{
 	}
 
 	@Override
-	public boolean testHypothesis(double p, Counterexample ce)
+	public boolean testHypothesis(double p, TestEnvironment te, Counterexample ce)
 			throws IOException,
 			ClassNotFoundException {
-
-		TestEnvironment te = ce.getTestEnvironment();
-
+		
 		int bi = 0;
 
 		double p1 = p - sigma;
 		double p0 = p + sigma;
 		double aid = Math.pow(p1, bi) * Math.pow((1-p1), sampleSize-bi) / Math.pow(p0, bi) / Math.pow((1-p0), sampleSize-bi);
-		while(!acceptH0(aid) && !acceptH1(aid)){
-			te.sample();
-			sampleSize ++;
-			System.out.println("sample : " + sampleSize);
-			if(te.test(ce)){ // the sample is in the counterexample
-				bi ++;
+		boolean force_break = false;
+		while(!acceptH0(aid) && !acceptH1(aid) && !force_break){
+			if(te.getSampler().isObtainingNewSample()){ // testing from new samples
+				te.getSampler().sample();
+				sampleSize++;
+				System.out.println("- New sample: " + sampleSize);
+				List<VariablesValue> vvs = PrismPathData.extractSEData(te.getSampler().getLatestSample(), 
+						AlgoProfile.vars,Integer.MAX_VALUE,te.getData_step_size(),te.getData_delimiter()); // variables values of last simulation
+				PredicateAbstraction pa = new PredicateAbstraction(te.getPredicates());
+				List<String> concrete_trace = pa.abstractList(vvs);
+				if(te.test(concrete_trace,ce)){ // the sample is in the counterexample
+					bi++;
+				}
+			}
+			else{ // testing from training data
+				int counter = 0;
+				for(List<String> concrete_trace : te.getTraining_data().getObservations()){
+					if(te.test(concrete_trace, ce)){ // the sample is in the counterexample
+						System.out.println("- Sample " +  counter + " is a counterexample path");
+						bi++;
+					}
+					counter++;
+				}
+				force_break = true; // all training data tested, force break
 			}
 			aid = Math.pow(p1, bi) * Math.pow((1-p1), sampleSize-bi) / Math.pow(p0, bi) / Math.pow((1-p0), sampleSize-bi);
+			
 		}
-		System.out.println("total sample size: " + sampleSize);
-		System.out.println("number of paths in counterexample: " + bi);
+		System.out.println("- Total sample size: " + sampleSize);
+		System.out.println("- Number of realizable paths in the counterexample: " + bi);
 		
 		if(acceptH0(aid)){
 			return false;
@@ -66,8 +88,8 @@ public class SprtTest implements HypothesisTest{
 	}
 
 	@Override
-	public List<Double> getTestedTransitionProb(Counterexample ce) throws IOException{
-		return SingleSampleTest.calculateTestedTranstionProb(ce);
+	public List<Double> getTestedTransitionProb(TestEnvironment te, Counterexample ce) throws IOException{
+		return SingleSampleTest.calculateTestedTranstionProb(te,ce);
 	}
 
 	@Override

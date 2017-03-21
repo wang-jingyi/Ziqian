@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 
 // extract counterexample from generated counterexample file
 
-public class CounterexampleOps {
+public class CounterexampleOperations {
 	
 	public static List<CounterexamplePath> extractCounterexample(String cpFilePath){
 		List<CounterexamplePath> cps = new ArrayList<>();

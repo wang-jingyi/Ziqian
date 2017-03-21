@@ -6,8 +6,6 @@ import io.github.wang_jingyi.ZiQian.prism.PrismModel;
 import io.github.wang_jingyi.ZiQian.prism.PrismPathData;
 import io.github.wang_jingyi.ZiQian.prism.PrismState;
 import io.github.wang_jingyi.ZiQian.profile.AlgoProfile;
-import io.github.wang_jingyi.ZiQian.run.Config;
-import io.github.wang_jingyi.ZiQian.utils.FileUtil;
 import io.github.wang_jingyi.ZiQian.utils.IntegerUtil;
 import io.github.wang_jingyi.ZiQian.utils.StringUtil;
 
@@ -22,49 +20,62 @@ public class SingleSampleTest implements HypothesisTest{
 
 	private int sampleSize;
 	private double p;
-	
+
 	public SingleSampleTest(int sampleSize) {
 		this.sampleSize = sampleSize;
 	}
 
 	@Override
-	public boolean testHypothesis(double p, Counterexample ce) throws IOException, ClassNotFoundException {
-		TestEnvironment te = ce.getTestEnvironment();
+	public boolean testHypothesis(double p, TestEnvironment te, Counterexample ce) throws IOException, ClassNotFoundException {
 		int cpCounter = 0;
-		for(int i=0; i<sampleSize; i++){
-			te.sample();
-			System.out.println("sample: " + (i+1));
-			if(te.test(ce)){
-				System.out.println("sample " + i + " is a counterexample path.");
-				cpCounter++;
+		if(te.getSampler().isObtainingNewSample()){ // testing from new samples
+			for(int i=0; i<sampleSize; i++){
+				System.out.println("- Sample: " + (i+1));
+				te.getSampler().sample();
+				List<VariablesValue> vvs = PrismPathData.extractSEData(te.getSampler().getLatestSample(), 
+						AlgoProfile.vars,Integer.MAX_VALUE,te.getData_step_size(),te.getData_delimiter()); // variables values of last simulation
+				PredicateAbstraction pa = new PredicateAbstraction(te.getPredicates());
+				List<String> concrete_trace = pa.abstractList(vvs);
+				if(te.test(concrete_trace,ce)){
+					System.out.println("- Sample " + i + " is a counterexample path");
+					cpCounter++;
+				}
 			}
 		}
-		
-		System.out.println("sample complete.");
-		
+		else{ // testing from training data
+			int counter = 0;
+			for(List<String> concrete_trace : te.getTraining_data().getObservations()){
+				if(te.test(concrete_trace, ce)){
+					System.out.println("- Sample " +  counter + " is a counterexample path");
+					cpCounter++;
+				}
+				counter++;
+				if(counter>=sampleSize){break;} 
+			}
+		}
+		System.out.println("- Sample complete");
 		if(pValueHZero(sampleSize, p, cpCounter) < pValueHOne(sampleSize, p, cpCounter)){
 			return true;
 		}
 		return false;
 	}
-	
+
 	private double pValueHZero(int n, double p, int c){
-//		assert c >= 1 : "no path is in counterexample.";
+		//		assert c >= 1 : "no path is in counterexample.";
 		if(c==0){
 			return 1;
 		}
 		double pvalue = 1 - IntegerUtil.BinCumulativeProb(n, p, c-1);
 		return pvalue;
 	}
-	
+
 	private double pValueHOne(int n, double p, int c){
 		double pvalue = IntegerUtil.BinCumulativeProb(n, p, c);
 		return pvalue;
 	}
-	
-	
-	static List<Double> calculateTestedTranstionProb(Counterexample ce) throws IOException{
-		TestEnvironment te = ce.getTestEnvironment();
+
+	// this function can be further refined to be faster	
+	public static List<Double> calculateTestedTranstionProb(TestEnvironment te, Counterexample ce) throws IOException{
 		List<SplittingPoint> sps = ce.getAllSplittingPoints();
 		PrismModel pm = ce.getPrismModel();
 
@@ -72,7 +83,7 @@ public class SingleSampleTest implements HypothesisTest{
 
 		Map<Integer, Integer> startingStateCounts = new HashMap<Integer, Integer>();
 		Map<SplittingPoint, Integer> spCounts = new HashMap<>();
-		
+
 		for(SplittingPoint sp : sps){
 			if(!startingStateCounts.containsKey(sp.getCurrentStateId())){
 				startingStateCounts.put(sp.getCurrentStateId(), 0);
@@ -80,17 +91,9 @@ public class SingleSampleTest implements HypothesisTest{
 			spCounts.put(sp, 0);
 		}
 
-		List<String> paths = FileUtil.filesInDir(te.getOutputFilePath());
-		paths.addAll(FileUtil.filesInDir(Config.DATA_PATH)); // add learning data statistics in
-		
-		for(String path : paths){
-			List<VariablesValue> vvs = PrismPathData.extractSEData(path, AlgoProfile.vars,Integer.MAX_VALUE, 
-					Config.STEP_SIZE); // variables values of last simulation
-			PredicateAbstraction pa = new PredicateAbstraction(te.getPredicateSet().getPredicates());
-			List<String> absExs = pa.abstractList(vvs);
-			
+		for(List<String> concrete_trace : te.getTraining_data().getObservations()){
 			PrismState currentPS = pm.getInitialStates().get(0);
-			for(int i=1; i<absExs.size()-1; i++){
+			for(int i=1; i<concrete_trace.size()-1; i++){
 				int currentID = currentPS.getId();
 				if(startingStateCounts.containsKey(currentID)){
 					int currentCount = startingStateCounts.get(currentID);
@@ -100,16 +103,16 @@ public class SingleSampleTest implements HypothesisTest{
 				else{
 					startingStateCounts.put(currentID, 1);
 				}
-				
-				int nextStateID = StringUtil.getStringIndex(absExs.get(i), currentPS.getSigmas());
+
+				int nextStateID = StringUtil.getStringIndex(concrete_trace.get(i), currentPS.getSigmas());
 				if(nextStateID==-1){
-					System.out.println("new transition happens.");
+					System.out.println("- New transition happens.");
 					continue;
 				}
-				assert nextStateID!=-1 : "concrete path not in the model.";
+//				assert nextStateID!=-1 : "- Concrete trace not in the model.";
 				PrismState nextPS = currentPS.getNextStates().get(nextStateID);
 				int nextID = nextPS.getId();
-				
+
 				for(SplittingPoint sp : sps){
 					if(sp.getCurrentStateId()==currentID && sp.getNextStateId()==nextID){
 						int spCount = spCounts.get(sp);
@@ -120,7 +123,7 @@ public class SingleSampleTest implements HypothesisTest{
 				currentPS = nextPS;
 			}
 		}
-		
+
 		for(SplittingPoint sp : sps){
 			int nextCount = spCounts.get(sp);
 			int startCount = startingStateCounts.get(sp.getCurrentStateId());
@@ -132,11 +135,11 @@ public class SingleSampleTest implements HypothesisTest{
 		}
 		return transProb;
 	}
-	
-	
+
+
 	@Override
-	public List<Double> getTestedTransitionProb(Counterexample ce) throws IOException {
-		return calculateTestedTranstionProb(ce);
+	public List<Double> getTestedTransitionProb(TestEnvironment te, Counterexample ce) throws IOException {
+		return calculateTestedTranstionProb(te, ce);
 	}
 
 	@Override
@@ -144,6 +147,4 @@ public class SingleSampleTest implements HypothesisTest{
 		return p;
 	}
 
-	
-	
 }

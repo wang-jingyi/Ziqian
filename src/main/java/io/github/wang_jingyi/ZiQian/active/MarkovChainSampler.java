@@ -3,7 +3,7 @@ package io.github.wang_jingyi.ZiQian.active;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MarkovChainSampler implements Sampler {
+public class MarkovChainSampler implements ActiveSampler {
 	
 	MarkovChain mc;
 	

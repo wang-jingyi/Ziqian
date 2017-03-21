@@ -1,0 +1,194 @@
+
+++++++ Running time profile for the run starting at 2017/03/16 16:11:17 ++++++
+--- Time for whole algorithm: 5.953021 s
+=== Time for each iteration: [5.952196] s ===
+::: Divided time for each iteration :::
+- Time for learning: [0.639758] s
+- Time for counterexample generation: [0.031899] s
+- Time for hypothesis testing: [0.03389] s
+- Time for identifying spurious transtions: [0.040098] s
+- Time for generating a new predicate: [1.946841] s
+
+
+
+++++++ Running time profile for the run starting at 2017/03/16 16:36:38 ++++++
+--- Time for whole algorithm: 5.714937 s
+=== Time for each iteration: [5.713952] s ===
+::: Divided time for each iteration :::
+- Time for learning: [0.651632] s
+- Time for counterexample generation: [0.030719] s
+- Time for hypothesis testing: [0.031221] s
+- Time for identifying spurious transtions: [0.041756] s
+- Time for generating a new predicate: [1.64672] s
+
+
+
+++++++ Running time profile for the run starting at 2017/03/17 11:43:30 ++++++
+--- Time for whole algorithm: 234.841543 s
+=== Time for each iteration: [234.838804] s ===
+::: Divided time for each iteration :::
+- Time for learning: [0.757657] s
+- Time for counterexample generation: [9.320779] s
+- Time for hypothesis testing: [2.809537] s
+- Time for identifying spurious transtions: [0.409361] s
+- Time for generating a new predicate: [217.820369] s
+
+
+
+++++++ Running time profile for the run starting at 2017/03/17 12:03:39 ++++++
+--- Time for whole algorithm: 5.927212 s
+=== Time for each iteration: [5.926464] s ===
+::: Divided time for each iteration :::
+- Time for learning: [0.6716] s
+- Time for counterexample generation: [0.032073] s
+- Time for hypothesis testing: [0.033166] s
+- Time for identifying spurious transtions: [0.040405] s
+- Time for generating a new predicate: [1.815781] s
+
+
+
+++++++ Running time profile for the run starting at 2017/03/17 12:04:53 ++++++
+--- Time for whole algorithm: 5.699884 s
+=== Time for each iteration: [5.699174] s ===
+::: Divided time for each iteration :::
+- Time for learning: [0.612111] s
+- Time for counterexample generation: [0.031459] s
+- Time for hypothesis testing: [0.033904] s
+- Time for identifying spurious transtions: [0.045247] s
+- Time for generating a new predicate: [1.67995] s
+
+
+
+++++++ Running time profile for the run starting at 2017/03/17 14:40:28 ++++++
+--- Time for whole algorithm: 16.449825 s
+=== Time for each iteration: [4.416241, 4.165328, 3.245854, 3.647712] s ===
+::: Divided time for each iteration :::
+- Time for learning: [0.675912, 0.630498, 0.646478, 0.859533, 0.973862] s
+- Time for counterexample generation: [0.03266, 0.004272, 0.013252, 0.03688] s
+- Time for hypothesis testing: [0.008098, 0.002659, 0.004653, 0.004722] s
+- Time for identifying spurious transtions: [0.041513, 0.017147, 0.001095, 0.001444] s
+- Time for generating a new predicate: [0.358714, 0.233124, 0.252711, 0.35766] s
+
+
+
+++++++ Running time profile for the run starting at 2017/03/17 14:51:35 ++++++
+--- Time for whole algorithm: 17.938748 s
+=== Time for each iteration: [4.39381, 4.086775, 4.223347, 4.436215] s ===
+::: Divided time for each iteration :::
+- Time for learning: [0.655927, 0.64018, 0.634447, 0.817067, 0.79762] s
+- Time for counterexample generation: [0.051784, 0.004458, 0.012516, 0.036495] s
+- Time for hypothesis testing: [0.009246, 0.003431, 0.006373, 0.004419] s
+- Time for identifying spurious transtions: [0.053669, 0.015105, 0.001455, 0.001298] s
+- Time for generating a new predicate: [0.345224, 0.181562, 0.267409, 0.33455] s
+
+
+
+++++++ Running time profile for the run starting at 2017/03/17 14:54:05 ++++++
+--- Time for whole algorithm: 5.672089 s
+=== Time for each iteration: [5.671354] s ===
+::: Divided time for each iteration :::
+- Time for learning: [0.665582] s
+- Time for counterexample generation: [0.033394] s
+- Time for hypothesis testing: [0.008112] s
+- Time for identifying spurious transtions: [0.041331] s
+- Time for generating a new predicate: [1.683827] s
+
+
+
+++++++ Running time profile for the run starting at 2017/03/17 14:58:41 ++++++
+--- Time for whole algorithm: 5.63398 s
+=== Time for each iteration: [5.633239] s ===
+::: Divided time for each iteration :::
+- Time for learning: [0.637333] s
+- Time for counterexample generation: [0.033611] s
+- Time for hypothesis testing: [0.008197] s
+- Time for identifying spurious transtions: [0.038567] s
+- Time for generating a new predicate: [1.670261] s
+
+
+
+++++++ Running time profile for the run starting at 2017/03/17 14:59:23 ++++++
+--- Time for whole algorithm: 13.290267 s
+=== Time for each iteration: [4.286138, 4.095765, 4.125515] s ===
+::: Divided time for each iteration :::
+- Time for learning: [0.627634, 0.632983, 0.614413, 0.782132] s
+- Time for counterexample generation: [0.032453, 0.003738, 0.011841] s
+- Time for hypothesis testing: [0.008424, 0.003486, 0.00437] s
+- Time for identifying spurious transtions: [0.039486, 0.017581, 0.001535] s
+- Time for generating a new predicate: [0.325641, 0.198134, 0.256913] s
+
+
+
+++++++ Running time profile for the run starting at 2017/03/17 15:27:17 ++++++
+--- Time for whole algorithm: 13.806552 s
+=== Time for each iteration: [4.717633, 4.126056, 4.167609] s ===
+::: Divided time for each iteration :::
+- Time for learning: [0.679573, 0.632109, 0.635032, 0.792746] s
+- Time for counterexample generation: [0.046682, 0.004388, 0.011081] s
+- Time for hypothesis testing: [0.010332, 0.002961, 0.004592] s
+- Time for identifying spurious transtions: [0.042387, 0.019334, 0.00139] s
+- Time for generating a new predicate: [0.367613, 0.226641, 0.236318] s
+
+
+
+++++++ Running time profile for the run starting at 2017/03/17 15:45:12 ++++++
+--- Time for whole algorithm: 13.943102 s
+=== Time for each iteration: [4.814574, 4.15339, 4.179771] s ===
+::: Divided time for each iteration :::
+- Time for learning: [0.69452, 0.642603, 0.662558, 0.792804] s
+- Time for counterexample generation: [0.049765, 0.003931, 0.011981] s
+- Time for hypothesis testing: [0.020959, 0.004232, 0.006304] s
+- Time for identifying spurious transtions: [0.054065, 0.016595, 0.00179] s
+- Time for generating a new predicate: [0.387808, 0.235629, 0.227846] s
+
+
+
+++++++ Running time profile for the run starting at 2017/03/17 15:48:57 ++++++
+--- Time for whole algorithm: 6.281817 s
+=== Time for each iteration: [6.279392] s ===
+::: Divided time for each iteration :::
+- Time for learning: [0.670451] s
+- Time for counterexample generation: [0.047297] s
+- Time for hypothesis testing: [0.019823] s
+- Time for identifying spurious transtions: [0.046133] s
+- Time for generating a new predicate: [1.909914] s
+
+
+
+++++++ Running time profile for the run starting at 2017/03/19 11:50:27 ++++++
+--- Time for whole algorithm: 6.290157 s
+=== Time for each iteration: [6.287796] s ===
+::: Divided time for each iteration :::
+- Time for learning: [0.702956] s
+- Time for counterexample generation: [0.049605] s
+- Time for hypothesis testing: [0.021589] s
+- Time for identifying spurious transtions: [0.050446] s
+- Time for generating a new predicate: [1.797897] s
+
+
+
+++++++ Running time profile for the run starting at 2017/03/19 11:55:22 ++++++
+--- Time for whole algorithm: 6.103131 s
+=== Time for each iteration: [6.102378] s ===
+::: Divided time for each iteration :::
+- Time for learning: [0.674255] s
+- Time for PRISM model checking: [3.429535] s
+- Time for counterexample generation: [0.051139] s
+- Time for hypothesis testing: [0.020389] s
+- Time for identifying spurious transtions: [0.049788] s
+- Time for generating a new predicate: [1.874323] s
+
+
+
+++++++ Running time profile for the run starting at 2017/03/20 12:41:09 ++++++
+--- Time for whole algorithm: 5.945629 s
+=== Time for each iteration: [5.942638] s ===
+::: Divided time for each iteration :::
+- Time for learning: [0.67238] s
+- Time for PRISM model checking: [3.511299] s
+- Time for counterexample generation: [0.044721] s
+- Time for hypothesis testing: [0.01017] s
+- Time for identifying spurious transtions: [0.040286] s
+- Time for generating a new predicate: [1.660792] s
+
+

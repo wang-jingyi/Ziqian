@@ -1,7 +1,7 @@
 package io.github.wang_jingyi.ZiQian.active;
 
 import io.github.wang_jingyi.ZiQian.run.Config;
-import io.github.wang_jingyi.ZiQian.run.GlobalVars;
+import io.github.wang_jingyi.ZiQian.run.GlobalConfigs;
 import io.github.wang_jingyi.ZiQian.run.PlatformDependent;
 import io.github.wang_jingyi.ZiQian.utils.FileUtil;
 import io.github.wang_jingyi.ZiQian.utils.NumberUtil;
@@ -31,7 +31,7 @@ public class SwatApproMatrix {
 		ALConfig.boundedSteps = ALConfig.stateNumber;
 		
 		String name_suffix = "state_" + ALConfig.stateNumber;
-		String result_root = PlatformDependent.MODEL_ROOT +  "/active/swat/" + "swat_"+Config.SWAT_SAMPLE_STEP+"_"+
+		String result_root = PlatformDependent.CAV_MODEL_ROOT +  "/active/swat/" + "swat_"+Config.SWAT_SAMPLE_STEP+"_"+
 				Config.SWAT_RECORD_STEP + "/" + name_suffix;
 		
 		List<String> swatPathRoot = new ArrayList<String>();
@@ -67,8 +67,8 @@ public class SwatApproMatrix {
 			}
 		}
 		
-		System.out.println("max sensor values in the trace: " + NumberUtil.ArrayToString(GlobalVars.maxSensorValues));
-		System.out.println("min sensor values in the trace: " + NumberUtil.ArrayToString(GlobalVars.minSensorValues));
+		System.out.println("max sensor values in the trace: " + NumberUtil.ArrayToString(GlobalConfigs.maxSensorValues));
+		System.out.println("min sensor values in the trace: " + NumberUtil.ArrayToString(GlobalConfigs.minSensorValues));
 		
 		
 		List<List<Integer>> abstractTraces = new ArrayList<List<Integer>>();

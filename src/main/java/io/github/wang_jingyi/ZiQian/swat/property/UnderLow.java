@@ -1,4 +1,4 @@
-package io.github.wang_jingyi.ZiQian.swat;
+package io.github.wang_jingyi.ZiQian.swat.property;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -7,21 +7,23 @@ import java.util.List;
 import io.github.wang_jingyi.ZiQian.Predicate;
 import io.github.wang_jingyi.ZiQian.VariablesValue;
 
-public class Underflow implements Predicate, Serializable{
+public class UnderLow implements Predicate, Serializable{
 	
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -4971393425170521837L;
-	List<String> vars = new ArrayList<>();
+	private List<String> vars = new ArrayList<>();
+	private int threshold;
 
-	public Underflow() {
-		vars.add("LIT301");
+	public UnderLow(String tankSensor, int threshold) {
+		this.vars.add(tankSensor);
+		this.threshold = threshold;
 	}
 	
 	@Override
 	public String getPredicateName() {
-		return "underflow";
+		return "swat_error";
 	}
 
 	@Override
@@ -35,7 +37,7 @@ public class Underflow implements Predicate, Serializable{
 			return false;
 		}
 		int sensorValue = vv.getVarValue(vars.get(0)).getRawIntValue();
-		if(sensorValue<250){
+		if(sensorValue<threshold){
 			return true;
 		}
 		return false;

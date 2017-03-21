@@ -2,7 +2,7 @@ package io.github.wang_jingyi.ZiQian.active;
 
 import gurobi.GRBException;
 import io.github.wang_jingyi.ZiQian.run.Config;
-import io.github.wang_jingyi.ZiQian.run.GlobalVars;
+import io.github.wang_jingyi.ZiQian.run.GlobalConfigs;
 import io.github.wang_jingyi.ZiQian.run.PlatformDependent;
 import io.github.wang_jingyi.ZiQian.utils.FileUtil;
 import io.github.wang_jingyi.ZiQian.utils.ListUtil;
@@ -56,8 +56,8 @@ public class SwatReachabilityTest {
 			sts.add(st);
 		}
 
-		System.out.println("max sensor values in the trace: " + NumberUtil.ArrayToString(GlobalVars.maxSensorValues));
-		System.out.println("min sensor values in the trace: " + NumberUtil.ArrayToString(GlobalVars.minSensorValues));
+		System.out.println("max sensor values in the trace: " + NumberUtil.ArrayToString(GlobalConfigs.maxSensorValues));
+		System.out.println("min sensor values in the trace: " + NumberUtil.ArrayToString(GlobalConfigs.minSensorValues));
 
 		List<List<Integer>> abstractTraces = new ArrayList<List<Integer>>();
 		for(int i=0; i<sts.size(); i++){
@@ -78,22 +78,22 @@ public class SwatReachabilityTest {
 			validInitDist.add((double)1/validInitStates.size());
 		}
 
-		FileUtil.cleanDirectory(PlatformDependent.MODEL_ROOT + "/active/swat/new_sample_ido");//
-//		FileUtil.cleanDirectory(PlatformDependent.MODEL_ROOT + "/active/swat/new_sample_ido_reach");
+		FileUtil.cleanDirectory(PlatformDependent.CAV_MODEL_ROOT + "/active/swat/new_sample_ido");//
+//		FileUtil.cleanDirectory(PlatformDependent.CAV_MODEL_ROOT + "/active/swat/new_sample_ido_reach");
 
 		Estimator estimator = new EFEstimator();
-		Sampler idosampler = new SwatSampler(ssa, 
-				PlatformDependent.MODEL_ROOT + "/active/swat/new_sample_ido", ALConfig.pathLength);
+		ActiveSampler idosampler = new SwatActiveSampler(ssa, 
+				PlatformDependent.CAV_MODEL_ROOT + "/active/swat/new_sample_ido", ALConfig.pathLength);
 		InitialDistGetter idoidg = new InitialDistributionOptimizer(ALConfig.stateNumber, validInitStates, ALConfig.pathLength);
-		Sampler idosamplerReach = new SwatSampler(ssa, 
-				PlatformDependent.MODEL_ROOT + "/active/swat/new_sample_ido_reach", ALConfig.pathLength);
+		ActiveSampler idosamplerReach = new SwatActiveSampler(ssa, 
+				PlatformDependent.CAV_MODEL_ROOT + "/active/swat/new_sample_ido_reach", ALConfig.pathLength);
 		InitialDistGetter idoidgReach = new ReachabilityOptimizer(ALConfig.stateNumber, validInitStates, targetStates, ALConfig.pathLength);
 
 		try {
 
 			Samples idosample = IterSampling(frequencyMatrix, ALConfig.newSampleNumber, estimator, idosampler, idoidg);
 			Reachability idoReach = new Reachability(idosample.getEstimatedTransitionMatrix(), validInitStates, validInitDist, targetStates,
-					PlatformDependent.MODEL_ROOT + "/active/swat", "swat_10_5_ido", ALConfig.boundedSteps);
+					PlatformDependent.CAV_MODEL_ROOT + "/active/swat", "swat_10_5_ido", ALConfig.boundedSteps);
 			List<Double> idoReachProbs = idoReach.computeReachability();
 			double idominfre = MetricComputing.calculateNonZeroMinFreq(idosample.getFrequencyMatrix());
 			double idomse = MetricComputing.calculateMSE(estExactMatrix, idosample.getEstimatedTransitionMatrix());
@@ -105,7 +105,7 @@ public class SwatReachabilityTest {
 
 			Samples idosampleReach = IterSampling(frequencyMatrix, ALConfig.newSampleNumber, estimator, idosamplerReach, idoidgReach);
 			Reachability rsReach = new Reachability(idosampleReach.getEstimatedTransitionMatrix(), validInitStates, validInitDist, targetStates,
-					PlatformDependent.MODEL_ROOT + "/active/swat", "swat_10_5_rs", ALConfig.boundedSteps);
+					PlatformDependent.CAV_MODEL_ROOT + "/active/swat", "swat_10_5_rs", ALConfig.boundedSteps);
 			List<Double> rsReachProbs = rsReach.computeReachability();
 			FileUtil.writeObject(Config.TMP_PATH + "/swat_rs_reach_probs", rsReachProbs);
 			double rsminfre = MetricComputing.calculateNonZeroMinFreq(idosampleReach.getFrequencyMatrix());
@@ -129,7 +129,7 @@ public class SwatReachabilityTest {
 	} 
 
 	public static Samples IterSampling(RealMatrix currentFrequencyMatrix, int numSample, Estimator estimator, 
-			Sampler sampler, InitialDistGetter idg) throws GRBException{
+			ActiveSampler sampler, InitialDistGetter idg) throws GRBException{
 		Samples sample = new Samples(ALConfig.pathLength, currentFrequencyMatrix, estimator, sampler, idg);
 		for(int i=1; i<=numSample; i++){
 			System.out.println("getting a new sample, number: " + i);

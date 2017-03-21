@@ -1,7 +1,7 @@
 package io.github.wang_jingyi.ZiQian.learn;
 
 import io.github.wang_jingyi.ZiQian.Input;
-import io.github.wang_jingyi.ZiQian.PredicateSet;
+import io.github.wang_jingyi.ZiQian.Predicate;
 import io.github.wang_jingyi.ZiQian.prism.PrismModel;
 import io.github.wang_jingyi.ZiQian.prism.PrismState;
 import io.github.wang_jingyi.ZiQian.utils.StringUtil;
@@ -69,7 +69,7 @@ public class LearnPST implements LearningDTMC{
 	}
 
 	// translate a learned PST to PrismModel format, only do the translation after the golden search
-	public void PrismModelTranslation(Input data, PredicateSet pset, String modelName) {
+	public void PrismModelTranslation(Input data, List<Predicate> pset, String modelName) {
 		
 		assert data.getObservations().size()==1 : "not a single observation.";
 		List<String> observation = data.getObservations().get(0);
@@ -191,7 +191,7 @@ public class LearnPST implements LearningDTMC{
 		
 		probabilisticSuffixAutomata.setPrismStates(prismStates);
 		probabilisticSuffixAutomata.setInitialStates(initialStates);
-		probabilisticSuffixAutomata.setPredicates(pset.getPredicates());
+		probabilisticSuffixAutomata.setPredicates(pset);
 		probabilisticSuffixAutomata.setNumOfPrismStates(numOfStates-1);
 
 	}

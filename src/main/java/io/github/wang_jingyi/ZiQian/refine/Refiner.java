@@ -1,25 +1,30 @@
 package io.github.wang_jingyi.ZiQian.refine;
 
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.List;
-
 import io.github.wang_jingyi.ZiQian.Predicate;
 import io.github.wang_jingyi.ZiQian.PredicateAbstraction;
 import io.github.wang_jingyi.ZiQian.VariablesValue;
 import io.github.wang_jingyi.ZiQian.VariablesValueInfo;
 import io.github.wang_jingyi.ZiQian.prism.PrismModel;
 import io.github.wang_jingyi.ZiQian.profile.AlgoProfile;
-import io.github.wang_jingyi.ZiQian.run.Config;
+import io.github.wang_jingyi.ZiQian.run.GlobalConfigs;
 import io.github.wang_jingyi.ZiQian.sample.SplittingPoint;
 import io.github.wang_jingyi.ZiQian.utils.FileUtil;
 import io.github.wang_jingyi.ZiQian.utils.NumberUtil;
+
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.List;
+
 import libsvm.LibSVM;
 import libsvm.svm_parameter;
 import net.sf.javaml.core.Dataset;
 import net.sf.javaml.core.DefaultDataset;
 import net.sf.javaml.core.DenseInstance;
 import net.sf.javaml.core.Instance;
+import net.sf.javaml.featureselection.FeatureScoring;
+import net.sf.javaml.featureselection.ranking.RankingFromScoring;
+import net.sf.javaml.featureselection.scoring.GainRatio;
+import net.sf.javaml.filter.normalize.NormalizeMidrange;
 
 public class Refiner{
 
@@ -30,10 +35,8 @@ public class Refiner{
 	private int negCount;
 	private int posCount;
 	private double classifyAccuracy;
-
 	private List<String> allVars = AlgoProfile.vars;
 	private List<String> newVars = new ArrayList<>();
-
 
 	public Refiner(List<SplittingPoint> sps, VariablesValueInfo vvi, List<Predicate> pres, PrismModel pm) {
 		super();
@@ -45,9 +48,8 @@ public class Refiner{
 
 	public LearnedPredicate refine() throws FileNotFoundException{
 		for(int i=0; i<spuriousTransitions.size(); i++){
-			System.out.println("current splitting point: " + spuriousTransitions.get(i).toString());
+			System.out.println("--- Current splitting point: " + spuriousTransitions.get(i).toString());
 			Dataset ds = collectDataSet(vvi.getVarsValues(), predicates, spuriousTransitions.get(i), pm);
-			//			ds = normalizeDataset(ds);
 			if(ds==null){ // if the dataset is null, i.e., only has one label, then it's not classifiable
 				continue;
 			}
@@ -56,7 +58,6 @@ public class Refiner{
 				return newPredicate;
 			}
 		}
-		System.out.println("cannot find a splitting predicate for all the spurious transitions, algorithm terminates.");
 		return null;
 	}
 
@@ -119,7 +120,7 @@ public class Refiner{
 				}
 
 				if(i==vvls.size()-1){ // the last observation must be a negative instance
-					if(Config.TERMINATE_SAMPLE ){ 
+					if(GlobalConfigs.TERMINATE_SAMPLE){ 
 						// sample will terminate like crowds/nand; 
 						// if not terminate, we dont know whether it's positive or negative
 						Instance ins = new DenseInstance(values,"negative");
@@ -131,7 +132,7 @@ public class Refiner{
 
 				if(vvls.get(i+1).equals(nextString)){ 
 
-					if(Config.SELECTIVE_DATA_COLLECTION){
+					if(GlobalConfigs.SELECTIVE_DATA_COLLECTION){
 						if(pcount<1){
 							// check if the next state is according to the counterexample path
 							Instance ins = new DenseInstance(values,"positive");
@@ -147,7 +148,7 @@ public class Refiner{
 					}
 				}
 				else{
-					if(Config.SELECTIVE_DATA_COLLECTION){
+					if(GlobalConfigs.SELECTIVE_DATA_COLLECTION){
 						if(ncount<1){
 							Instance ins = new DenseInstance(values,"negative");
 							ds.add(ins);
@@ -164,32 +165,40 @@ public class Refiner{
 			}
 		}
 
-		System.out.println("instance in the dataset: " + ds.size());
-		System.out.println("transition to split: " + sp.toString());
+		System.out.println("- Instance in the dataset: " + ds.size());
 		return ds;
 
 	}
 
-	private List<Integer> selectWeightElements(double[] weights){
-		List<Integer> ind = new ArrayList<>();
-		for(int i=0; i<weights.length; i++){
-			if(weights[i]!=0){
-				ind.add(i);
-			}
-		}
-		return ind;
-	}
+//	private List<Integer> selectWeightElements(double[] weights){
+//		List<Integer> ind = new ArrayList<>();
+//		for(int i=0; i<weights.length; i++){
+//			if(weights[i]!=0){
+//				ind.add(i);
+//			}
+//		}
+//		return ind;
+//	}
 
 	private LearnedPredicate supervisedClassify(Dataset ds) throws FileNotFoundException {
 
+		// dataset normalization between [0,1]
+		System.out.println("- Normalize dataset");
+		NormalizeMidrange dnm = new NormalizeMidrange(0.5, 1);
+		dnm.filter(ds);
+
 		LibSVM svm = new LibSVM();
 		svm_parameter svm_para = (svm_parameter) svm.getParameters().clone();
+		
+		FeatureScoring fs = new GainRatio();
+		RankingFromScoring rfs = new RankingFromScoring(fs);
+		
+		rfs.build(ds);
+//		svm_para.kernel_type = 2;
+//		svm_para.gamma = 0.1;
+//		svm_para.C = 1;
 
-		//		svm_para.kernel_type = 0;
-		//		svm_para.gamma = 0.1;
-		//		svm_para.C = 10;
-
-		System.out.println("kernel type: " + svm_para.kernel_type);
+		System.out.println("- Kernel type: " + svm_para.kernel_type);
 		svm.setParameters(svm_para);
 
 
@@ -198,27 +207,26 @@ public class Refiner{
 		for(Instance ins : ds){
 			sb.append(ins.toString() + "\n");
 		}
-		FileUtil.writeStringToFile(Config.PROJECT_ROOT+"/tmp/collected_data.txt", sb.toString());
+		FileUtil.writeStringToFile(GlobalConfigs.PROJECT_ROOT+"/tmp/collected_data.txt", sb.toString());
 
 		svm.buildClassifier(ds);
 
 		StringBuilder svm_log = new StringBuilder();
-		svm_log.append("variables involved in the classifier: \n");
+		svm_log.append("- Variables involved in the classifier: \n");
 		svm_log.append(allVars.toString() + "\n");
-		svm_log.append("weights of the classifier: \n");
+		svm_log.append("- Weights of the classifier: \n");
 		svm_log.append(NumberUtil.ArrayToString(svm.getWeights()));
-		FileUtil.writeStringToFile(Config.OUTPUT_MODEL_PATH+"/" + Config.MODEL_NAME + (AlgoProfile.iterationCount+1)+"_classifier.txt", svm_log.toString());
+		FileUtil.writeStringToFile(GlobalConfigs.OUTPUT_MODEL_PATH+"/swat" + (AlgoProfile.iterationCount+1)+"_classifier.txt", svm_log.toString());
 
 
-		double[] weights = svm.getWeights();
-		List<Integer> ind = selectWeightElements(weights);
-		for(int i=0; i<ind.size(); i++){
-			newVars.add(allVars.get(ind.get(i)));
-		}
+//		double[] weights = svm.getWeights();
+//		List<Integer> ind = selectWeightElements(weights);
+//		for(int i=0; i<ind.size(); i++){
+//			newVars.add(allVars.get(ind.get(i)));
+//		}
 
 		int rightCount = 0;
 		int sumCount = 0;
-		System.out.println("calculate accuracy...");
 		for(Instance ins : ds){
 			if(svm.classify(ins).equals(ins.classValue())){
 				rightCount ++;
@@ -226,10 +234,10 @@ public class Refiner{
 			sumCount++;
 		}
 		classifyAccuracy = (double)rightCount/sumCount;
-		System.out.println("accuracy : " + classifyAccuracy);
+		System.out.println("- Classification accuracy : " + classifyAccuracy);
 
 		if(rightCount==negCount || rightCount==posCount){ // all data are in one side, fail to classify
-			System.out.println("fail to find a splitting predicate...");
+			System.out.println("=== Fail to find a linear splitting predicate ===");
 			return null;
 		}
 

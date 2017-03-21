@@ -14,9 +14,9 @@ public class ExtractResult {
 
 	public static void main(String[] args) {
 		
-		String pmPath = PlatformDependent.MODEL_ROOT + "/active/swat/swat_10_5_ido.pm";
-		String pmPath1 = PlatformDependent.MODEL_ROOT + "/active/swat/swat_10_5_rs.pm";
-		String propPath = PlatformDependent.MODEL_ROOT + "/active/swat/swat_10_5_ido.pctl";
+		String pmPath = PlatformDependent.CAV_MODEL_ROOT + "/active/swat/swat_10_5_ido.pm";
+		String pmPath1 = PlatformDependent.CAV_MODEL_ROOT + "/active/swat/swat_10_5_rs.pm";
+		String propPath = PlatformDependent.CAV_MODEL_ROOT + "/active/swat/swat_10_5_ido.pctl";
 		
 		List<Double> idoResults = new ArrayList<Double>();
 		List<Double> rsResults = new ArrayList<Double>();

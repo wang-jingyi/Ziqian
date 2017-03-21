@@ -1,12 +1,11 @@
 package io.github.wang_jingyi.ZiQian.evolution;
 
 import io.github.wang_jingyi.ZiQian.Input;
-import io.github.wang_jingyi.ZiQian.PredicateSet;
+import io.github.wang_jingyi.ZiQian.Predicate;
 import io.github.wang_jingyi.ZiQian.learn.DataPrefix;
 import io.github.wang_jingyi.ZiQian.learn.LearningDTMC;
 import io.github.wang_jingyi.ZiQian.prism.PrismModel;
 import io.github.wang_jingyi.ZiQian.prism.PrismState;
-import io.github.wang_jingyi.ZiQian.profile.TimeProfile;
 import io.github.wang_jingyi.ZiQian.utils.IntegerUtil;
 import io.github.wang_jingyi.ZiQian.utils.StringUtil;
 
@@ -40,26 +39,24 @@ public class LearnMergeEvolutions implements LearningDTMC{
 
 	@Override
 	public void learn(Input data) {
-		System.out.println("Retrieving data prefixes inforamtion...");
-		TimeProfile.dataPrefixStartTime = System.nanoTime();
+		System.out.println("- Building prefix tree acceptor");
 		dp = new DataPrefix(data);
 		dp.execute();
-		TimeProfile.dataPrefixExes++;
-		TimeProfile.dataPrefixEndTime = System.nanoTime();
-		System.out.println("Executing evolutionary merging process...");
+		dp.printPrefixTreeInfo();
+		System.out.println("- Executing evolutionary state merging");
 		executeEvolutions();
 	}
 
 	private void executeEvolutions() {
 		
 		// create candidate grouping
-		System.out.println("Creating initial candidate grouping...");
+		System.out.println("- Creating initial candidate grouping...");
 		numOfStates = dp.getData().getAlphabet().size(); 
 		int mergeEncodeStateNum = numOfStates + 1;// add 1 for the empty state
 		PrefixMergeEncode mef = new PrefixMergeEncode(dp,mergeEncodeStateNum);
 
 		// create a pipeline that applies cross-over then mutation.
-		System.out.println("Creating pipelines that applies cross-over and mutation...");
+		System.out.println("- Creating pipelines that applies cross-over and mutation...");
 		List<EvolutionaryOperator<int[]>> operators
 		= new LinkedList<EvolutionaryOperator<int[]>>();
 		operators.add(new IntArrayCrossover());
@@ -67,11 +64,11 @@ public class LearnMergeEvolutions implements LearningDTMC{
 		= new EvolutionPipeline<int[]>(operators);
 
 		// create evaluator of candidates
-		System.out.println("Creating candidate evaluator...");
+		System.out.println("- Creating candidate evaluator...");
 		MergeEvaluator me = new MergeEvaluator(dp);
 
 		// create selection strategy of candidates
-		System.out.println("Creating selection strategy of candidates...");
+		System.out.println("- Creating selection strategy of candidates...");
 		SelectionStrategy<Object> selection = new TournamentSelection(new Probability(0.9));
 
 		// create random generator for evolution
@@ -118,7 +115,7 @@ public class LearnMergeEvolutions implements LearningDTMC{
 //		numOfStates = validStateIndex.size();
 //	}
 	
-	public void PrismModelTranslation(Input data, PredicateSet presSet, String modelName) {
+	public void PrismModelTranslation(Input data, List<Predicate> predicates, String modelName) {
 		List<PrismState> prismStates = new ArrayList<PrismState>(); // list of prism states
 		List<PrismState> initialStates = new ArrayList<PrismState>(); // list of initial states
 		
@@ -252,7 +249,7 @@ public class LearnMergeEvolutions implements LearningDTMC{
 		pm.setNumOfPrismStates(prismStates.size());
 		pm.setPrismStates(prismStates);
 		pm.setInitialStates(initialStates);
-		pm.setPredicates(presSet.getPredicates());
+		pm.setPredicates(predicates);
 	}
 
 	@Override

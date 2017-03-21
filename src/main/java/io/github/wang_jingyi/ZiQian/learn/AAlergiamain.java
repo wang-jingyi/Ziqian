@@ -1,13 +1,11 @@
 package io.github.wang_jingyi.ZiQian.learn;
 
 import io.github.wang_jingyi.ZiQian.Input;
-import io.github.wang_jingyi.ZiQian.PredicateSet;
+import io.github.wang_jingyi.ZiQian.Predicate;
 import io.github.wang_jingyi.ZiQian.prism.PrismModel;
 import io.github.wang_jingyi.ZiQian.prism.PrismState;
-import io.github.wang_jingyi.ZiQian.profile.LearningProfile;
 import io.github.wang_jingyi.ZiQian.profile.AlgoProfile;
-import io.github.wang_jingyi.ZiQian.profile.TimeProfile;
-import io.github.wang_jingyi.ZiQian.run.Config;
+import io.github.wang_jingyi.ZiQian.run.GlobalConfigs;
 import io.github.wang_jingyi.ZiQian.utils.FileUtil;
 import io.github.wang_jingyi.ZiQian.utils.IntegerUtil;
 import io.github.wang_jingyi.ZiQian.utils.StringUtil;
@@ -34,17 +32,16 @@ public class AAlergiamain implements LearningDTMC{
 	@Override
 	public void learn(Input data) throws FileNotFoundException, IOException, ClassNotFoundException {
 		
-		if(LearningProfile.prefixCalculated==false || AlgoProfile.newIteration==true){
-			TimeProfile.dataPrefixStartTime = System.nanoTime();
-			TimeProfile.dataPrefixExes++; // record how many times is dataPrefixes calculated
+		if(AlgoProfile.prefixCalculated==false || AlgoProfile.newIteration==true){
 			dp = new DataPrefix(data);
 			dp.execute();
-			FileUtil.writeObject(Config.PROJECT_ROOT + "/tmp/dataPrefix.ser", dp);
-			LearningProfile.prefixCalculated = true;
-			TimeProfile.dataPrefixEndTime = System.nanoTime();
+			dp.printPrefixTreeInfo();
+			FileUtil.writeObject(GlobalConfigs.PROJECT_ROOT + "/tmp/dataPrefix.ser", dp);
+			AlgoProfile.prefixCalculated = true;
+			AlgoProfile.newIteration = false;
 		}
 		else{
-			dp = (DataPrefix)FileUtil.readObject(Config.PROJECT_ROOT + "/tmp/dataPrefix.ser");
+			dp = (DataPrefix)FileUtil.readObject(GlobalConfigs.PROJECT_ROOT + "/tmp/dataPrefix.ser");
 		}
 		origdp = dp.clone();
 		record = new MergeRecord(origdp);
@@ -340,7 +337,7 @@ public class AAlergiamain implements LearningDTMC{
 	}
 	
 	@Override
-	public void PrismModelTranslation(Input data, PredicateSet presSet, String modelName) {
+	public void PrismModelTranslation(Input data, List<Predicate> predicates, String modelName) {
 		List<PrismState> prismStates = new ArrayList<PrismState>(); // list of prism states
 		List<PrismState> initialStates = new ArrayList<PrismState>(); // list of initial states
 		List<List<Integer>> nextStateIdx = new ArrayList<List<Integer>>();
@@ -422,7 +419,7 @@ public class AAlergiamain implements LearningDTMC{
 		
 		probabilisticPrefixAutomata.setPrismStates(prismStates);
 		probabilisticPrefixAutomata.setInitialStates(initialStates);
-		probabilisticPrefixAutomata.setPredicates(presSet.getPredicates());
+		probabilisticPrefixAutomata.setPredicates(predicates);
 		probabilisticPrefixAutomata.setNumOfPrismStates(numOfStates);
 	}
 

@@ -16,5 +16,6 @@ public class AlgoProfile {
 	public static List<Integer> varLength = new ArrayList<>(); // length of triggered variables
 	
 	public static StringBuilder runTimeLog = new StringBuilder();
+	public static boolean prefixCalculated;
 	
 }

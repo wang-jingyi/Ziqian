@@ -1,30 +1,27 @@
 package io.github.wang_jingyi.ZiQian.run;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import io.github.wang_jingyi.ZiQian.Input;
 import io.github.wang_jingyi.ZiQian.NonAbstraction;
 import io.github.wang_jingyi.ZiQian.Predicate;
-import io.github.wang_jingyi.ZiQian.PredicateSet;
 import io.github.wang_jingyi.ZiQian.VariablesValueInfo;
 import io.github.wang_jingyi.ZiQian.evolution.LearnMergeEvolutions;
 import io.github.wang_jingyi.ZiQian.example.CrowdPositive;
+import io.github.wang_jingyi.ZiQian.learn.AAlergia;
 import io.github.wang_jingyi.ZiQian.learn.LearningDTMC;
 import io.github.wang_jingyi.ZiQian.learn.ModelSelection;
-import io.github.wang_jingyi.ZiQian.learn.AAlergia;
 import io.github.wang_jingyi.ZiQian.prism.ExtractPrismData;
 import io.github.wang_jingyi.ZiQian.prism.FormatPrismModel;
 import io.github.wang_jingyi.ZiQian.profile.TimeProfile;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class LearnMain {
 
 	public static void main(String[] args) throws IOException, ClassNotFoundException{
 		
-		TimeProfile.mainStartTime = System.nanoTime();
-		
-		ExtractPrismData epd = new ExtractPrismData(Config.DATA_PATH, Config.DATA_SIZE, 1);
+		ExtractPrismData epd = new ExtractPrismData(Config.DATA_PATH, Config.DATA_SIZE, 1, Config.DELIMTER);
 		VariablesValueInfo vvl = epd.getVariablesValueInfo();
 		
 		// swat 
@@ -59,18 +56,16 @@ public class LearnMain {
 		
 //		pl.add(new Overflow());
 //		pl.add(new Underflow());
-		PredicateSet ps = new PredicateSet(pl);
 		
 		if(Config.LEARN_METHOD.equals("AA")){
 			System.out.println("learn by aalergia...");
 			ModelSelection gs = new AAlergia(Math.pow(2, -6), Math.pow(2, 6)); //
 			LearningDTMC bestDTMC = gs.selectCriterion(data);
-			bestDTMC.PrismModelTranslation(data, ps, Config.MODEL_NAME+Config.DATA_SIZE); //
+			bestDTMC.PrismModelTranslation(data, pl, Config.MODEL_NAME+Config.DATA_SIZE); //
 			// format to .pm file
 			System.out.println("formatting the model to .pm file for model checking...");
 			FormatPrismModel fpm = new FormatPrismModel("dtmc", Config.AA_OUTPUT_PATH, Config.MODEL_NAME+Config.DATA_SIZE);
 			fpm.translateToFormat(bestDTMC.getPrismModel(), data);
-			TimeProfile.mainEndTime = System.nanoTime();
 			TimeProfile.outputTimeProfile(Config.AA_OUTPUT_PATH+"/time_profile_"+Config.DATA_SIZE+".txt");
 		}
 		
@@ -78,12 +73,11 @@ public class LearnMain {
 			System.out.println("learn by evolution...");
 			LearnMergeEvolutions bestDTMC = new LearnMergeEvolutions();
 			bestDTMC.learn(data);
-			bestDTMC.PrismModelTranslation(data, ps, Config.MODEL_NAME+Config.DATA_SIZE);
+			bestDTMC.PrismModelTranslation(data, pl, Config.MODEL_NAME+Config.DATA_SIZE);
 			// format to .pm file
 			System.out.println("formatting the model to .pm file for model checking...");
 			FormatPrismModel fpm = new FormatPrismModel("dtmc", Config.GA_OUTPUT_PATH, Config.MODEL_NAME+Config.DATA_SIZE);
 			fpm.translateToFormat(bestDTMC.getPrismModel(), data);
-			TimeProfile.mainEndTime = System.nanoTime();
 			TimeProfile.outputTimeProfile(Config.GA_OUTPUT_PATH+"/time_profile_"+Config.DATA_SIZE+".txt");
 		}
 		

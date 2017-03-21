@@ -3,7 +3,7 @@ package io.github.wang_jingyi.ZiQian.active;
 import gurobi.GRBException;
 import io.github.wang_jingyi.ZiQian.profile.TimeProfile;
 import io.github.wang_jingyi.ZiQian.run.Config;
-import io.github.wang_jingyi.ZiQian.run.GlobalVars;
+import io.github.wang_jingyi.ZiQian.run.GlobalConfigs;
 import io.github.wang_jingyi.ZiQian.run.PlatformDependent;
 import io.github.wang_jingyi.ZiQian.utils.FileUtil;
 import io.github.wang_jingyi.ZiQian.utils.ListUtil;
@@ -22,9 +22,9 @@ public class SwatActiveMain {
 		
 		ALConfig.stateNumber = 64;
 		String name_suffix = "state_" + ALConfig.stateNumber;
-		String actual_result_root = PlatformDependent.MODEL_ROOT +  "/active/swat/" + "swat_"+Config.SWAT_SAMPLE_STEP+"_"+
+		String actual_result_root = PlatformDependent.CAV_MODEL_ROOT +  "/active/swat/" + "swat_"+Config.SWAT_SAMPLE_STEP+"_"+
 				Config.SWAT_RECORD_STEP + "/" + name_suffix;
-		String result_root = PlatformDependent.MODEL_ROOT +  "/active/swat/" + "swat_"+Config.SWAT_SAMPLE_STEP+"_"+
+		String result_root = PlatformDependent.CAV_MODEL_ROOT +  "/active/swat/" + "swat_"+Config.SWAT_SAMPLE_STEP+"_"+
 				Config.SWAT_RECORD_STEP + "/" + name_suffix + "/new_" + ALConfig.newSampleNumber;
 		String ido_result_root = result_root+"/ido";
 		String rs_result_root = result_root+"/rs";
@@ -83,8 +83,8 @@ public class SwatActiveMain {
 			sts.add(st);
 		}
 		
-		System.out.println("max sensor values in the trace: " + NumberUtil.ArrayToString(GlobalVars.maxSensorValues));
-		System.out.println("min sensor values in the trace: " + NumberUtil.ArrayToString(GlobalVars.minSensorValues));
+		System.out.println("max sensor values in the trace: " + NumberUtil.ArrayToString(GlobalConfigs.maxSensorValues));
+		System.out.println("min sensor values in the trace: " + NumberUtil.ArrayToString(GlobalConfigs.minSensorValues));
 		
 		List<List<Integer>> abstractTraces = new ArrayList<List<Integer>>();
 		for(int i=0; i<sts.size(); i++){
@@ -105,14 +105,14 @@ public class SwatActiveMain {
 			validInitDist.add((double)1/validInitStates.size());
 		}
 		
-//		FileUtil.cleanDirectory(PlatformDependent.MODEL_ROOT + "/active/swat/new_sample_ido" + name_suffix);//
-//		FileUtil.cleanDirectory(PlatformDependent.MODEL_ROOT + "/active/swat/new_sample_rs" + name_suffix);
+//		FileUtil.cleanDirectory(PlatformDependent.CAV_MODEL_ROOT + "/active/swat/new_sample_ido" + name_suffix);//
+//		FileUtil.cleanDirectory(PlatformDependent.CAV_MODEL_ROOT + "/active/swat/new_sample_rs" + name_suffix);
 		
 		Estimator estimator = new EFEstimator();
-		Sampler idosampler = new SwatSampler(ssa, ido_result_root + "/new_sample", ALConfig.pathLength);
+		ActiveSampler idosampler = new SwatActiveSampler(ssa, ido_result_root + "/new_sample", ALConfig.pathLength);
 		InitialDistGetter idoidg = new InitialDistributionOptimizer(ALConfig.stateNumber, validInitStates, ALConfig.pathLength);
 		
-		Sampler rssampler = new SwatSampler(ssa, rs_result_root + "/new_sample", ALConfig.pathLength);
+		ActiveSampler rssampler = new SwatActiveSampler(ssa, rs_result_root + "/new_sample", ALConfig.pathLength);
 		InitialDistGetter uniformidg = new OriginalInitialDistribution(validInitStates,validInitDist);
 		
 		try {
@@ -191,7 +191,7 @@ public class SwatActiveMain {
 	} 
 	
 	public static Samples IterSampling(RealMatrix currentFrequencyMatrix, int numSample, Estimator estimator, 
-			Sampler sampler, InitialDistGetter idg) throws GRBException{
+			ActiveSampler sampler, InitialDistGetter idg) throws GRBException{
 		Samples sample = new Samples(ALConfig.pathLength, currentFrequencyMatrix, estimator, sampler, idg);
 		for(int i=1; i<=numSample; i++){
 			System.out.println("getting a new sample, number: " + i);

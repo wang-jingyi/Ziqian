@@ -10,23 +10,7 @@ public class PrismState {
 	private List<PrismState> nextStates = new ArrayList<PrismState>();
 	private List<Double> transitionProb = new ArrayList<Double>();
 	private List<String> tranProbInString = new ArrayList<String>();
-	public List<String> getTranProbInString() {
-		return tranProbInString;
-	}
-
-	public void setTranProbInString(List<String> tranProbInString) {
-		this.tranProbInString = tranProbInString;
-	}
-
 	private List<String> sigmas = new ArrayList<String>();
-
-	public List<String> getSigmas() {
-		return sigmas;
-	}
-
-	public void setSigmas(List<String> sigmas) {
-		this.sigmas = sigmas;
-	}
 
 	public PrismState(int id, List<String> label){
 		this.id = id;
@@ -86,6 +70,22 @@ public class PrismState {
 	}
 	public void setId(int id) {
 		this.id = id;
+	}
+	
+	public List<String> getTranProbInString() {
+		return tranProbInString;
+	}
+
+	public void setTranProbInString(List<String> tranProbInString) {
+		this.tranProbInString = tranProbInString;
+	}
+	
+	public List<String> getSigmas() {
+		return sigmas;
+	}
+
+	public void setSigmas(List<String> sigmas) {
+		this.sigmas = sigmas;
 	}
 
 

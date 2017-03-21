@@ -112,7 +112,7 @@ public class Main {
 				MarkovChain mc = new MarkovChain(matrix, validInitStates, validInitDist);
 
 				Reachability rmcr = new Reachability(rmc.getTransitionMatrix(), validInitStates, validInitDist, targetStates,
-						PlatformDependent.MODEL_ROOT+"/active/rmc/rmc"+sn, rmc.getRmcName(), ALConfig.boundedSteps);
+						PlatformDependent.CAV_MODEL_ROOT+"/active/rmc/rmc"+sn, rmc.getRmcName(), ALConfig.boundedSteps);
 				List<Double> actualReach = rmcr.computeReachability();
 				boolean allLarge = true;
 				for(double d : actualReach){
@@ -131,7 +131,7 @@ public class Main {
 				
 				// define estimator, initial distribution getter
 				Estimator estimator = new LaplaceEstimator();
-				Sampler sampler = new MarkovChainSampler(mc);
+				ActiveSampler sampler = new MarkovChainSampler(mc);
 				InitialDistGetter idoidg = new InitialDistributionOptimizer(mc.getNodeNumber(), validInitStates, ALConfig.pathLength);
 				InitialDistGetter uniformidg = new OriginalInitialDistribution(validInitStates,validInitDist);
 				
@@ -149,12 +149,12 @@ public class Main {
 					double current_rs_mse = MetricComputing.calculateMSE(mc.getTransitionMatrix(),randomSample.getEstimatedTransitionMatrix());
 
 					Reachability idormcr = new Reachability(idoSample.getEstimatedTransitionMatrix(), validInitStates, validInitDist, targetStates,
-							PlatformDependent.MODEL_ROOT + "/active/rmc/rmc"+sn, rmc.getRmcName()+"_ido_"+numSample+"_"+time, ALConfig.boundedSteps);
+							PlatformDependent.CAV_MODEL_ROOT + "/active/rmc/rmc"+sn, rmc.getRmcName()+"_ido_"+numSample+"_"+time, ALConfig.boundedSteps);
 					List<Double> idoReachProbs = idormcr.computeReachability();
 					List<Double> idoDiff = ListUtil.listABSPercThresDiff(actualReach, idoReachProbs,reachThres);
 					
 					Reachability rsrmcr = new Reachability(randomSample.getEstimatedTransitionMatrix(), validInitStates, validInitDist, targetStates,
-							PlatformDependent.MODEL_ROOT + "/active/rmc/rmc"+sn, rmc.getRmcName()+"_rs_"+numSample+"_"+time, ALConfig.boundedSteps);
+							PlatformDependent.CAV_MODEL_ROOT + "/active/rmc/rmc"+sn, rmc.getRmcName()+"_rs_"+numSample+"_"+time, ALConfig.boundedSteps);
 					List<Double> randomReachProbs = rsrmcr.computeReachability();
 					List<Double> randomDiff = ListUtil.listABSPercThresDiff(actualReach, randomReachProbs,reachThres);
 					
@@ -204,7 +204,7 @@ public class Main {
 	}
 
 	public static Samples IterSampling(MarkovChain mc, RealMatrix currentFM, List<Integer> validInitStates, int pathLength, int numSample, Estimator estimator, 
-			Sampler sampler, InitialDistGetter idg) throws GRBException{
+			ActiveSampler sampler, InitialDistGetter idg) throws GRBException{
 		Samples sample = new Samples(pathLength, currentFM, estimator, sampler, idg);
 		for(int i=0; i<numSample; i++){
 			sample.newSample();

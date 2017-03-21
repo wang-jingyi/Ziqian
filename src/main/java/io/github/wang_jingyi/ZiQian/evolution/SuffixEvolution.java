@@ -1,7 +1,7 @@
 package io.github.wang_jingyi.ZiQian.evolution;
 
 import io.github.wang_jingyi.ZiQian.Input;
-import io.github.wang_jingyi.ZiQian.PredicateSet;
+import io.github.wang_jingyi.ZiQian.Predicate;
 import io.github.wang_jingyi.ZiQian.learn.DataSuffix;
 import io.github.wang_jingyi.ZiQian.prism.PrismModel;
 import io.github.wang_jingyi.ZiQian.prism.PrismState;
@@ -37,7 +37,7 @@ public class SuffixEvolution{
 	private int mutationNum = 2; // number of mutation for each candidate
 	private int generationLimit = 3; // terminate without improvement in this limit
 
-	protected PrismModel singleObsEvolution(Input data, PredicateSet pset, DataSuffix ds){
+	protected PrismModel singleObsEvolution(Input data, List<Predicate> pset, DataSuffix ds){
 		int maxHistory = ds.getMaxHistoryLength();
 		double bestFitness = Double.MAX_VALUE;
 		EvolutionResult er = new EvolutionResult();
@@ -125,7 +125,7 @@ public class SuffixEvolution{
 		return er;
 	}
 
-	public PrismModel PrismModelTranslation(Input data, PredicateSet pset, DataSuffix ds) {
+	public PrismModel PrismModelTranslation(Input data, List<Predicate> predicates, DataSuffix ds) {
 
 		PrismModel pm = new PrismModel();
 		List<PrismState> prismStates = new ArrayList<PrismState>(); // list of prism states
@@ -250,7 +250,7 @@ public class SuffixEvolution{
 		pm.setPrismStates(prismStates);
 		pm.setInitialStates(initialStates);
 		pm.setNumOfPrismStates(psID-1); // after add last state, psID is still added by one
-		pm.setPredicates(pset.getPredicates());
+		pm.setPredicates(predicates);
 		return pm;
 	}
 
