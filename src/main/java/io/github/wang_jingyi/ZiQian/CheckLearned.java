@@ -33,7 +33,7 @@ public class CheckLearned {
 		String winCommand = "";
 		String result = "";
 		if(os_type.startsWith("Windows")){
-			winCommand = "cmd /c cd " + PlatformDependent.PRISM_PATH + " &&prism.bat " + prismFilePath + " -prop" + String.valueOf(propertyIndex);
+			winCommand = "cmd /c cd " + PlatformDependent.PRISM_PATH + " && prism.bat " + prismFilePath + " " + propertyFilePath + " -prop " + String.valueOf(propertyIndex);
 			result = ShellInteraction.executeCommand(winCommand);
 		}
 		else if(os_type.startsWith("Mac")||os_type.startsWith("Ubuntu")){
