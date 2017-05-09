@@ -11,6 +11,7 @@ import io.github.wang_jingyi.ZiQian.learn.LearningDTMC;
 import io.github.wang_jingyi.ZiQian.learn.ModelSelection;
 import io.github.wang_jingyi.ZiQian.prism.ExtractPrismData;
 import io.github.wang_jingyi.ZiQian.prism.FormatPrismModel;
+import io.github.wang_jingyi.ZiQian.profile.AlgoProfile;
 import io.github.wang_jingyi.ZiQian.profile.TimeProfile;
 
 import java.io.IOException;
@@ -21,7 +22,7 @@ public class LearnMain {
 
 	public static void main(String[] args) throws IOException, ClassNotFoundException{
 		
-		ExtractPrismData epd = new ExtractPrismData(Config.DATA_PATH, Config.DATA_SIZE, 1, Config.DELIMTER);
+		ExtractPrismData epd = new ExtractPrismData(Config.DATA_PATH, Config.DATA_SIZE, 1, Config.DELIMITER);
 		VariablesValueInfo vvl = epd.getVariablesValueInfo();
 		
 		// swat 
@@ -36,13 +37,13 @@ public class LearnMain {
 //		Config.vars.add("z");
 
 		// crowds
-		Config.vars.add("runCount");
+		AlgoProfile.vars.add("runCount");
 //		Config.vars.add("new");
-		Config.vars.add("lastSeen");
-		Config.vars.add("observe0");
+		AlgoProfile.vars.add("lastSeen");
+		AlgoProfile.vars.add("observe0");
 		
-		NonAbstraction na = new NonAbstraction(Config.vars);
-		Config.varsLength = na.updateVarsLength(vvl); // must be executed before extract data
+		NonAbstraction na = new NonAbstraction(AlgoProfile.vars);
+		AlgoProfile.varsLength = na.updateVarsLength(vvl); // must be executed before extract data
 		Input data = na.extractVariableInfo(vvl);
 		
 		System.out.println("size of the alphabet: " + data.getAlphabet().size());

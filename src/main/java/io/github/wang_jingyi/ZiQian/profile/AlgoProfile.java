@@ -13,9 +13,11 @@ public class AlgoProfile {
 	public static List<Predicate> predicates = new ArrayList<>();
 	
 	public static List<String> vars = new ArrayList<>(); // triggered variables 
-	public static List<Integer> varLength = new ArrayList<>(); // length of triggered variables
+	public static List<Integer> varsLength;
 	
-	public static StringBuilder runTimeLog = new StringBuilder();
+	public static String result = "false";
+	
 	public static boolean prefixCalculated;
+	
 	
 }

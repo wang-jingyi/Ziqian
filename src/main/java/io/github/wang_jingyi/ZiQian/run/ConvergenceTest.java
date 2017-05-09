@@ -21,7 +21,7 @@ public class ConvergenceTest {
 
 	public static void main(String[] args) throws FileNotFoundException, ClassNotFoundException, IOException {
 
-		Config.initConfig();
+//		Config.initConfig();
 		@SuppressWarnings("unchecked")
 		List<Predicate> pres = (List<Predicate>) FileUtil.readObject(Config.OUTPUT_MODEL_PATH+"/predicates");
 
@@ -34,9 +34,9 @@ public class ConvergenceTest {
 		//		}
 
 
-		List<String> varsSet = PrismPathData.extractPathVars(Config.DATA_PATH, Config.DELIMTER);
+		List<String> varsSet = PrismPathData.extractPathVars(Config.DATA_PATH, Config.DELIMITER);
 		//
-		ExtractPrismData epd_lot = new ExtractPrismData(Config.DATA_PATH, Config.CONVERGE_TEST_DATA_SIZE, Config.STEP_SIZE, Config.DELIMTER);
+		ExtractPrismData epd_lot = new ExtractPrismData(Config.DATA_PATH, Config.CONVERGE_TEST_DATA_SIZE, Config.STEP_SIZE, Config.DELIMITER);
 		VariablesValueInfo vvi_lot = epd_lot.getVariablesValueInfo(varsSet);
 
 		long start_time = System.nanoTime();
@@ -54,7 +54,7 @@ public class ConvergenceTest {
 
 		String modelName = Config.MODEL_NAME + "_" + name;
 
-		ModelSelection gs = new AAlergia(Math.pow(2, -6), Math.pow(2, 6)); //
+		ModelSelection gs = new AAlergia(0, 2); //
 		LearningDTMC bestDTMC = gs.selectCriterion(data);
 		bestDTMC.PrismModelTranslation(data, pres, modelName); //
 

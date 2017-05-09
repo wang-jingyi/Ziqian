@@ -81,7 +81,6 @@ public class DataPrefix implements Serializable{
 		buildPrefixIndexMap();
 		calNextSymbolThings();
 		calInitDistribution();
-//		checkDataPrefix();
 	}
 
 	public void printPrefixTreeInfo(){
@@ -108,19 +107,6 @@ public class DataPrefix implements Serializable{
 		}
 		
 	}
-
-	//	private void checkDataPrefix() {
-	//		for(int i=0; i<prefixesTotalNum; i++){
-	//			int occ = sortedPrefixCounts.get(i);
-	//			int freqSum = sortedPrefixFinalCount.get(i);
-	//			for(int j=0; j<data.getAlphabet().size(); j++){
-	//				freqSum += nextSymbolFrequency.get(i).get(j);
-	//
-	//			}
-	////			assert occ==freqSum : "total occurrence not equal to out transitions";
-	//		}
-	//
-	//	}
 
 	public List<Integer> getInitStates() {
 		return initStates;

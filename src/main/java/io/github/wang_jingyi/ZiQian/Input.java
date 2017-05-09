@@ -13,7 +13,7 @@ public class Input implements Serializable{
 	private List<List<String>> observations;
 	private int dataSize;
 	
-	public Input(List<String> alpha, List<List<String>> observations) {
+	public Input(List<String> alpha, List<List<String>> observations){
 		this.alphabet = alpha;
 		this.observations = observations;
 		this.dataSize = getInputSize();

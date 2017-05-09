@@ -1,16 +1,15 @@
 package io.github.wang_jingyi.ZiQian;
 
-import io.github.wang_jingyi.ZiQian.learn.AAlergia;
-import io.github.wang_jingyi.ZiQian.learn.LearningDTMC;
-import io.github.wang_jingyi.ZiQian.learn.ModelSelection;
-import io.github.wang_jingyi.ZiQian.prism.FormatPrismModel;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
+
+import io.github.wang_jingyi.ZiQian.learn.Alergia;
+import io.github.wang_jingyi.ZiQian.learn.LearningDTMC;
+import io.github.wang_jingyi.ZiQian.prism.FormatPrismModel;
 
 public class SunExampleTest {
 
@@ -63,14 +62,15 @@ public class SunExampleTest {
 		pres.add(pre);
 		String modelName = "sunexample";
 
-		ModelSelection gs = new AAlergia(Math.pow(2, -6), Math.pow(2, 6)); //
-		LearningDTMC bestDTMC = gs.selectCriterion(data);
-		bestDTMC.PrismModelTranslation(data, pres, "sunexample"); //
+		LearningDTMC dtmc = new Alergia(0.8);
+		dtmc.learn(data);
+		dtmc.PrismModelTranslation(data, pres, "sunexample"); //
 
 		// format to .pm file
-		System.out.println("formatting the model to .pm file for model checking...");
+		System.out.println("--- Format to PRISM file");
 		FormatPrismModel fpm = new FormatPrismModel("dtmc", "/Users/jingyi" , modelName);
-		fpm.translateToFormat(bestDTMC.getPrismModel(), data);
+		fpm.translateToFormat(dtmc.getPrismModel(), data);
+		System.out.println("====== End of the program ======");
 	}
 
 }

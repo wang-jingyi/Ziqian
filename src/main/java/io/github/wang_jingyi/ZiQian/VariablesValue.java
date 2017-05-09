@@ -28,7 +28,7 @@ public class VariablesValue{
 				return values.get(i);
 			}
 		}
-		assert false : "The given variable doesnt exist.";
+		assert false : "=== The given variable doesnt exist.";
 		return null;
 	}
 	

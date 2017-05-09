@@ -57,11 +57,13 @@ public class CheckLearned {
 			TimeProfile.iteration_end_time = System.nanoTime();
 			TimeProfile.iteration_times.add(TimeProfile.nanoToSeconds
 					(TimeProfile.iteration_end_time-TimeProfile.iteration_start_time));
+			System.out.println("- PRISM result: true");
 			System.out.println("====== The property has been verified ======");
-			TimeProfile.main_end_time = System.currentTimeMillis();
-			TimeProfile.main_time = TimeProfile.millisToSeconds(TimeProfile.main_end_time-TimeProfile.main_start_time);
+			AlgoProfile.result = "true";
+			TimeProfile.main_end_time = System.nanoTime();
+			TimeProfile.main_time = TimeProfile.nanoToSeconds(TimeProfile.main_end_time-TimeProfile.main_start_time);
 			TimeProfile.outputTimeProfile();
-			TimeProfile.outputTimeProfile(GlobalConfigs.PROJECT_ROOT+"/time_profile.txt");
+			TimeProfile.outputTimeProfile(GlobalConfigs.OUTPUT_MODEL_PATH+"/time_profile.txt");
 			FileUtil.writeObject(Config.OUTPUT_MODEL_PATH + "/predicates", AlgoProfile.predicates);
 			System.exit(0);
 		}

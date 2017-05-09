@@ -35,7 +35,7 @@ public class CounterExtractionTest {
 		VariablesValueInfo vvl = epd.getVariablesValueInfo();
 		
 		AlgoProfile.vars = vvl.getVars();
-		AlgoProfile.varLength = vvl.getVarsLength();
+		AlgoProfile.varsLength = vvl.getVarsLength();
 		
 		List<Predicate> pres = new ArrayList<>();
 		pres.add(new TruePredicate());

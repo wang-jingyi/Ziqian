@@ -14,9 +14,9 @@ public class OverHigh implements Predicate, Serializable{
 	 */
 	private static final long serialVersionUID = 262212472467613540L;
 	private List<String> vars = new ArrayList<>();
-	private int threshold;
+	private double threshold;
 	
-	public OverHigh(String tankSensor, int threshold) {
+	public OverHigh(String tankSensor, double threshold) {
 		this.vars.add(tankSensor);
 		this.threshold = threshold;
 	}

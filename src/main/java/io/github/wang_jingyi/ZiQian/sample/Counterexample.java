@@ -175,9 +175,10 @@ public class Counterexample implements SplitPointFinder{
 
 		for(int i=0; i<transProbInCps.size(); i++){
 			double deviation = transProbInCps.get(i) - testedTransProbInCps.get(i);
-			if(deviation==0){ // exclude splitting point with probability 0
-				continue;
-			}
+//			deviation = deviation * transProbInCps.get(i); // take the original transition probability into account, the smaller the better
+//			if(deviation==0){ // exclude splitting point with probability 0
+//				continue;
+//			}
 			probDeviation.put(allSplittingPoints.get(i), deviation);
 		}
 		System.out.println("- Probability deviation of splitting point: " + probDeviation);
@@ -208,8 +209,6 @@ public class Counterexample implements SplitPointFinder{
 //			}
 //		}
 		finalsps.addAll(sps);
-
-//		System.out.println("- Splitting points: " + sps);
 		System.out.println("- Maximum deviation: " + probDeviation.get(sps.get(0)));
 		return finalsps;
 	}

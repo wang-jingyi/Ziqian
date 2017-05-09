@@ -3,10 +3,16 @@ package io.github.wang_jingyi.ZiQian.example;
 import io.github.wang_jingyi.ZiQian.Predicate;
 import io.github.wang_jingyi.ZiQian.VariablesValue;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class EglFormulaA extends EglUnfair implements Predicate{
+public class EglFormulaA extends EglUnfair implements Predicate, Serializable{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1495459239778127253L;
+
 	public EglFormulaA() {
 		super();
 	}

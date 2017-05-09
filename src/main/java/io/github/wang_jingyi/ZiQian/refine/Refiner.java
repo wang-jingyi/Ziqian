@@ -21,10 +21,6 @@ import net.sf.javaml.core.Dataset;
 import net.sf.javaml.core.DefaultDataset;
 import net.sf.javaml.core.DenseInstance;
 import net.sf.javaml.core.Instance;
-import net.sf.javaml.featureselection.FeatureScoring;
-import net.sf.javaml.featureselection.ranking.RankingFromScoring;
-import net.sf.javaml.featureselection.scoring.GainRatio;
-import net.sf.javaml.filter.normalize.NormalizeMidrange;
 
 public class Refiner{
 
@@ -34,6 +30,8 @@ public class Refiner{
 	private PrismModel pm;
 	private int negCount;
 	private int posCount;
+	private boolean terminateSample;
+	private boolean selectiveDataCollection;
 	private double classifyAccuracy;
 	private List<String> allVars = AlgoProfile.vars;
 	private List<String> newVars = new ArrayList<>();
@@ -45,6 +43,17 @@ public class Refiner{
 		this.predicates = pres;
 		this.pm = pm;
 	}
+	
+	public Refiner(List<SplittingPoint> sps, VariablesValueInfo vvi, List<Predicate> pres, PrismModel pm, boolean ts, boolean sdc) {
+		super();
+		this.spuriousTransitions = sps;
+		this.vvi = vvi;
+		this.predicates = pres;
+		this.pm = pm;
+		this.terminateSample = ts;
+		this.selectiveDataCollection = sdc;
+	}
+	
 
 	public LearnedPredicate refine() throws FileNotFoundException{
 		for(int i=0; i<spuriousTransitions.size(); i++){
@@ -120,7 +129,7 @@ public class Refiner{
 				}
 
 				if(i==vvls.size()-1){ // the last observation must be a negative instance
-					if(GlobalConfigs.TERMINATE_SAMPLE){ 
+					if(terminateSample){ 
 						// sample will terminate like crowds/nand; 
 						// if not terminate, we dont know whether it's positive or negative
 						Instance ins = new DenseInstance(values,"negative");
@@ -132,7 +141,7 @@ public class Refiner{
 
 				if(vvls.get(i+1).equals(nextString)){ 
 
-					if(GlobalConfigs.SELECTIVE_DATA_COLLECTION){
+					if(selectiveDataCollection){
 						if(pcount<1){
 							// check if the next state is according to the counterexample path
 							Instance ins = new DenseInstance(values,"positive");
@@ -148,7 +157,7 @@ public class Refiner{
 					}
 				}
 				else{
-					if(GlobalConfigs.SELECTIVE_DATA_COLLECTION){
+					if(selectiveDataCollection){
 						if(ncount<1){
 							Instance ins = new DenseInstance(values,"negative");
 							ds.add(ins);
@@ -165,7 +174,7 @@ public class Refiner{
 			}
 		}
 
-		System.out.println("- Instance in the dataset: " + ds.size());
+		System.out.println("- Instance in the dataset: " + ds.size() + ":   postive instance: " + posCount + ",   negative instance: " + negCount);
 		return ds;
 
 	}
@@ -183,17 +192,17 @@ public class Refiner{
 	private LearnedPredicate supervisedClassify(Dataset ds) throws FileNotFoundException {
 
 		// dataset normalization between [0,1]
-		System.out.println("- Normalize dataset");
-		NormalizeMidrange dnm = new NormalizeMidrange(0.5, 1);
-		dnm.filter(ds);
+//		System.out.println("- Normalize dataset");
+//		NormalizeMidrange dnm = new NormalizeMidrange(0.5, 1);
+//		dnm.filter(ds);
 
 		LibSVM svm = new LibSVM();
 		svm_parameter svm_para = (svm_parameter) svm.getParameters().clone();
 		
-		FeatureScoring fs = new GainRatio();
-		RankingFromScoring rfs = new RankingFromScoring(fs);
+//		FeatureScoring fs = new GainRatio();
+//		RankingFromScoring rfs = new RankingFromScoring(fs);
+//		rfs.build(ds);
 		
-		rfs.build(ds);
 //		svm_para.kernel_type = 2;
 //		svm_para.gamma = 0.1;
 //		svm_para.C = 1;

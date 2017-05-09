@@ -51,6 +51,7 @@ public class TimeProfile {
 		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 		Date date = new Date();
 		sb.append("\n++++++ Running time profile for the run starting at " + dateFormat.format(date) + " ++++++\n");
+		sb.append("--- Verification result: " + AlgoProfile.result + " ---\n");
 		sb.append("--- Time for whole algorithm: " + main_time + " s\n");
 		sb.append("=== Time for each iteration: " + iteration_times + " s ===\n");
 		sb.append("::: Divided time for each iteration :::\n");

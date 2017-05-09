@@ -37,7 +37,8 @@ public class PredicateAbstraction implements Abstraction{
 			}
 		}
 		System.out.println("------Data information------");
-		System.out.println("-Alphabet: " + alpha + ",		alphabet size: " + alpha.size());
+		System.out.println("- alphabet: " + alpha);
+		System.out.println("- alphabet size: " + alpha.size());
 		return new Input(alpha, obss);
 	}
 

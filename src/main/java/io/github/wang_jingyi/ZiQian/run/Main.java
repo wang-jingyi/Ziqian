@@ -1,15 +1,23 @@
 package io.github.wang_jingyi.ZiQian.run;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
 import io.github.wang_jingyi.ZiQian.CheckLearned;
 import io.github.wang_jingyi.ZiQian.Input;
 import io.github.wang_jingyi.ZiQian.Predicate;
 import io.github.wang_jingyi.ZiQian.PredicateAbstraction;
 import io.github.wang_jingyi.ZiQian.TruePredicate;
 import io.github.wang_jingyi.ZiQian.VariablesValueInfo;
-import io.github.wang_jingyi.ZiQian.evolution.LearnMergeEvolutions;
 import io.github.wang_jingyi.ZiQian.example.CrowdPositive;
 import io.github.wang_jingyi.ZiQian.exceptions.PrismNoResultException;
 import io.github.wang_jingyi.ZiQian.exceptions.SimulationException;
+import io.github.wang_jingyi.ZiQian.learn.AAlergia;
+import io.github.wang_jingyi.ZiQian.learn.LearningDTMC;
+import io.github.wang_jingyi.ZiQian.learn.ModelSelection;
 import io.github.wang_jingyi.ZiQian.prism.ExtractPrismData;
 import io.github.wang_jingyi.ZiQian.prism.FormatPrismModel;
 import io.github.wang_jingyi.ZiQian.prism.PrismPathData;
@@ -26,12 +34,6 @@ import io.github.wang_jingyi.ZiQian.sample.TestEnvironment;
 import io.github.wang_jingyi.ZiQian.swat.SwatSampler;
 import io.github.wang_jingyi.ZiQian.utils.FileUtil;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
 public class Main {
 	
 	public static void main(String[] args) throws FileNotFoundException, ClassNotFoundException, IOException, SimulationException {
@@ -40,6 +42,7 @@ public class Main {
 		FileUtil.cleanDirectory(Config.OUTPUT_MODEL_PATH);
 		FileUtil.cleanDirectory(Config.TESTING_PATH);
 		Config.writePropertyLearnFile();
+		GlobalConfigs.OUTPUT_MODEL_PATH = Config.OUTPUT_MODEL_PATH;
 		
 		if(FileUtil.filesInDir(Config.DATA_PATH).size()<1){
 			if(Config.SWAT){
@@ -64,7 +67,7 @@ public class Main {
 		}
 		
 		List<String> varsSet 
-		= PrismPathData.extractPathVars(Config.DATA_PATH, Config.DELIMTER);
+		= PrismPathData.extractPathVars(Config.DATA_PATH, Config.DELIMITER);
 //				= new ArrayList<>();
 //		varsSet.add("new");
 //		varsSet.add("runCount");
@@ -79,11 +82,11 @@ public class Main {
 		
 		
 		System.out.println("data path: " + Config.DATA_PATH) ;
-		ExtractPrismData epd = new ExtractPrismData(Config.DATA_PATH, Config.DATA_SIZE, Config.STEP_SIZE, Config.DELIMTER);
+		ExtractPrismData epd = new ExtractPrismData(Config.DATA_PATH, Config.DATA_SIZE, Config.STEP_SIZE, Config.DELIMITER);
 		VariablesValueInfo vvl = epd.getVariablesValueInfo(varsSet);
 		
 		AlgoProfile.vars = vvl.getVars();	
-		AlgoProfile.varLength = vvl.getVarsLength();
+		AlgoProfile.varsLength = vvl.getVarsLength();
 		
 		List<Predicate> pres = new ArrayList<>();
 		pres.add(new TruePredicate());
@@ -104,7 +107,6 @@ public class Main {
 		int larModelSize = 0;
 		while(iteration<20){
 			iteration++;
-			AlgoProfile.runTimeLog.append("-------------------------------------" + "iteration: " + iteration + "-------------------------------------");
 			System.out.println("-------------------------------------" + "iteration: " + iteration + "-------------------------------------");
 			System.out.println("number of predicates: " + pres.size());
 			larModelSize = run(vvl,pres,iteration,larModelSize,te);
@@ -122,13 +124,13 @@ public class Main {
 		
 		String modelName = Config.MODEL_NAME + iteration;
 		
-//		ModelSelection gs = new PrefixMergeGoldenSearch(Math.pow(2, -6), Math.pow(2, 6)); //
-//		LearningDTMC bestDTMC = gs.selectCriterion(data);
-//		bestDTMC.PrismModelTranslation(data, ps, modelName); //
+		ModelSelection gs = new AAlergia(Math.pow(2, -6), Math.pow(2, 6)); //
+		LearningDTMC bestDTMC = gs.selectCriterion(data);
+		bestDTMC.PrismModelTranslation(data, pres, modelName); //
 
-		LearnMergeEvolutions bestDTMC = new LearnMergeEvolutions();
-		bestDTMC.learn(data);
-		bestDTMC.PrismModelTranslation(data, pres, modelName);
+//		LearnMergeEvolutions bestDTMC = new LearnMergeEvolutions();
+//		bestDTMC.learn(data);
+//		bestDTMC.PrismModelTranslation(data, pres, modelName);
 //		
 		
 		
@@ -160,7 +162,7 @@ public class Main {
 		System.out.println("hypothesis testing...");
 		
 		Sampler sampler = new PrismSampler(Config.ORIG_MODEL_FILE, Config.TESTING_PATH, Config.MODEL_SETTING);
-		te.init(pres,sampler,data,Config.DELIMTER,Config.STEP_SIZE);
+		te.init(pres,sampler,data,Config.DELIMITER,Config.STEP_SIZE);
 		
 //		HypothesisTest sst = new SingleSampleTest(1);
 		HypothesisTest sst = new SprtTest(0.2, 0.1, 0.1, 0.1);

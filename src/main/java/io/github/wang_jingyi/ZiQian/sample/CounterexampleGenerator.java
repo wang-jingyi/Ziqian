@@ -1,10 +1,5 @@
 package io.github.wang_jingyi.ZiQian.sample;
 
-import io.github.wang_jingyi.ZiQian.prism.PrismModel;
-import io.github.wang_jingyi.ZiQian.prism.PrismState;
-import io.github.wang_jingyi.ZiQian.utils.IntegerUtil;
-import io.github.wang_jingyi.ZiQian.utils.MapUtil;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -18,6 +13,11 @@ import org.jgrapht.Graphs;
 import org.jgrapht.alg.KShortestPaths;
 import org.jgrapht.graph.DefaultDirectedWeightedGraph;
 import org.jgrapht.graph.DefaultWeightedEdge;
+
+import io.github.wang_jingyi.ZiQian.prism.PrismModel;
+import io.github.wang_jingyi.ZiQian.prism.PrismState;
+import io.github.wang_jingyi.ZiQian.utils.IntegerUtil;
+import io.github.wang_jingyi.ZiQian.utils.MapUtil;
 
 /*
  * Given a PrismModel, a time step and a probability bound,
@@ -60,12 +60,14 @@ public class CounterexampleGenerator {
 
 		List<CounterexamplePath> cps = new ArrayList<>();
 		List<GraphPath<Integer, DefaultWeightedEdge>> gcps = new ArrayList<>();
-
+		
+		int step = 0;
+		int k = 1;
 		if(boundedStep==-1){ // unbounded property
-			int k = 1; 
 			double lastAccProb = 0;
 			Map<CounterexamplePath, Double> cpProbs = new HashMap<CounterexamplePath, Double>();
 			while(true){ // iteratively find minimum k paths which forms a counterexample
+				k = (int) Math.pow(2, step); // initial number of paths 
 				KShortestPaths<Integer, DefaultWeightedEdge> ksps = new KShortestPaths<Integer, DefaultWeightedEdge>(graph, 1, k);
 				gcps = ksps.getPaths(endingVertex);
 
@@ -89,7 +91,7 @@ public class CounterexampleGenerator {
 				}
 				else{
 					lastAccProb = accProb;
-					k = (int) Math.pow(2, k);
+					step = step ++;
 				}
 
 			}
@@ -97,7 +99,7 @@ public class CounterexampleGenerator {
 		else if(boundedStep>0){ // bounded property
 			Map<CounterexamplePath, Double> cpProbs = new HashMap<CounterexamplePath, Double>();
 			while(true){
-				int k = 1;
+				k = (int) Math.pow(2, step);
 				double lastAccProb = 0;
 				KShortestPaths<Integer, DefaultWeightedEdge> ksps = new KShortestPaths<Integer, DefaultWeightedEdge>(graph, 1, k, boundedStep);
 				gcps = ksps.getPaths(endingVertex);
@@ -113,18 +115,17 @@ public class CounterexampleGenerator {
 				if(accProb>=probabilityBound){
 					break;
 				}
-				if(accProb==lastAccProb){ // probability measure dont increase anymore, have to add loops
+				if(accProb==lastAccProb){ // probability measure don't increase anymore, have to add loops
 					cps.addAll(addCounterexamplePathsWithLoops(cpProbs, sortedLoops, accProb));
 					containLoops = true;
 					break;
 				}
 				else{
 					lastAccProb = accProb;
-					k++;
+					step ++;
 				}
 			}
 		}
-		//		System.out.println("counterexample : " + cps);
 		System.out.println("- Total number of paths in the counterexample: " + cps.size());
 		return cps;
 	}
@@ -136,9 +137,13 @@ public class CounterexampleGenerator {
 
 		while(accProb<probabilityBound){ // add loops to accumulate probability mass to exceed the probability bound
 			LoopPoint currentLP = findInsertingLoopPoint(cpProbs,sortedLoops);
-			accProb += weightToProbability(currentLP.addedWeight); // add a loop with highest probability to accumulate probability
-
 			List<Integer> loopPath = currentLP.path;
+			if(loopPath==null){
+				System.out.println("- No loop to add");
+				break;
+			}
+			
+			accProb += weightToProbability(currentLP.addedWeight); // add a loop with highest probability to accumulate probability
 			List<Integer> clonedLoopPath = IntegerUtil.cloneList(loopPath);
 
 			for(int j=0; j<loopPath.size(); j++){
@@ -269,6 +274,7 @@ public class CounterexampleGenerator {
 				PrismState ps = prismModel.getPrismStates().get(vertex-1);
 				List<PrismState> nextStates = ps.getNextStates();
 				List<Double> transProb = ps.getTransitionProb();
+				assert nextStates.size()==transProb.size() : "=== Not valid state";
 				for(int j=0; j<nextStates.size(); j++){
 					if(collapsedStates.contains(nextStates.get(j).getId())){
 						DefaultWeightedEdge edge = graph.addEdge(ps.getId(), collopsedStatesId);
@@ -276,6 +282,9 @@ public class CounterexampleGenerator {
 					}
 					else{
 						DefaultWeightedEdge edge = graph.addEdge(ps.getId(), nextStates.get(j).getId());
+						if(edge==null || transProb.get(j)==null){
+							System.out.println("breakout");
+						}
 						graph.setEdgeWeight(edge, Math.log10(1/transProb.get(j)));
 					}
 				}

@@ -32,25 +32,20 @@ public class PSTGoldenSearch extends GoldenSectionSearch implements ModelSelecti
 		LearnPST rightLA = new LearnPST();
 		boolean leftWins = false;
 		double LRdistance = Double.MAX_VALUE;
-		
+		int learn_counter = 0;
+		System.out.println("------ Learn from single trace, search for the best parameter ------");
 		while(LRdistance > 0.05 ){ // @@@@@@@@@@@@@@@@ to check
-//			System.out.println("Iteration : " + (numOfIteration+1));
-//			System.out.println("-----------Left epsilon-----------");
-//			System.out.println("Current left epsilon: " + left);
-
-			
 			leftLA.setEpsilon(left);
+			System.out.println("--- Learn from parameter " + learn_counter);
+			learn_counter++;
 			leftLA.learn(data);
-			System.out.println("Number of state of left PSA: " + leftLA.getNumOfStates());
 			leftScore = leftLA.getSelectionCriterion();
-			System.out.println("Left bic score: " + leftScore);
-//	
 			
 			rightLA.setEpsilon(right);
+			System.out.println("--- Learn from parameter " + learn_counter);
+			learn_counter++;
 			rightLA.learn(data);
-			System.out.println("Number of state of right PSA: " + rightLA.getNumOfStates());
 			rightScore = rightLA.getSelectionCriterion();
-			System.out.println("Right bic score: " + rightScore);
 
 			if(leftScore<rightScore){
 				leftBound = left;
@@ -66,15 +61,12 @@ public class PSTGoldenSearch extends GoldenSectionSearch implements ModelSelecti
 			left = calNewLeft(leftBound, rightBound);
 			right = calNewRight(leftBound, rightBound);
 			numOfIteration ++;
-//			System.out.println("========================================");
 			LRdistance = Math.abs(leftScore-rightScore)/Math.max(leftScore, rightScore);
 		}
 		
-//		System.out.println("Distance between left and right selection score in percentage: " + LRdistance);
-		System.out.println("Epsilon with highest BIC score: " + epsilon);
-		System.out.println("Highest BIC score: " + highestSelectionCriterion);
-		System.out.println("Total number of iteration: " + numOfIteration);
-//		System.out.println("========================================");
+		System.out.println("- Highest BIC score: " + highestSelectionCriterion);
+		System.out.println("- Best epsilon: " + epsilon);
+		System.out.println("- Total number of iteration: " + numOfIteration);
 		if(leftWins){
 			return leftLA;
 		}

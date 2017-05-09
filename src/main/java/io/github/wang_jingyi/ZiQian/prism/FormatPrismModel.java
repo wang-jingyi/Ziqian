@@ -1,16 +1,17 @@
 package io.github.wang_jingyi.ZiQian.prism;
 
-import io.github.wang_jingyi.ZiQian.Input;
-import io.github.wang_jingyi.ZiQian.Predicate;
-import io.github.wang_jingyi.ZiQian.VariablesValue;
-import io.github.wang_jingyi.ZiQian.run.Config;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import io.github.wang_jingyi.ZiQian.Input;
+import io.github.wang_jingyi.ZiQian.Predicate;
+import io.github.wang_jingyi.ZiQian.VariablesValue;
+import io.github.wang_jingyi.ZiQian.profile.AlgoProfile;
+import io.github.wang_jingyi.ZiQian.run.Config;
 
 
 /*
@@ -22,7 +23,15 @@ public class FormatPrismModel implements ModelTranslation{
 	private String modelType; // dtmc, ctmc, mdp, etc
 	private String outputFilePath; // path for output .pm file
 	private String fileName; // name for the .pm file
+	private boolean abstraction = true;
 
+	public FormatPrismModel(String modelType, String outputFilePath, String fileName, boolean abs) {
+		this.modelType = modelType;
+		this.outputFilePath = outputFilePath;
+		this.fileName = fileName;
+		this.abstraction = abs;
+	}
+	
 	public FormatPrismModel(String modelType, String outputFilePath, String fileName) {
 		this.modelType = modelType;
 		this.outputFilePath = outputFilePath;
@@ -48,12 +57,12 @@ public class FormatPrismModel implements ModelTranslation{
 			BufferedWriter bw = new BufferedWriter(fw);
 			BufferedWriter bw1 = new BufferedWriter(fw1);
 			
-			if(Config.abstraction){ // abstract case
+			if(abstraction){ // abstract case
 				bw.write(ToDotPM(pm,data));
 			}
 			
 			else{ // non-abstract case
-				bw.write(ToDotPM(pm,data,Config.vars,Config.varsLength));
+				bw.write(ToDotPM(pm,data,AlgoProfile.vars,AlgoProfile.varsLength));
 			}
 			
 			bw1.write(labelToFile(pm));

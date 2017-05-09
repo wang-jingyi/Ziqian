@@ -1,7 +1,7 @@
 package io.github.wang_jingyi.ZiQian;
 
 import io.github.wang_jingyi.ZiQian.prism.PrismPathData;
-import io.github.wang_jingyi.ZiQian.run.Config;
+import io.github.wang_jingyi.ZiQian.profile.AlgoProfile;
 import io.github.wang_jingyi.ZiQian.utils.StringUtil;
 
 import java.util.ArrayList;
@@ -23,7 +23,7 @@ public class NonAbstraction implements VariableInfoExtraction{
 		List<List<String>> obss = new ArrayList<>();
 		
 		for(List<VariablesValue> vvl : vvi.getVarsValues()){
-			List<String> obs = extractPathVarsValues(vvl, vars, Config.varsLength);
+			List<String> obs = extractPathVarsValues(vvl, vars, AlgoProfile.varsLength);
 			obss.add(obs);
 		}
 		

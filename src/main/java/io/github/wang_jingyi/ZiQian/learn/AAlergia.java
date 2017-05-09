@@ -28,8 +28,8 @@ public class AAlergia extends GoldenSectionSearch implements ModelSelection {
 
 		epsilon = 0;
 		highestSelectionCriterion = 0;
-		AAlergiamain leftLA = new AAlergiamain();
-		AAlergiamain rightLA = new AAlergiamain();
+		Alergia leftLA = new Alergia();
+		Alergia rightLA = new Alergia();
 		boolean leftWins = false;
 		double LRdistance = Double.MAX_VALUE;
 //		int iteration = 1;

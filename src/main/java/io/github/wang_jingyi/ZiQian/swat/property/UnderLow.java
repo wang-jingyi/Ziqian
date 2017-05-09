@@ -14,9 +14,9 @@ public class UnderLow implements Predicate, Serializable{
 	 */
 	private static final long serialVersionUID = -4971393425170521837L;
 	private List<String> vars = new ArrayList<>();
-	private int threshold;
+	private double threshold;
 
-	public UnderLow(String tankSensor, int threshold) {
+	public UnderLow(String tankSensor, double threshold) {
 		this.vars.add(tankSensor);
 		this.threshold = threshold;
 	}

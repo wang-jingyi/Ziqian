@@ -30,43 +30,43 @@ import org.uncommons.watchmaker.framework.termination.Stagnation;
 public class SuffixEvolution{
 
 	private int[] resultCandidate;
-	private int maxMaxHistory = 2; // longest history to watch
+	private int maxMaxHistory = 3; // longest history to watch
 	private int initialPopulationSize = 100; // initial number of candidates
 	private int populationSize = 10; // number of candidates in each population
 	private int eliteCount = 3; // number of candidate to preserve for each generation
 	private int mutationNum = 2; // number of mutation for each candidate
 	private int generationLimit = 3; // terminate without improvement in this limit
 
-	protected PrismModel singleObsEvolution(Input data, List<Predicate> pset, DataSuffix ds){
+	public PrismModel singleObsEvolution(Input data, List<Predicate> pset, DataSuffix ds){
 		int maxHistory = ds.getMaxHistoryLength();
 		double bestFitness = Double.MAX_VALUE;
 		EvolutionResult er = new EvolutionResult();
 
 		while(maxHistory<=maxMaxHistory){
-			System.out.println("current maximum history length: " + maxHistory);
+			System.out.println("--- Current maximum history length: " + maxHistory);
 			er = executeEvolution(data,ds);
 			if(er.bestCandidatefitness>bestFitness){ // fitness dont get better when state size increases
-				System.out.println("the fitness doesnt increase anymore with maximum history length: " + (maxHistory-1));
+				System.out.println("=== The fitness doesnt increase anymore with maximum history length: " + (maxHistory-1));
 				break;
 			}
 			else{
 				bestFitness = er.bestCandidatefitness;
 				resultCandidate = er.bestCandidate;
 				maxHistory++;
-				System.out.println("best candidate data likelihood: " + SuffixModelEvaluator.getLogDataProbability(data, ds, resultCandidate));
+				System.out.println("- Best candidate data likelihood: " + SuffixModelEvaluator.getLogDataProbability(data, ds, resultCandidate));
 				if(maxHistory<=maxMaxHistory){
-					System.out.println("the max length of history needs to be increased.");
+					System.out.println("- The max length of history needs to be increased.");
 					ds = new DataSuffix(data, maxHistory);
 					ds.execute();
 				}
 				else{
-					System.out.println("reach preset maximum history, algorithm terminates.");
+					System.out.println("- Reach preset maximum history, algorithm terminates.");
 					break;
 				}
 
 			}
 		}
-		System.out.println("best candidate fitness: " + bestFitness);
+		System.out.println("=== Best candidate fitness: " + bestFitness);
 		PrismModel pm = PrismModelTranslation(data, pset, ds);
 		return pm;
 	}

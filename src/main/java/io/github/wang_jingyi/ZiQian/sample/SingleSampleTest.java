@@ -74,7 +74,6 @@ public class SingleSampleTest implements HypothesisTest{
 		return pvalue;
 	}
 
-	// this function can be further refined to be faster	
 	public static List<Double> calculateTestedTranstionProb(TestEnvironment te, Counterexample ce) throws IOException{
 		List<SplittingPoint> sps = ce.getAllSplittingPoints();
 		PrismModel pm = ce.getPrismModel();
@@ -106,7 +105,7 @@ public class SingleSampleTest implements HypothesisTest{
 
 				int nextStateID = StringUtil.getStringIndex(concrete_trace.get(i), currentPS.getSigmas());
 				if(nextStateID==-1){
-					System.out.println("- New transition happens.");
+//					System.out.println("- New transition happens.");
 					continue;
 				}
 //				assert nextStateID!=-1 : "- Concrete trace not in the model.";
@@ -128,7 +127,7 @@ public class SingleSampleTest implements HypothesisTest{
 			int nextCount = spCounts.get(sp);
 			int startCount = startingStateCounts.get(sp.getCurrentStateId());
 			if(startCount==0){
-				transProb.add(-1.0);
+				transProb.add(0.0);
 				continue;
 			}
 			transProb.add((double)nextCount/startCount);

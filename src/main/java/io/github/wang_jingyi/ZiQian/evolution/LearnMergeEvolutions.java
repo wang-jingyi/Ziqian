@@ -39,24 +39,24 @@ public class LearnMergeEvolutions implements LearningDTMC{
 
 	@Override
 	public void learn(Input data) {
-		System.out.println("- Building prefix tree acceptor");
+		System.out.println("--- Build prefix tree acceptor");
 		dp = new DataPrefix(data);
 		dp.execute();
 		dp.printPrefixTreeInfo();
-		System.out.println("- Executing evolutionary state merging");
+		System.out.println("--- Execute evolutionary state merging");
 		executeEvolutions();
 	}
 
 	private void executeEvolutions() {
 		
 		// create candidate grouping
-		System.out.println("- Creating initial candidate grouping...");
+		System.out.println("- Create initial candidate grouping");
 		numOfStates = dp.getData().getAlphabet().size(); 
 		int mergeEncodeStateNum = numOfStates + 1;// add 1 for the empty state
 		PrefixMergeEncode mef = new PrefixMergeEncode(dp,mergeEncodeStateNum);
 
 		// create a pipeline that applies cross-over then mutation.
-		System.out.println("- Creating pipelines that applies cross-over and mutation...");
+		System.out.println("- Create pipelines that applies cross-over and mutation...");
 		List<EvolutionaryOperator<int[]>> operators
 		= new LinkedList<EvolutionaryOperator<int[]>>();
 		operators.add(new IntArrayCrossover());
@@ -64,11 +64,11 @@ public class LearnMergeEvolutions implements LearningDTMC{
 		= new EvolutionPipeline<int[]>(operators);
 
 		// create evaluator of candidates
-		System.out.println("- Creating candidate evaluator...");
+		System.out.println("- Create candidate evaluator");
 		MergeEvaluator me = new MergeEvaluator(dp);
 
 		// create selection strategy of candidates
-		System.out.println("- Creating selection strategy of candidates...");
+		System.out.println("- Create selection strategy of candidates");
 		SelectionStrategy<Object> selection = new TournamentSelection(new Probability(0.9));
 
 		// create random generator for evolution
@@ -88,7 +88,7 @@ public class LearnMergeEvolutions implements LearningDTMC{
 			}
 				});
 		
-		System.out.println("Evolving...");
+		System.out.println("- Evolving");
 		resultGrouping = engine.evolve(10, 2, new GenerationCount(1));
 		
 	}
@@ -200,7 +200,7 @@ public class LearnMergeEvolutions implements LearningDTMC{
 				double transPJ = (double)nextStateFrq.get(j)/totoalOutTrans;
 				nextStateTransP.add(transPJ);
 			}
-			assert nextStateSumFrq==totoalOutTrans : "out transitions not equal to the total occurrence";
+			assert nextStateSumFrq==totoalOutTrans : "### out transitions not equal to the total occurrence";
 			nextIDs.put(i, nextStateID);
 			nextTransP.put(i, nextStateTransP);
 		}

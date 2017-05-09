@@ -1,5 +1,8 @@
 package io.github.wang_jingyi.ZiQian.run;
 
+import java.io.IOException;
+import java.util.List;
+
 import io.github.wang_jingyi.ZiQian.CheckLearned;
 import io.github.wang_jingyi.ZiQian.DTMCLearner;
 import io.github.wang_jingyi.ZiQian.Input;
@@ -19,15 +22,12 @@ import io.github.wang_jingyi.ZiQian.refine.Refiner;
 import io.github.wang_jingyi.ZiQian.sample.Counterexample;
 import io.github.wang_jingyi.ZiQian.sample.CounterexampleGenerator;
 import io.github.wang_jingyi.ZiQian.sample.CounterexamplePath;
-import io.github.wang_jingyi.ZiQian.sample.HypothesisTest;
 import io.github.wang_jingyi.ZiQian.sample.ModelTesting;
 import io.github.wang_jingyi.ZiQian.sample.Sampler;
 import io.github.wang_jingyi.ZiQian.sample.SingleSampleTest;
 import io.github.wang_jingyi.ZiQian.sample.SprtTest;
 import io.github.wang_jingyi.ZiQian.sample.TestEnvironment;
-
-import java.io.IOException;
-import java.util.List;
+import io.github.wang_jingyi.ZiQian.utils.FileUtil;
 
 public class LAR {
 	
@@ -44,6 +44,7 @@ public class LAR {
 	private double safetyBound;
 	private String MODEL_NAME;
 	private String LEARNING_TYPE;
+	private double alergia_epsilon = 0.5;
 	private String TESTING_TYPE;
 	private int sstSampleSize = 1000;
 	private int LARModelSize;
@@ -52,6 +53,8 @@ public class LAR {
 	private double confidence_inteval;
 	private String data_delimiter;
 	private int data_step_size;
+	private boolean terminate_sample;
+	private boolean selective_data_collection;
 	
 	
 	public LAR() {
@@ -67,28 +70,29 @@ public class LAR {
 			TimeProfile.iteration_start_time = System.nanoTime();;
 			System.out.println("\n****** Iteration : " + iteration + " ******\n");
 			
-			TimeProfile.learning_start_time = System.nanoTime();;
+			TimeProfile.learning_start_time = System.nanoTime();
 			PredicateAbstraction pa = new PredicateAbstraction(property);
 			Input data = pa.abstractInput(vvi.getVarsValues());
+			
 			
 			String modelName = MODEL_NAME + "_" + iteration;
 			DTMCLearner learner = new DTMCLearner();
 			
 			if(LEARNING_TYPE.equals("AA")){
-				learner.setLearner(new AAlergia(Math.pow(2, -6), Math.pow(2, 6)).selectCriterion(data));
+				learner.setLearner(new AAlergia(0,2).selectCriterion(data));
 			}
 			else if(LEARNING_TYPE.equals("GA")){
 				learner.setLearner(new LearnMergeEvolutions());
-				learner.getLearner().learn(data);
 			}
 			else{
 				throw new UnsupportedLearningTypeException();
 			}
 			
 			LearningDTMC bestDTMC = learner.getLearner();
+			bestDTMC.learn(data);
 			bestDTMC.PrismModelTranslation(data, pa.getPredicates(), modelName);
 			System.out.println("------ Writing learned model into PRISM format ------");
-			FormatPrismModel fpm = new FormatPrismModel("dtmc", OUTPUT_MODEL_PATH, modelName);
+			FormatPrismModel fpm = new FormatPrismModel("dtmc", OUTPUT_MODEL_PATH, modelName, true);
 			fpm.translateToFormat(bestDTMC.getPrismModel(), data);
 			System.out.println("- Learned model wrote to : " + OUTPUT_MODEL_PATH + "/" + modelName + ".pm");
 			System.out.println("- Number of states in the learned model: " + bestDTMC.getPrismModel().getNumOfPrismStates());
@@ -102,7 +106,8 @@ public class LAR {
 				TimeProfile.main_end_time = System.nanoTime();;
 				TimeProfile.main_time = TimeProfile.nanoToSeconds(TimeProfile.main_end_time-TimeProfile.main_start_time);
 				TimeProfile.outputTimeProfile();
-				TimeProfile.outputTimeProfile(GlobalConfigs.PROJECT_ROOT+"/time_profile.txt");
+				TimeProfile.outputTimeProfile(GlobalConfigs.OUTPUT_MODEL_PATH+"/time_profile.txt");
+				FileUtil.writeObject(Config.OUTPUT_MODEL_PATH + "/predicates", AlgoProfile.predicates);
 				System.exit(0);
 			}
 			else{
@@ -131,7 +136,7 @@ public class LAR {
 			te.init(property, sampler, data, data_delimiter, data_step_size);
 			ModelTesting mt = new ModelTesting();
 			if(TESTING_TYPE.equalsIgnoreCase("sst")){
-				mt.setHypothesisTesting(new SingleSampleTest(100));
+				mt.setHypothesisTesting(new SingleSampleTest(sstSampleSize));
 			}
 			else if(TESTING_TYPE.equalsIgnoreCase("sprt")){
 				mt.setHypothesisTesting(new SprtTest(safetyBound, error_alpha, error_beta, confidence_inteval));
@@ -140,23 +145,16 @@ public class LAR {
 				throw new UnsupportedTestingTypeException();
 			}
 			
-//			HypothesisTest sst = new SingleSampleTest(1);
-			HypothesisTest sst = new SprtTest(safetyBound, error_alpha, error_beta, confidence_inteval);
-			Counterexample ce = new Counterexample(bestDTMC.getPrismModel(), counterPaths, sst);
+			Counterexample ce = new Counterexample(bestDTMC.getPrismModel(), counterPaths, mt.getHypothesisTesting());
 			ce.analyze(te);
 			
 			System.out.println("------ Refine the predicate set ------");
 			
 			TimeProfile.refine_start_time = System.nanoTime();;
-			Refiner refiner = new Refiner(ce.getSortedSplittingPoints(), vvi, property, bestDTMC.getPrismModel());
-//			List<String> dataPaths = new ArrayList<>();
-//			dataPaths.add(Config.DATA_PATH);
-//			dataPaths.add(Config.TESTING_PATH);
-			
-//			Dataset ds = refiner.collectDataFromPaths(dataPaths, ps.getPredicates(), 
-//					ce.getSortedSplittingPoints(), bestDTMC.getPrismModel());
+			Refiner refiner = new Refiner(ce.getSortedSplittingPoints(), vvi, property, bestDTMC.getPrismModel(), terminate_sample,
+					selective_data_collection);
 			Predicate newPredicate = refiner.refine();
-			TimeProfile.refine_end_time = System.nanoTime();;
+			TimeProfile.refine_end_time = System.nanoTime();
 			TimeProfile.refine_times.add(TimeProfile.nanoToSeconds(TimeProfile.refine_end_time
 					-TimeProfile.refine_start_time));
 			
@@ -165,10 +163,11 @@ public class LAR {
 				TimeProfile.iteration_times.add(TimeProfile.nanoToSeconds
 						(TimeProfile.iteration_end_time-TimeProfile.iteration_start_time));
 				System.out.println("======= Fail to learn a new predicate, verification fails ======");
+				FileUtil.writeObject(Config.OUTPUT_MODEL_PATH + "/predicates", AlgoProfile.predicates);
 				TimeProfile.main_end_time = System.nanoTime();;
 				TimeProfile.main_time = TimeProfile.nanoToSeconds(TimeProfile.main_end_time-TimeProfile.main_start_time);
 				TimeProfile.outputTimeProfile();
-				TimeProfile.outputTimeProfile(GlobalConfigs.PROJECT_ROOT+"/time_profile.txt");
+				TimeProfile.outputTimeProfile(GlobalConfigs.OUTPUT_MODEL_PATH+"/time_profile.txt");
 				System.exit(0);
 			}
 			
@@ -269,7 +268,15 @@ public class LAR {
 	public void setLEARNING_TYPE(String lEARNING_TYPE) {
 		LEARNING_TYPE = lEARNING_TYPE;
 	}
+	
+	public double getAlergia_epsilon() {
+		return alergia_epsilon;
+	}
 
+
+	public void setAlergia_epsilon(double alergia_epsilon) {
+		this.alergia_epsilon = alergia_epsilon;
+	}
 
 	public int getLARModelSize() {
 		return LARModelSize;
@@ -386,5 +393,13 @@ public class LAR {
 
 	public void setSstSampleSize(int sstSampleSize) {
 		this.sstSampleSize = sstSampleSize;
+	}
+	
+	public void setTerminateSample(boolean b){
+		this.terminate_sample = b;
+	}
+	
+	public void setSelectiveDataCollection(boolean b){
+		this.selective_data_collection = b;
 	}
 }

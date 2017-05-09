@@ -37,7 +37,7 @@ public class ExtractPrismDataTest {
 		VariablesValueInfo vvl = epd.getVariablesValueInfo();
 		
 		AlgoProfile.vars = vvl.getVars();
-		AlgoProfile.varLength = vvl.getVarsLength();
+		AlgoProfile.varsLength = vvl.getVarsLength();
 		
 		List<Predicate> pres = new ArrayList<>();
 		pres.add(new CrowdPositive());
@@ -45,7 +45,6 @@ public class ExtractPrismDataTest {
 		int iteration = 0;
 		while(true){
 			iteration++;
-			AlgoProfile.runTimeLog.append("-------------------------------------" + "iteration: " + iteration + "-------------------------------------");
 			System.out.println("-------------------------------------" + "iteration: " + iteration + "-------------------------------------");
 			if(iteration==3){
 //				System.out.println("end test...");
