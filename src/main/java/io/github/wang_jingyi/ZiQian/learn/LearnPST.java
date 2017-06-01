@@ -1,21 +1,21 @@
 package io.github.wang_jingyi.ZiQian.learn;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
 import io.github.wang_jingyi.ZiQian.Input;
 import io.github.wang_jingyi.ZiQian.Predicate;
 import io.github.wang_jingyi.ZiQian.prism.PrismModel;
 import io.github.wang_jingyi.ZiQian.prism.PrismState;
 import io.github.wang_jingyi.ZiQian.utils.StringUtil;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-
 public class LearnPST implements LearningDTMC{
 
 	private PSTNode root = new PSTNode();
 	private int numOfStates;
 	private double epsilon = 0.001; // default threshold
-	private int maxMemorySize = 10;
+	private int maxMemorySize = 20;
 	private double selectionCriterion; // BIC score in this learning algorithm
 	private PrismModel PSA = new PrismModel(); // this will be used for generating .pm file later
 	
@@ -64,19 +64,8 @@ public class LearnPST implements LearningDTMC{
 
 
 	private int getLeafsSize(PSTNode root){ // find leafs of a tree iteratively
-		List<PSTNode> leafs = new ArrayList<PSTNode>();
-		LinkedList<PSTNode> stack = new LinkedList<PSTNode>();
-		stack.add(root);
-		while(!stack.isEmpty()){
-			PSTNode f = stack.remove();
-			if(f.isLeaf()==true){
-				leafs.add(f);
-			}
-			for(PSTEdge child : f.getPSTEdges()){
-				stack.add(child.getDestPSTNode());
-			}
-		}
-		return leafs.size();
+		
+		return findLeafInLengthOrder(root).size();
 	}
 
 	// translate a learned PST to PrismModel format, only do the translation after the golden search
@@ -85,41 +74,55 @@ public class LearnPST implements LearningDTMC{
 		assert data.getObservations().size()==1 : "=== not a single observation ===";
 		List<String> observation = data.getObservations().get(0);
 		
-		System.out.println("- Translating learned model to a PrismModel...");
+		System.out.println("- translating learned model to a PrismModel...");
 		List<PrismState> prismStates = new ArrayList<PrismState>(); // list of prism states
 		List<PrismState> initialStates = new ArrayList<PrismState>(); // list of initial states
 		
 		numOfStates = 1; //reset the number of state, since we may need to extend the tree
 
 		// extend original tree, leaf by leaf check until the desired property of PST holds
-		System.out.println("- Extend original tree to satisfy pst property");
-		LinkedList<PSTNode> stack = new LinkedList<PSTNode>();
-		stack.add(root);
-		while(!stack.isEmpty()){
-			PSTNode f = stack.remove();
-			if(f.isLeaf()==true){ // if f is leaf
-				List<String> leafLabel = f.getLabel();
+		// this step should start from deepest node and add missing sons if necessary
+		System.out.println("- extend original tree to satisfy pst property");
+		boolean pst_property_holds = false;
+		while(!pst_property_holds){
+			List<PSTNode> leafs_in_length_order = findLeafInLengthOrder(root);
+			int current_leaf_num = leafs_in_length_order.size();
+			boolean traverse_over = false;
+			for(int j=current_leaf_num-1; j>=0; j--){
+				PSTNode current_leaf = leafs_in_length_order.get(j);
+				List<String> leafLabel = current_leaf.getLabel();
 				List<String> leafLabelLongestPrefix = StringUtil.getLongestPrefix(leafLabel);
 				PSTNode deepestSuffix = findDeepestSuffix(leafLabelLongestPrefix);
 				if(!StringUtil.equals(leafLabelLongestPrefix, deepestSuffix.getLabel())){ // no leaf or internal node generate this leaf
 					deepestSuffix.setExtending(true); // extend from the deepest suffix node, set extending true
 					deepestSuffix.setLeaf(false); // set leaf false
-					PSTEdge tmpEdge = new PSTEdge(new PSTNode());
-					deepestSuffix.getPSTEdges().add(tmpEdge);
-					PSTNode newNode = tmpEdge.getDestPSTNode();
-					newNode.setLabel(leafLabelLongestPrefix);
-					newNode.setLeaf(true);
+					List<String> leafLabelLongestPrefixParent = leafLabelLongestPrefix.subList(1, leafLabelLongestPrefix.size());
+					for(String sigma : data.getAlphabet()){
+						PSTEdge tmpEdge = new PSTEdge(new PSTNode());
+						tmpEdge.setLabel(sigma);
+						deepestSuffix.getPSTEdges().add(tmpEdge);
+						PSTNode newNode = tmpEdge.getDestPSTNode();
+						List<String> tmpLabel = StringUtil.cloneList(leafLabelLongestPrefixParent);
+						tmpLabel.add(0,sigma);
+						newNode.setLabel(tmpLabel);
+						newNode.setLeaf(true);
+					}
+					break;
+				}
+				if(j==0){
+					traverse_over = true;
 				}
 			}
-			if(f.isExtending()==false){ 	// if a leaf is extended, no need to traverse its new added sons
-				for(PSTEdge child : f.getPSTEdges()){
-					stack.add(child.getDestPSTNode());
-				}
+			if(traverse_over){
+				pst_property_holds = true;
 			}
 		}
 		
+		
+		
 		// build transitions and PrismState
 		System.out.println("- Build transitions and PrismState");
+		LinkedList<PSTNode> stack = new LinkedList<PSTNode>();
 		stack.add(root);
 		while(!stack.isEmpty()){
 			PSTNode f = stack.remove();
@@ -138,13 +141,13 @@ public class LearnPST implements LearningDTMC{
 				
 				for(PSTEdge edge : f.getPSTEdges()){
 					PrismState ps = new PrismState(numOfStates, edge.getDestPSTNode().getLabel());
-					System.out.println("- Add PrismState (sons of extending node):: " + "state id: " + ps.getId() + ", state label: "+ ps.getLabel());
+					System.out.println("- add PrismState (sons of extending node):: " + "state id: " + ps.getId() + ", state label: "+ ps.getLabel());
 					ps.setTransitionProb(transP);
 					ps.setSigmas(sigmas);
 					numOfStates++;
 					prismStates.add(ps);
 				}
-				assert transSum==1 : "=== Out transition probability not equal to 1 ===";
+				assert transSum==1 : "=== out transition probability not equal to 1 ===";
 				
 			}
 			if(f.isLeaf()==true){ // original leaf node
@@ -160,12 +163,12 @@ public class LearnPST implements LearningDTMC{
 					}
 				}
 				PrismState ps = new PrismState(numOfStates, f.getLabel());
-				System.out.println("- Add PrismState (original leaf node):: " + "state id: " + ps.getId() + ", state label: "+ ps.getLabel());
+				System.out.println("- add PrismState (original leaf node):: " + "state id: " + ps.getId() + ", state label: "+ ps.getLabel());
 				ps.setTransitionProb(transP);
 				ps.setSigmas(sigmas);
 				numOfStates++;
 				prismStates.add(ps);
-				assert transSum>=0.9999999999999998 : "=== Out transition probability not equal to 1 ===";
+				assert transSum==0 || transSum>=0.9999999999999998 : "=== out transition probability not equal to 1 ===";
 				
 			}
 			if(f.isExtending()==false && f.isLeaf()==false){ 
@@ -183,6 +186,7 @@ public class LearnPST implements LearningDTMC{
 				for(PrismState innps : prismStates){
 					if(StringUtil.equals(nextPSLabel, innps.getLabel()) || StringUtil.isSuffix(innps.getLabel(), nextPSLabel)){
 						ps.getNextStates().add(innps);
+						break;
 					}
 				}
 			}
@@ -198,7 +202,7 @@ public class LearnPST implements LearningDTMC{
 
 	private void buildPST(Input data) {
 		List<String> observation = data.getObservations().get(0);
-		System.out.println("- Build probabilistic suffix tree");
+		System.out.println("- build probabilistic suffix tree");
 		List<List<String>> candidates = new ArrayList<List<String>>();
 		List<Double> candsProb = new ArrayList<Double>();// for each candidate, there is a corresponding occurrence probability 
 		for(String sigma : data.getAlphabet()){ // initialize inclusion candidates
@@ -296,7 +300,7 @@ public class LearnPST implements LearningDTMC{
 		while(deepestSuffix.getPSTEdges().size()!=0 && index>=0){
 			boolean found = false;
 			for(PSTEdge edge : deepestSuffix.getPSTEdges()){
-				if(edge.getLabel()==currentCand.get(index)){ // find the corresponding edge
+				if(edge.getLabel().equals(currentCand.get(index))){ // find the corresponding edge
 					deepestSuffix = edge.getDestPSTNode();
 					found = true;
 					break;
@@ -309,7 +313,6 @@ public class LearnPST implements LearningDTMC{
 				index--;
 			}
 		}
-//		assert deepestSuffix.isLeaf()==true : "deepest suffix found is not a leaf"; //? it fails when suffix is not a leaf but has a son that is not making a longer suffix
 		return deepestSuffix;
 	}
 
@@ -329,6 +332,22 @@ public class LearnPST implements LearningDTMC{
 			}
 		}
 		return currentNode;
+	}
+	
+	private List<PSTNode> findLeafInLengthOrder(PSTNode root){
+		List<PSTNode> leafs = new ArrayList<PSTNode>();
+		LinkedList<PSTNode> stack = new LinkedList<PSTNode>();
+		stack.add(root);
+		while(!stack.isEmpty()){
+			PSTNode f = stack.remove();
+			if(f.isLeaf()==true){
+				leafs.add(f);
+			}
+			for(PSTEdge child : f.getPSTEdges()){
+				stack.add(child.getDestPSTNode());
+			}
+		}
+		return leafs;
 	}
 
 	// add qualified string s and all its suffixes which are not in tree 
@@ -357,22 +376,22 @@ public class LearnPST implements LearningDTMC{
 
 	private void addMissingSons(PSTNode root, Input data) { // add missing sons of internal nodes recursively
 		List<String> observation = data.getObservations().get(0);
-		if(root.getPSTEdges().size()==0){
+		if(root.getPSTEdges().size()==0){ // tree has only a root node or is leaf node already
 			return;
 		}
-		if(root.getPSTEdges().size()!=data.getAlphabet().size()){
+		if(root.getPSTEdges().size()!=data.getAlphabet().size()){ // some transitions are not in the tree
 			for(int i=0; i<data.getAlphabet().size(); i++){
 				if(!isInEdges(data.getAlphabet().get(i),root.getPSTEdges())){
 					List<String> newLabel = StringUtil.cloneList(root.getLabel());
 					newLabel.add(0, data.getAlphabet().get(i));
-					double newLabelP = StringUtil.calOccProb(newLabel, observation);
-					if(newLabelP>0){ // only add this son when it has probability larger than 0
+//					double newLabelP = StringUtil.calOccProb(newLabel, observation);
+//					if(newLabelP>0){ // this son has probability larger than 0
 						double transP = StringUtil.calNextSymbolTransProb(root.getLabel(), data.getAlphabet().get(i), observation);
 						PSTEdge tmpEdge = new PSTEdge(data.getAlphabet().get(i), new PSTNode(), transP);
 						root.getPSTEdges().add(tmpEdge);
 						tmpEdge.getDestPSTNode().setLabel(newLabel);
 						tmpEdge.getDestPSTNode().setLeaf(true); // newly added sons must be leafs
-					}
+//					}
 				};
 			}
 		}

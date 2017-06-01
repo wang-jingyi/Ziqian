@@ -8,7 +8,7 @@ import io.github.wang_jingyi.ZiQian.utils.FileUtil;
 public class SwatConfig {
 	
 	public static String SWAT_EVALUATION_ROOT = PlatformDependent.SWAT_EVALUATION_PATH;
-	public static String BATCH = "data_batch_1";
+	public static String BATCH = "data_batch_2";
 	public static String SENSOR = "LIT401";
 	public static double SENSOR_THRES = 1000; 
 	public static String MODEL_PATH = SWAT_EVALUATION_ROOT + "/" + BATCH;

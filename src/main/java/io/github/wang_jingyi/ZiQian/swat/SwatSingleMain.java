@@ -39,10 +39,6 @@ public class SwatSingleMain {
 		
 		PredicateAbstraction pa = new PredicateAbstraction(pres);
 		Input data = pa.abstractInput(vvi.getVarsValues());
-//		DataSuffix ds = new DataSuffix(data, 1);
-//		SuffixEvolution se = new SuffixEvolution();
-//		se.singleObsEvolution(data, pres, ds);
-//		PSTGoldenSearch pstl = new PSTGoldenSearch(0.0001, 0.001);
 		LearningDTMC learner = new LearnPST(0.0001);
 		learner.learn(data);
 		learner.PrismModelTranslation(data, pres, "swat");

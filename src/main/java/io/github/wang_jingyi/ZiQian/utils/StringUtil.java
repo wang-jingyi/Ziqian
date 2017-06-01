@@ -92,7 +92,10 @@ public class StringUtil {
 		}
 		else{
 			currentOcc = countSubEvents(copiedCand, events);
-			assert currentOcc > 0 : "No such sub-event in the observation";
+//			assert currentOcc > 0 : "No such sub-event in the observation";
+			if(currentOcc==0){
+				return 0;
+			}
 			// if the end of the event contains current candidate, then we should subtract its occurrence by 1
 			int csize = copiedCand.size();
 			int j = 0;
