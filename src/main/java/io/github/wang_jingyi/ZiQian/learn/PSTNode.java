@@ -12,6 +12,15 @@ public class PSTNode {
 	private boolean extending = false;
 	
 	
+	public PSTNode nextNode(String sigma){
+		for(PSTEdge edge : edges){
+			if(edge.getLabel().equals(sigma)){
+				return edge.getDestPSTNode();
+			}
+		}
+		return null;
+	}
+	
 	public boolean isExtending() {
 		return extending;
 	}
@@ -47,18 +56,12 @@ public class PSTNode {
 		this.label = new ArrayList<String>();
 	}
 	
-	public String toString(){
-		StringBuilder sb = new StringBuilder();
-		if(label==null){
-			sb.append("[ Node>> label: unkown" + "; ");
-		}
-		else{
-			sb.append("[ Node>> label: " + label.toString() + "; ");
-		}
-		sb.append(" >>]");
-		return sb.toString();
-	}
 	
+	@Override
+	public String toString() {
+		return "PSTNode [label=" + label + ", edges=" + edges + ", isLeaf=" + isLeaf + ", extending=" + extending + "]";
+	}
+
 	public boolean equal(PSTNode compared){
 		return StringUtil.equals(this.getLabel(), compared.getLabel());
 	}

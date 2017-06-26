@@ -52,8 +52,6 @@ public class PSTEdge {
 			sb.append("[ edge: label: " + label.toString() + "; transiton probability: " + transProb + 
 					"; destination node:" + destPSTNode.toString() + " ]");
 		}
-		
-		
 		return sb.toString();
 	}
 }

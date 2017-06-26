@@ -1,11 +1,21 @@
 package io.github.wang_jingyi.ZiQian;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import org.junit.Test;
 
 public class JavaTest {
+	
+	@Test 
+	public void testListMap(){
+		HashSet<List<String>> mp = new HashSet<>();
+		List<String> a = new ArrayList<>();
+		a.add("d");
+		mp.add(a);
+		System.out.println("test a:" + mp.contains(a));
+	}
 	
 	@Test
 	public void testListEquals(){

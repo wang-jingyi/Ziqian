@@ -80,6 +80,49 @@ public class StringUtil {
 		}
 		return count;
 	}
+	
+	
+	public static List<Double> calGeneratingTransProb(List<String> currentCand, List<String> sigmas, List<String> events){
+		
+		int currentOcc = 0;
+		if(currentCand.size()==0){ // if it's empty string
+			currentOcc = events.size();
+		}
+		else{
+			currentOcc = countSubEvents(currentCand, events);
+//			assert currentOcc > 0 : "No such sub-event in the observation";
+			if(currentOcc==0){
+				return null;
+			}
+			
+			// if the end of the event contains current candidate, then we should subtract its occurrence by 1
+			int csize = currentCand.size();
+			int j = 0;
+			boolean isEnd = true;
+			for(int i=events.size()-csize; i<events.size(); i++){ // check if it is in the end
+				if(!events.get(i).equals(currentCand.get(j))){
+					isEnd = false;
+					break;
+				}
+				j++;
+			}
+			if(isEnd==true){
+				currentOcc--;
+			}
+		}
+		
+		List<Double> dist = new ArrayList<>();
+		// count string-sigma occurrence
+		for(int i=0; i<sigmas.size(); i++){
+			String sigma = sigmas.get(i);
+			List<String> copiedCand = cloneList(currentCand);
+			copiedCand.add(sigma);
+			int occ = countSubEvents(copiedCand, events);
+			dist.add((double)occ/currentOcc);
+		}
+		return dist;
+	}
+	
 
 	// given string s, and sigma, calculate the transition probability from s to s-sigma
 	// special case: s is right at the end of the event

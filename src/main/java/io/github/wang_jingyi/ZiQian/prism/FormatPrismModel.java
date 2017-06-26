@@ -81,7 +81,7 @@ public class FormatPrismModel implements ModelTranslation{
 	private String labelToFile(PrismModel pm){
 		StringBuilder sb = new StringBuilder();
 		for(int i=0; i<pm.getNumOfPrismStates(); i++){
-			sb.append("state id: " + pm.getPrismStates().get(i).getId() + ", label: " + pm.getPrismStates().get(i).getCurrentState() + "\n");
+			sb.append("state id: " + pm.getPrismStates().get(i).getId() + ", label: " + pm.getPrismStates().get(i).getLabel() + "\n");
 		}
 		return sb.toString();
 	}

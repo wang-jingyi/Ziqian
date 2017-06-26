@@ -202,6 +202,8 @@ public class PrismPathData {
 		return executions;
 	}
 	
+	// first line is variables
+	// data starts from second line
 	public static List<String> extractPathVars(String dirPath, String delimter) throws IOException{
 		List<String> vars = new ArrayList<>();
 		for(String s : FileUtil.filesInDir(dirPath)){

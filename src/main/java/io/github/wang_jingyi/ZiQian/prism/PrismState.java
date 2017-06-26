@@ -27,13 +27,10 @@ public class PrismState {
 		return label.get(labelLength-1);
 	}
 
-	public String toString(){
-		StringBuilder sb = new StringBuilder();
-		sb.append("[State " + id + " : \n");
-		sb.append("state label: " + label + "\n");
-		sb.append(".]");
-
-		return sb.toString();
+	@Override
+	public String toString() {
+		return "PrismState [id=" + id + ", label=" + label + ", nextStates=" + nextStates + ", transitionProb="
+				+ transitionProb + ", tranProbInString=" + tranProbInString + ", sigmas=" + sigmas + "]";
 	}
 
 	public List<String> getLabel() {

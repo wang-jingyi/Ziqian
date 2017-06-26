@@ -13,8 +13,8 @@ public class SwatConfig {
 	public static double SENSOR_THRES = 1000; 
 	public static String MODEL_PATH = SWAT_EVALUATION_ROOT + "/" + BATCH;
 	public static String DATA_PATH = MODEL_PATH + "/normal_traces";
-	public static int DATA_SIZE = 5000;
-	public static int STEP_SIZE = 5;
+	public static int DATA_SIZE = 50000;
+	public static int STEP_SIZE = 50;
 	public static String PROPERTY_LEARN_FILE = MODEL_PATH + "/swat.pctl";
 	public static int PROPERTY_INDEX = 1;
 	public static int BOUNDED_STEP = -1;
