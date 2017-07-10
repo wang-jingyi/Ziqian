@@ -51,5 +51,10 @@ public class SwatSampler implements Sampler{
 	public boolean isObtainingNewSample() {
 		return false;
 	}
+
+	@Override
+	public boolean isDecomposed() {
+		return false;
+	}
 	
 }

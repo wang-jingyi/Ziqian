@@ -4,6 +4,7 @@ import io.github.wang_jingyi.ZiQian.PredicateAbstraction;
 import io.github.wang_jingyi.ZiQian.VariablesValue;
 import io.github.wang_jingyi.ZiQian.prism.PrismPathData;
 import io.github.wang_jingyi.ZiQian.profile.AlgoProfile;
+import io.github.wang_jingyi.ZiQian.utils.FileUtil;
 
 import java.io.IOException;
 import java.util.List;
@@ -35,7 +36,18 @@ public class SprtTest implements HypothesisTest{
 		double aid = Math.pow(p1, bi) * Math.pow((1-p1), sampleSize-bi) / Math.pow(p0, bi) / Math.pow((1-p0), sampleSize-bi);
 		boolean force_break = false;
 		while(!acceptH0(aid) && !acceptH1(aid) && !force_break){
-			if(te.getSampler().isObtainingNewSample()){ // testing from new samples
+			
+			if(te.getSampler().isDecomposed()==true){
+				@SuppressWarnings("unchecked")
+				List<String> concrete_trace = (List<String>) FileUtil.readObject(te.getSampler().getLatestSample());
+				int counter = 0;
+				if(te.test(concrete_trace, ce)){
+					System.out.println("- Sample " +  counter + " is a counterexample path");
+					bi++;
+				}
+			}
+			
+			else if(te.getSampler().isObtainingNewSample()){ // testing from new samples
 				te.getSampler().sample();
 				sampleSize++;
 				System.out.println("- New sample: " + sampleSize);

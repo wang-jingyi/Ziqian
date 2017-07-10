@@ -16,14 +16,16 @@ public class CounterexamplePath{
 		}
 	}
 	
+	
+	
 	@Override
-	public String toString(){
-		StringBuilder sb = new StringBuilder();
-		sb.append(counterPath.toString());
-		return sb.toString();
+	public String toString() {
+		return "CounterexamplePath [counterPath=" + counterPath + ", testedTransitionCount=" + testedTransitionCount
+				+ ", concretePathCount=" + concretePathCount + "]";
 	}
-	
-	
+
+
+
 	public List<Integer> getCounterPath() {
 		return counterPath;
 	}

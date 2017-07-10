@@ -54,5 +54,10 @@ public class PrismSampler implements Sampler{
 		this.simulationLength = simulationLength;
 	}
 
+	@Override
+	public boolean isDecomposed() {
+		return false;
+	}
+
 	
 }

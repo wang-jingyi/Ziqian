@@ -28,6 +28,7 @@ public class SingleSampleTest implements HypothesisTest{
 	@Override
 	public boolean testHypothesis(double p, TestEnvironment te, Counterexample ce) throws IOException, ClassNotFoundException {
 		int cpCounter = 0;
+		
 		if(te.getSampler().isObtainingNewSample()){ // testing from new samples
 			for(int i=0; i<sampleSize; i++){
 				System.out.println("- Sample: " + (i+1));

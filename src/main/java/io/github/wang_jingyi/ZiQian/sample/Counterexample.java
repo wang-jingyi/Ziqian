@@ -243,5 +243,9 @@ public class Counterexample implements SplitPointFinder{
 		}
 		return transProb;
 	}
+	
+	public int getLongestCounterPath() {
+		return longestCounterPath;
+	}
 
 }
