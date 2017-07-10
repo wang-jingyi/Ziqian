@@ -1,4 +1,4 @@
-package io.github.wang_jingyi.ZiQian.swat;
+package io.github.wang_jingyi.ZiQian.sample;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -7,24 +7,29 @@ import java.util.List;
 
 import io.github.wang_jingyi.ZiQian.prism.PrismModel;
 import io.github.wang_jingyi.ZiQian.prism.PrismState;
-import io.github.wang_jingyi.ZiQian.sample.Counterexample;
-import io.github.wang_jingyi.ZiQian.sample.Sampler;
 import io.github.wang_jingyi.ZiQian.utils.FileUtil;
 import io.github.wang_jingyi.ZiQian.utils.StringUtil;
 
+
+/*
+ * extract multiple paths from training data
+ * the extracted path will be stored as an object
+ * 
+ * */
 public class SingleTraceSampler implements Sampler{
 
-	int trace_count = 0;
-	String decomposed_trace_path;
-	String lastest_sample_path;
-	List<String> testing_data;
-	PrismModel learned_model;
-	Counterexample ce;
+	int trace_count = 0; // number of extracted paths
+	String decomposed_trace_path; // the path to store the extracted paths
+	String latest_sample_path; // the path of latest extracted path
+	List<String> testing_data; // abstract testing data
+	PrismModel learned_model; // learned model
+	Counterexample ce; // counterexample
 	List<String> previous_observation; // abstract previous observation
-	int start_index = 0;
+	int start_index = 0; // start index of the new path
 	
 	public SingleTraceSampler(String decomposed_data_path, List<String> testing_data, 
 			PrismModel learned_model, Counterexample ce, List<String> previous_observation) {
+		FileUtil.cleanDirectory(decomposed_trace_path);
 		this.decomposed_trace_path = decomposed_data_path;
 		this.testing_data = testing_data;
 		this.learned_model = learned_model;
@@ -44,7 +49,7 @@ public class SingleTraceSampler implements Sampler{
 
 	@Override
 	public String getLatestSample() {
-		return lastest_sample_path;
+		return latest_sample_path;
 	}
 
 	@Override
@@ -96,7 +101,7 @@ public class SingleTraceSampler implements Sampler{
 				
 				try {
 					FileUtil.writeObject(decomposed_trace_path+"/trace_"+trace_count, actual_path);
-					lastest_sample_path = decomposed_trace_path + "trace_"+trace_count;
+					latest_sample_path = decomposed_trace_path + "trace_"+trace_count;
 					trace_count ++;
 				} catch (FileNotFoundException e) {
 					// TODO Auto-generated catch block
