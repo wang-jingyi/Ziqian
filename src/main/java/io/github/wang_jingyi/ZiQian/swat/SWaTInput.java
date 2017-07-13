@@ -17,6 +17,11 @@ public class SWaTInput {
 	String testing_log;
 	List<Predicate> predicates;
 	int previous_count = 100;
+	VariablesValueInfo training_vvi;
+	VariablesValueInfo testing_vvi;
+	List<String> varsSet;
+	Input training_input;
+	List<String> testing_input;
 	List<String> previous_observation;
 	
 	public SWaTInput(String training_log, String testing_log, List<Predicate> predicates, int previous_count) {
@@ -27,27 +32,42 @@ public class SWaTInput {
 		this.previous_observation = new ArrayList<>();
 	}
 	
-	public Input getAbstractInput() throws IOException{
-		List<String> varsSet 
-		= PrismPathData.extractPathVars(training_log, SwatConfig.DELIMITER);
-		ExtractPrismData epd = new ExtractPrismData(training_log, SwatConfig.DATA_SIZE, SwatConfig.STEP_SIZE, SwatConfig.DELIMITER);
-		VariablesValueInfo vvi = epd.getVariablesValueInfo(varsSet);
+	
+	public void execute(){
+		try {
+			varsSet = PrismPathData.extractPathVars(training_log, SwatConfig.DELIMITER);
+			ExtractPrismData epd = new ExtractPrismData(training_log, SwatConfig.DATA_SIZE, SwatConfig.STEP_SIZE, SwatConfig.DELIMITER);
+			training_vvi = epd.getVariablesValueInfo(varsSet);
+			PredicateAbstraction pa = new PredicateAbstraction(predicates);
+			training_input = pa.abstractInput(training_vvi.getVarsValues());
+			
+			
+			ExtractPrismData epd1 = new ExtractPrismData(testing_log, SwatConfig.DATA_SIZE, SwatConfig.STEP_SIZE, SwatConfig.DELIMITER);
+			testing_vvi = epd1.getVariablesValueInfo(varsSet);
+			Input testing_data = pa.abstractInput(testing_vvi.getVarsValues());
+			testing_input = testing_data.getObservations().get(0);
+			previous_observation = testing_data.getObservations().get(0).subList(0, previous_count);
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		
-		PredicateAbstraction pa = new PredicateAbstraction(predicates);
-		Input data = pa.abstractInput(vvi.getVarsValues());
-		return data;
 	}
 	
-	public List<String> getAbstractTestingLog() throws IOException{
-		List<String> varsSet 
-		= PrismPathData.extractPathVars(testing_log, SwatConfig.DELIMITER);
-		ExtractPrismData epd = new ExtractPrismData(training_log, SwatConfig.DATA_SIZE, SwatConfig.STEP_SIZE, SwatConfig.DELIMITER);
-		VariablesValueInfo vvi = epd.getVariablesValueInfo(varsSet);
-		
-		PredicateAbstraction pa = new PredicateAbstraction(predicates);
-		Input data = pa.abstractInput(vvi.getVarsValues());
-		previous_observation = data.getObservations().get(0).subList(0, previous_count);
-		return data.getObservations().get(0);
+	public VariablesValueInfo getTraining_vvi() {
+		return training_vvi;
+	}
+
+	public VariablesValueInfo getTesting_vvi() {
+		return testing_vvi;
+	}
+
+	public Input getAbstractTrainingInput() throws IOException{
+		return training_input;
+	}
+	
+	public List<String> getAbstractTestingInput() throws IOException{
+		return testing_input;
 	}
 	
 	public List<String> getPreviousObservation(){

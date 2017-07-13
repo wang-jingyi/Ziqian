@@ -65,10 +65,11 @@ public class CounterexampleGenerator {
 		int k = 1;
 		if(boundedStep==-1){ // unbounded property
 			double lastAccProb = 0;
+			int start_vertex = prismModel.getInitialStates().get(0).getId(); // initial state as start vertex
 			Map<CounterexamplePath, Double> cpProbs = new HashMap<CounterexamplePath, Double>();
 			while(true){ // iteratively find minimum k paths which forms a counterexample
 				k = (int) Math.pow(2, step); // initial number of paths 
-				KShortestPaths<Integer, DefaultWeightedEdge> ksps = new KShortestPaths<Integer, DefaultWeightedEdge>(graph, 1, k);
+				KShortestPaths<Integer, DefaultWeightedEdge> ksps = new KShortestPaths<Integer, DefaultWeightedEdge>(graph,start_vertex,k);
 				gcps = ksps.getPaths(endingVertex);
 
 				double accProb = 0;
@@ -222,6 +223,7 @@ public class CounterexampleGenerator {
 	}
 
 	private DefaultDirectedWeightedGraph<Integer, DefaultWeightedEdge> PRISMModelToGraph(){
+		
 		DefaultDirectedWeightedGraph<Integer, DefaultWeightedEdge> graph = 
 				new DefaultDirectedWeightedGraph<Integer, DefaultWeightedEdge>
 		(DefaultWeightedEdge.class);

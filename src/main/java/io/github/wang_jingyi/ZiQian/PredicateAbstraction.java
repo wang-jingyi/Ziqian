@@ -23,9 +23,11 @@ public class PredicateAbstraction implements Abstraction{
 	
 	public Input abstractInput(List<List<VariablesValue>> vvll){
 		List<List<String>> obss = new ArrayList<>();
+		int total_size = 0;
 		for(List<VariablesValue> vvl : vvll){
 			List<String> abs_l = abstractList(vvl);
 			obss.add(abs_l);
+			total_size += abs_l.size();
 		}
 		
 		List<String> alpha = new ArrayList<>();
@@ -39,8 +41,11 @@ public class PredicateAbstraction implements Abstraction{
 		System.out.println("------Data information------");
 		System.out.println("- alphabet: " + alpha);
 		System.out.println("- alphabet size: " + alpha.size());
+		System.out.println("- trace size: " + obss.size());
+		System.out.println("- traces total size: " + total_size);
 		return new Input(alpha, obss);
 	}
+	
 
 	@Override
 	public List<String> abstractList(List<VariablesValue> vvl) {

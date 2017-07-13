@@ -157,7 +157,8 @@ public class FormatPrismModel implements ModelTranslation{
 
 		// module
 		sb.append("module " + fileName + "\n");
-		sb.append("s:[1.." + pm.getNumOfPrismStates() + "] init 1" + "; \n"); //
+		
+		sb.append("s:[1.." + pm.getNumOfPrismStates() + "] init " + pm.getInitialStates().get(0).getId() + "; \n"); //
 
 		// state transitions
 		for(int i=0; i<pm.getNumOfPrismStates(); i++){

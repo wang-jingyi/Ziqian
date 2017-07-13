@@ -38,6 +38,7 @@ public class SprtTest implements HypothesisTest{
 		while(!acceptH0(aid) && !acceptH1(aid) && !force_break){
 			
 			if(te.getSampler().isDecomposed()==true){
+				te.getSampler().sample();
 				@SuppressWarnings("unchecked")
 				List<String> concrete_trace = (List<String>) FileUtil.readObject(te.getSampler().getLatestSample());
 				int counter = 0;

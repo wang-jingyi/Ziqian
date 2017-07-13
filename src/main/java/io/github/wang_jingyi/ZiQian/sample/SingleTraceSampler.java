@@ -29,8 +29,8 @@ public class SingleTraceSampler implements Sampler{
 	
 	public SingleTraceSampler(String decomposed_data_path, List<String> testing_data, 
 			PrismModel learned_model, Counterexample ce, List<String> previous_observation) {
-		FileUtil.cleanDirectory(decomposed_trace_path);
 		this.decomposed_trace_path = decomposed_data_path;
+		FileUtil.cleanDirectory(decomposed_trace_path);
 		this.testing_data = testing_data;
 		this.learned_model = learned_model;
 		this.ce = ce;
@@ -101,8 +101,9 @@ public class SingleTraceSampler implements Sampler{
 				
 				try {
 					FileUtil.writeObject(decomposed_trace_path+"/trace_"+trace_count, actual_path);
-					latest_sample_path = decomposed_trace_path + "trace_"+trace_count;
+					latest_sample_path = decomposed_trace_path + "/trace_"+trace_count;
 					trace_count ++;
+					break;
 				} catch (FileNotFoundException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

@@ -33,30 +33,6 @@ public class LearnPST implements LearningDTMC{
 		this.maxMemorySize = mms;
 	}
 
-	public PSTNode getRoot() {
-		return root;
-	}
-
-	public int getNumOfStates() {
-		return numOfStates;
-	}
-
-	public double getEpsilon() {
-		return epsilon;
-	}
-
-	public void setEpsilon(double epsilon) {
-		this.epsilon = epsilon;
-	}
-
-	public double getSelectionCriterion() {
-		return selectionCriterion;
-	}
-
-	public void setSelectionCriterion(double selectionCriterion) {
-		this.selectionCriterion = selectionCriterion;
-	}
-
 	public void learn(Input data) {
 		buildPST(data);
 		numOfStates = getLeafsSize(root);
@@ -88,6 +64,7 @@ public class LearnPST implements LearningDTMC{
 		HashSet<PSTNode> testedLeaf = new HashSet<>();
 		while(!pst_property_holds){
 			List<PSTNode> leafs_in_length_order = findLeafInLengthOrder(root);
+			assert leafs_in_length_order.size()>0 : "=== no valid model learned ===";
 			int current_leaf_num = leafs_in_length_order.size();
 			boolean traverse_over = false;
 			for(int j=current_leaf_num-1; j>=0; j--){
@@ -186,8 +163,10 @@ public class LearnPST implements LearningDTMC{
 	}
 
 	private void buildPST(Input data) {
+
 		List<String> observation = data.getObservations().get(0);
 		System.out.println("- build probabilistic suffix tree");
+		
 		List<List<String>> candidates = new ArrayList<List<String>>();
 		List<Double> candsProb = new ArrayList<Double>();// for each candidate, there is a corresponding occurrence probability 
 		for(String sigma : data.getAlphabet()){ // initialize inclusion candidates
@@ -422,5 +401,29 @@ public class LearnPST implements LearningDTMC{
 
 	public PrismModel getPrismModel() {
 		return PSA;
+	}
+	
+	public PSTNode getRoot() {
+		return root;
+	}
+
+	public int getNumOfStates() {
+		return numOfStates;
+	}
+
+	public double getEpsilon() {
+		return epsilon;
+	}
+
+	public void setEpsilon(double epsilon) {
+		this.epsilon = epsilon;
+	}
+
+	public double getSelectionCriterion() {
+		return selectionCriterion;
+	}
+
+	public void setSelectionCriterion(double selectionCriterion) {
+		this.selectionCriterion = selectionCriterion;
 	}
 }

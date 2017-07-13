@@ -8,6 +8,7 @@ import io.github.wang_jingyi.ZiQian.prism.PrismModel;
 import io.github.wang_jingyi.ZiQian.profile.AlgoProfile;
 import io.github.wang_jingyi.ZiQian.run.GlobalConfigs;
 import io.github.wang_jingyi.ZiQian.sample.SplittingPoint;
+import io.github.wang_jingyi.ZiQian.swat.SwatConfig;
 import io.github.wang_jingyi.ZiQian.utils.FileUtil;
 import io.github.wang_jingyi.ZiQian.utils.NumberUtil;
 
@@ -79,7 +80,7 @@ public class Refiner{
 
 		if(oneLabel==true){
 			return	null;
-			//					unsupervisedClassify(ds);
+			//unsupervisedClassify(ds);
 		}
 		else{
 			return supervisedClassify(ds);
@@ -225,7 +226,7 @@ public class Refiner{
 		svm_log.append(allVars.toString() + "\n");
 		svm_log.append("- Weights of the classifier: \n");
 		svm_log.append(NumberUtil.ArrayToString(svm.getWeights()));
-		FileUtil.writeStringToFile(GlobalConfigs.OUTPUT_MODEL_PATH+"/swat" + (AlgoProfile.iterationCount+1)+"_classifier.txt", svm_log.toString());
+		FileUtil.writeStringToFile(SwatConfig.OUTPUT_MODEL_PATH+"/swat" + (AlgoProfile.iterationCount+1)+"_classifier.txt", svm_log.toString());
 
 
 //		double[] weights = svm.getWeights();
