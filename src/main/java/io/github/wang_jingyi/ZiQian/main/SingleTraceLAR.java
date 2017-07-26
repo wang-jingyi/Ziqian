@@ -55,6 +55,7 @@ public class SingleTraceLAR {
 	private int data_size;
 	private boolean terminate_sample;
 	private boolean selective_data_collection;
+	private double epsilon = 0.0000001;
 
 
 	public void execute() throws FileNotFoundException, ClassNotFoundException, IOException, UnsupportedTestingTypeException{
@@ -74,7 +75,7 @@ public class SingleTraceLAR {
 			String modelName = MODEL_NAME + "_" + iteration;
 
 			// learning
-			LearningDTMC learner = new LearnPST(0.0000001);
+			LearningDTMC learner = new LearnPST(epsilon);
 			learner.learn(input.getAbstractTrainingInput());
 			learner.PrismModelTranslation(input.getAbstractTrainingInput(), predicate_set, modelName);
 			identifyInitialStates(learner.getPrismModel(), input.getPreviousObservation());
@@ -176,7 +177,10 @@ public class SingleTraceLAR {
 	public String getOUTPUT_MODEL_PATH() {
 		return OUTPUT_MODEL_PATH;
 	}
-
+	
+	public void setEpsilon(double epsilon) {
+		this.epsilon = epsilon;
+	}
 
 	public void setProperty(List<Predicate> property) {
 		this.property = property;
