@@ -1,8 +1,8 @@
 package io.github.wang_jingyi.ZiQian.active;
 
-import io.github.wang_jingyi.ZiQian.run.Config;
-import io.github.wang_jingyi.ZiQian.sample.Sampler;
-import io.github.wang_jingyi.ZiQian.swat.SwatSampler;
+import io.github.wang_jingyi.ZiQian.main.Config;
+import io.github.wang_jingyi.ZiQian.refine.Sampler;
+import io.github.wang_jingyi.ZiQian.refine.SwatSampler;
 import io.github.wang_jingyi.ZiQian.utils.FileUtil;
 
 import java.io.FileNotFoundException;

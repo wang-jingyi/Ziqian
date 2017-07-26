@@ -1,0 +1,78 @@
+package io.github.wang_jingyi.ZiQian.data;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import io.github.wang_jingyi.ZiQian.Input;
+import io.github.wang_jingyi.ZiQian.Predicate;
+import io.github.wang_jingyi.ZiQian.PredicateAbstraction;
+import io.github.wang_jingyi.ZiQian.main.SwatConfig;
+
+public class SWaTInput {
+	
+	String training_log;
+	String testing_log;
+	List<Predicate> predicates;
+	int previous_count = 100;
+	VariablesValueInfo training_vvi;
+	VariablesValueInfo testing_vvi;
+	List<String> varsSet;
+	Input training_input;
+	List<String> testing_input;
+	List<String> previous_observation;
+	
+	public SWaTInput(String training_log, String testing_log, List<Predicate> predicates, int previous_count) {
+		this.training_log = training_log;
+		this.testing_log = testing_log;
+		this.predicates = predicates;
+		this.previous_count = previous_count;
+		this.previous_observation = new ArrayList<>();
+	}
+	
+	
+	public void execute(){
+		try {
+			varsSet = PrismPathData.extractPathVars(training_log, SwatConfig.DELIMITER);
+			ExtractPrismData epd = new ExtractPrismData(training_log, SwatConfig.DATA_SIZE, SwatConfig.STEP_SIZE, SwatConfig.DELIMITER);
+			training_vvi = epd.getVariablesValueInfo(varsSet);
+			PredicateAbstraction pa = new PredicateAbstraction(predicates);
+			training_input = pa.abstractInput(training_vvi.getVarsValues());
+			
+			
+			ExtractPrismData epd1 = new ExtractPrismData(testing_log, SwatConfig.DATA_SIZE, SwatConfig.STEP_SIZE, SwatConfig.DELIMITER);
+			testing_vvi = epd1.getVariablesValueInfo(varsSet);
+			Input testing_data = pa.abstractInput(testing_vvi.getVarsValues());
+			testing_input = testing_data.getObservations().get(0);
+			previous_observation = testing_data.getObservations().get(0).subList(0, previous_count);
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
+	public VariablesValueInfo getTraining_vvi() {
+		return training_vvi;
+	}
+
+	public VariablesValueInfo getTesting_vvi() {
+		return testing_vvi;
+	}
+
+	public Input getAbstractTrainingInput() throws IOException{
+		return training_input;
+	}
+	
+	public List<String> getAbstractTestingInput() throws IOException{
+		return testing_input;
+	}
+	
+	public List<String> getPreviousObservation(){
+		return previous_observation;
+	}
+	
+	public List<Predicate> getPredicates(){
+		return predicates;
+	}
+}

@@ -19,8 +19,6 @@ public class AAlergia extends GoldenSectionSearch implements ModelSelection {
 	@Override
 	public LearningDTMC selectCriterion(Input data) throws FileNotFoundException, ClassNotFoundException, IOException {
 		
-//		System.out.println("Selecting the best parameter for learning...");
-
 		double left = calNewLeft(leftBound, rightBound);
 		double right = calNewRight(leftBound, rightBound);
 		double leftScore = Double.MAX_VALUE;
@@ -36,21 +34,13 @@ public class AAlergia extends GoldenSectionSearch implements ModelSelection {
 		
 		while(LRdistance > 0.001){ // distance percentage is less than 1 percent
 			
-//			System.out.println("---Iteration : " + iteration);
-			
-//			System.out.println("--Left parameter : ");
-//			System.out.println("Parameter alpha for learning: " + left);
 			leftLA.setAlpha(left);
 			leftLA.learn(data);
 			leftScore = leftLA.getSelectionCriterion();
-//			System.out.println("bic score: " + leftScore);
 			
-//			System.out.println("--Right parameter : ");
-//			System.out.println("Parameter alpha for learning: " + right);
 			rightLA.setAlpha(right);
 			rightLA.learn(data);
 			rightScore = rightLA.getSelectionCriterion();
-//			System.out.println("bic score: " + rightScore);
 
 			if(leftScore<rightScore){
 				leftBound = left;
@@ -66,7 +56,6 @@ public class AAlergia extends GoldenSectionSearch implements ModelSelection {
 			left = calNewLeft(leftBound, rightBound);
 			right = calNewRight(leftBound, rightBound);
 			LRdistance = Math.abs(leftScore-rightScore)/Math.max(leftScore, rightScore); // difference in percentage
-//			iteration++;
 		}
 		
 		if(leftWins){

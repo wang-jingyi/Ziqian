@@ -3,8 +3,8 @@ package io.github.wang_jingyi.ZiQian.active;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.github.wang_jingyi.ZiQian.run.Config;
-import io.github.wang_jingyi.ZiQian.run.PlatformDependent;
+import io.github.wang_jingyi.ZiQian.main.Config;
+import io.github.wang_jingyi.ZiQian.main.PlatformDependent;
 import io.github.wang_jingyi.ZiQian.utils.ExternalCaller;
 import io.github.wang_jingyi.ZiQian.utils.ListUtil;
 import io.github.wang_jingyi.ZiQian.utils.NumberUtil;

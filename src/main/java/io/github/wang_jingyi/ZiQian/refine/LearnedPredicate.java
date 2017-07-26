@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import io.github.wang_jingyi.ZiQian.Predicate;
-import io.github.wang_jingyi.ZiQian.VariablesValue;
+import io.github.wang_jingyi.ZiQian.data.VariablesValue;
 import net.sf.javaml.classification.Classifier;
 import net.sf.javaml.core.DenseInstance;
 import net.sf.javaml.core.Instance;

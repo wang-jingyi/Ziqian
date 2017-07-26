@@ -3,6 +3,8 @@ package io.github.wang_jingyi.ZiQian;
 import java.io.Serializable;
 import java.util.List;
 
+import io.github.wang_jingyi.ZiQian.data.VariablesValue;
+
 public class TruePredicate implements Predicate, Serializable{
 	
 

@@ -2,12 +2,12 @@ package io.github.wang_jingyi.ZiQian;
 
 
 import io.github.wang_jingyi.ZiQian.exceptions.PrismNoResultException;
-import io.github.wang_jingyi.ZiQian.profile.AlgoProfile;
-import io.github.wang_jingyi.ZiQian.profile.TimeProfile;
-import io.github.wang_jingyi.ZiQian.run.Config;
-import io.github.wang_jingyi.ZiQian.run.GlobalConfigs;
-import io.github.wang_jingyi.ZiQian.run.PlatformDependent;
-import io.github.wang_jingyi.ZiQian.sample.ShellInteraction;
+import io.github.wang_jingyi.ZiQian.main.AlgoProfile;
+import io.github.wang_jingyi.ZiQian.main.Config;
+import io.github.wang_jingyi.ZiQian.main.GlobalConfigs;
+import io.github.wang_jingyi.ZiQian.main.PlatformDependent;
+import io.github.wang_jingyi.ZiQian.main.TimeProfile;
+import io.github.wang_jingyi.ZiQian.refine.ShellInteraction;
 import io.github.wang_jingyi.ZiQian.utils.FileUtil;
 
 import java.io.IOException;

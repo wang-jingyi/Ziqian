@@ -1,6 +1,6 @@
 package io.github.wang_jingyi.ZiQian.active;
 
-import io.github.wang_jingyi.ZiQian.run.Config;
+import io.github.wang_jingyi.ZiQian.main.Config;
 import io.github.wang_jingyi.ZiQian.utils.ExternalCaller;
 import io.github.wang_jingyi.ZiQian.utils.FileUtil;
 import io.github.wang_jingyi.ZiQian.utils.PrismUtil;

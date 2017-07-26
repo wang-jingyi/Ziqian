@@ -9,10 +9,10 @@ import java.util.List;
 
 import io.github.wang_jingyi.ZiQian.Input;
 import io.github.wang_jingyi.ZiQian.Predicate;
+import io.github.wang_jingyi.ZiQian.main.AlgoProfile;
+import io.github.wang_jingyi.ZiQian.main.GlobalConfigs;
 import io.github.wang_jingyi.ZiQian.prism.PrismModel;
 import io.github.wang_jingyi.ZiQian.prism.PrismState;
-import io.github.wang_jingyi.ZiQian.profile.AlgoProfile;
-import io.github.wang_jingyi.ZiQian.run.GlobalConfigs;
 import io.github.wang_jingyi.ZiQian.utils.FileUtil;
 import io.github.wang_jingyi.ZiQian.utils.IntegerUtil;
 import io.github.wang_jingyi.ZiQian.utils.StringUtil;
@@ -142,14 +142,10 @@ public class Alergia implements LearningDTMC{
 			}
 		}
 
-//		int bc = 0;
 		while(blue.size()>0){ // j indexes blue states
 			Collections.sort(blue);
 			int j = blue.get(0);
 			blue.remove(0); // remove from blue
-//			bc ++;
-//			System.out.println("--- Blue node count: " + bc);
-//			System.out.println("--- Current blue node: " + dp.getSortedPrefixes().get(j));
 			List<Integer> redWithSameLastSymbol = new ArrayList<Integer>();
 			
 			for(int i : red){

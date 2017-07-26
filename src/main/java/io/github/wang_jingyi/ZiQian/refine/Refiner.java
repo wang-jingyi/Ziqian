@@ -2,13 +2,12 @@ package io.github.wang_jingyi.ZiQian.refine;
 
 import io.github.wang_jingyi.ZiQian.Predicate;
 import io.github.wang_jingyi.ZiQian.PredicateAbstraction;
-import io.github.wang_jingyi.ZiQian.VariablesValue;
-import io.github.wang_jingyi.ZiQian.VariablesValueInfo;
+import io.github.wang_jingyi.ZiQian.data.VariablesValue;
+import io.github.wang_jingyi.ZiQian.data.VariablesValueInfo;
+import io.github.wang_jingyi.ZiQian.main.AlgoProfile;
+import io.github.wang_jingyi.ZiQian.main.GlobalConfigs;
+import io.github.wang_jingyi.ZiQian.main.SwatConfig;
 import io.github.wang_jingyi.ZiQian.prism.PrismModel;
-import io.github.wang_jingyi.ZiQian.profile.AlgoProfile;
-import io.github.wang_jingyi.ZiQian.run.GlobalConfigs;
-import io.github.wang_jingyi.ZiQian.sample.SplittingPoint;
-import io.github.wang_jingyi.ZiQian.swat.SwatConfig;
 import io.github.wang_jingyi.ZiQian.utils.FileUtil;
 import io.github.wang_jingyi.ZiQian.utils.NumberUtil;
 
@@ -204,9 +203,9 @@ public class Refiner{
 //		RankingFromScoring rfs = new RankingFromScoring(fs);
 //		rfs.build(ds);
 		
-//		svm_para.kernel_type = 2;
-//		svm_para.gamma = 0.1;
-//		svm_para.C = 1;
+		svm_para.kernel_type = 2;
+		svm_para.gamma = 0.1;
+		svm_para.C = 1;
 
 		System.out.println("- Kernel type: " + svm_para.kernel_type);
 		svm.setParameters(svm_para);

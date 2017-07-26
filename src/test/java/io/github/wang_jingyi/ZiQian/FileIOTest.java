@@ -1,7 +1,7 @@
 package io.github.wang_jingyi.ZiQian;
 
 import io.github.wang_jingyi.ZiQian.learn.DataPrefix;
-import io.github.wang_jingyi.ZiQian.run.Config;
+import io.github.wang_jingyi.ZiQian.main.Config;
 import io.github.wang_jingyi.ZiQian.utils.FileUtil;
 
 import java.io.FileNotFoundException;

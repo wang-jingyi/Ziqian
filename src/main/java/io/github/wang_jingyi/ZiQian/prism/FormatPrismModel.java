@@ -9,9 +9,9 @@ import java.util.List;
 
 import io.github.wang_jingyi.ZiQian.Input;
 import io.github.wang_jingyi.ZiQian.Predicate;
-import io.github.wang_jingyi.ZiQian.VariablesValue;
-import io.github.wang_jingyi.ZiQian.profile.AlgoProfile;
-import io.github.wang_jingyi.ZiQian.run.Config;
+import io.github.wang_jingyi.ZiQian.data.VariablesValue;
+import io.github.wang_jingyi.ZiQian.main.AlgoProfile;
+import io.github.wang_jingyi.ZiQian.main.Config;
 
 
 /*

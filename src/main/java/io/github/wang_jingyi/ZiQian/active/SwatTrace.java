@@ -1,12 +1,12 @@
 package io.github.wang_jingyi.ZiQian.active;
 
-import io.github.wang_jingyi.ZiQian.run.GlobalConfigs;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+
+import io.github.wang_jingyi.ZiQian.main.GlobalConfigs;
 
 public class SwatTrace {
 	

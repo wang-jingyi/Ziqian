@@ -1,6 +1,6 @@
 package io.github.wang_jingyi.ZiQian.active;
 
-import io.github.wang_jingyi.ZiQian.run.GlobalConfigs;
+import io.github.wang_jingyi.ZiQian.main.GlobalConfigs;
 import io.github.wang_jingyi.ZiQian.utils.NumberUtil;
 
 import org.junit.Test;

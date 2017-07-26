@@ -7,24 +7,25 @@ import java.util.List;
 
 import org.junit.Test;
 
+import io.github.wang_jingyi.ZiQian.data.ExtractPrismData;
+import io.github.wang_jingyi.ZiQian.data.VariablesValueInfo;
 import io.github.wang_jingyi.ZiQian.example.CrowdPositive;
 import io.github.wang_jingyi.ZiQian.exceptions.PrismNoResultException;
 import io.github.wang_jingyi.ZiQian.learn.LearningDTMC;
 import io.github.wang_jingyi.ZiQian.learn.ModelSelection;
+import io.github.wang_jingyi.ZiQian.main.AlgoProfile;
+import io.github.wang_jingyi.ZiQian.main.PlatformDependent;
 import io.github.wang_jingyi.ZiQian.learn.AAlergia;
-import io.github.wang_jingyi.ZiQian.prism.ExtractPrismData;
 import io.github.wang_jingyi.ZiQian.prism.FormatPrismModel;
-import io.github.wang_jingyi.ZiQian.profile.AlgoProfile;
+import io.github.wang_jingyi.ZiQian.refine.Counterexample;
+import io.github.wang_jingyi.ZiQian.refine.CounterexampleGenerator;
+import io.github.wang_jingyi.ZiQian.refine.CounterexamplePath;
+import io.github.wang_jingyi.ZiQian.refine.HypothesisTest;
+import io.github.wang_jingyi.ZiQian.refine.PrismSampler;
 import io.github.wang_jingyi.ZiQian.refine.Refiner;
-import io.github.wang_jingyi.ZiQian.run.PlatformDependent;
-import io.github.wang_jingyi.ZiQian.sample.Counterexample;
-import io.github.wang_jingyi.ZiQian.sample.CounterexampleGenerator;
-import io.github.wang_jingyi.ZiQian.sample.CounterexamplePath;
-import io.github.wang_jingyi.ZiQian.sample.HypothesisTest;
-import io.github.wang_jingyi.ZiQian.sample.PrismSampler;
-import io.github.wang_jingyi.ZiQian.sample.Sampler;
-import io.github.wang_jingyi.ZiQian.sample.SprtTest;
-import io.github.wang_jingyi.ZiQian.sample.TestEnvironment;
+import io.github.wang_jingyi.ZiQian.refine.Sampler;
+import io.github.wang_jingyi.ZiQian.refine.SprtTest;
+import io.github.wang_jingyi.ZiQian.refine.TestEnvironment;
 
 public class ExtractPrismDataTest {
 	

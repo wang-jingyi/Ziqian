@@ -1,7 +1,7 @@
 package io.github.wang_jingyi.ZiQian.example;
 
-import io.github.wang_jingyi.ZiQian.VariablesValue;
-import io.github.wang_jingyi.ZiQian.run.Config;
+import io.github.wang_jingyi.ZiQian.data.VariablesValue;
+import io.github.wang_jingyi.ZiQian.main.Config;
 
 import java.util.ArrayList;
 import java.util.List;

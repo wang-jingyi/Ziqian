@@ -19,7 +19,9 @@ import java.util.List;
 public interface LearningDTMC {
 	
 	public void learn(Input data) throws FileNotFoundException, IOException, ClassNotFoundException;
+	
 	public void PrismModelTranslation(Input data, List<Predicate> ps, String modelName);
+	
 	public PrismModel getPrismModel();
 	
 }

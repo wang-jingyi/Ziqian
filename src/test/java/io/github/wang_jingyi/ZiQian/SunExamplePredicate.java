@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.github.wang_jingyi.ZiQian.data.VariablesValue;
+
 public class SunExamplePredicate implements Predicate, Serializable{
 
 	/**

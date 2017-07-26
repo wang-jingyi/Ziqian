@@ -1,7 +1,7 @@
 package io.github.wang_jingyi.ZiQian.active;
 
 import gurobi.GRBException;
-import io.github.wang_jingyi.ZiQian.run.PlatformDependent;
+import io.github.wang_jingyi.ZiQian.main.PlatformDependent;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
