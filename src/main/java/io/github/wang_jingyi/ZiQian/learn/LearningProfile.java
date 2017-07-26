@@ -1,4 +1,4 @@
-package io.github.wang_jingyi.ZiQian.main;
+package io.github.wang_jingyi.ZiQian.learn;
 
 import java.util.ArrayList;
 import java.util.List;

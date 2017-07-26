@@ -7,7 +7,6 @@ import java.util.List;
 import io.github.wang_jingyi.ZiQian.Input;
 import io.github.wang_jingyi.ZiQian.Predicate;
 import io.github.wang_jingyi.ZiQian.PredicateAbstraction;
-import io.github.wang_jingyi.ZiQian.main.SwatConfig;
 
 public class SWaTInput {
 	
@@ -21,26 +20,33 @@ public class SWaTInput {
 	Input training_input;
 	List<String> testing_input;
 	List<String> previous_observation;
+	String delimiter;
+	int data_size;
+	int step_size;
 	
-	public SWaTInput(String training_log, String testing_log, List<Predicate> predicates, int previous_count) {
+	public SWaTInput(String training_log, String testing_log, List<Predicate> predicates, int previous_count, int data_size,
+			int step_size, String delimiter) {
 		this.training_log = training_log;
 		this.testing_log = testing_log;
 		this.predicates = predicates;
 		this.previous_count = previous_count;
 		this.previous_observation = new ArrayList<>();
+		this.data_size = data_size;
+		this.step_size = step_size;
+		this.delimiter = delimiter;
 	}
 	
 	
 	public void execute(){
 		try {
-			varsSet = PrismPathData.extractPathVars(training_log, SwatConfig.DELIMITER);
-			ExtractPrismData epd = new ExtractPrismData(training_log, SwatConfig.DATA_SIZE, SwatConfig.STEP_SIZE, SwatConfig.DELIMITER);
+			varsSet = PrismPathData.extractPathVars(training_log, delimiter);
+			ExtractPrismData epd = new ExtractPrismData(training_log, data_size, step_size, delimiter);
 			training_vvi = epd.getVariablesValueInfo(varsSet);
 			PredicateAbstraction pa = new PredicateAbstraction(predicates);
 			training_input = pa.abstractInput(training_vvi.getVarsValues());
 			
 			
-			ExtractPrismData epd1 = new ExtractPrismData(testing_log, SwatConfig.DATA_SIZE, SwatConfig.STEP_SIZE, SwatConfig.DELIMITER);
+			ExtractPrismData epd1 = new ExtractPrismData(testing_log, data_size, step_size, delimiter);
 			testing_vvi = epd1.getVariablesValueInfo(varsSet);
 			Input testing_data = pa.abstractInput(testing_vvi.getVarsValues());
 			testing_input = testing_data.getObservations().get(0);

@@ -122,7 +122,7 @@ public class LAR {
 			}
 			
 			System.out.println("------ Generating counterexample ------");
-			TimeProfile.ce_generation_start_time = System.nanoTime();;
+			TimeProfile.ce_generation_start_time = System.nanoTime();
 			CounterexampleGenerator counterg = new CounterexampleGenerator(bestDTMC.getPrismModel(),  // generate counterexamples
 					boundedSteps, safetyBound);
 			List<CounterexamplePath> counterPaths = counterg.generateCounterexamples();
@@ -148,7 +148,7 @@ public class LAR {
 			
 			System.out.println("------ Refine the predicate set ------");
 			
-			TimeProfile.refine_start_time = System.nanoTime();;
+			TimeProfile.refine_start_time = System.nanoTime();
 			Refiner refiner = new Refiner(ce.getSortedSplittingPoints(), vvi, property, bestDTMC.getPrismModel(), terminate_sample,
 					selective_data_collection);
 			Predicate newPredicate = refiner.refine();
