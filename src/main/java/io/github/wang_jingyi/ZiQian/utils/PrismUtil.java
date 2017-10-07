@@ -118,6 +118,10 @@ public class PrismUtil {
 		FileUtil.writeStringToFile(dirPath+"/"+fileName+"_learn.pctl", sb.toString());
 	}
 
+	/**
+	 * @param output PRISM result
+	 * @return the verification result
+	 */
 	public static double extractResultFromCommandOutput(String output){
 		try{
 			Pattern pattern = Pattern.compile("(Result: \\d.\\d+)");

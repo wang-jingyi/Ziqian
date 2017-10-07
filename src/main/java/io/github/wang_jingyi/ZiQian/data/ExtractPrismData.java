@@ -3,6 +3,7 @@ package io.github.wang_jingyi.ZiQian.data;
 import io.github.wang_jingyi.ZiQian.FormatVariablesValue;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ExtractPrismData implements FormatVariablesValue{
@@ -31,7 +32,8 @@ public class ExtractPrismData implements FormatVariablesValue{
 	// extract specific variables information
 	public VariablesValueInfo getVariablesValueInfo(List<String> vars) throws IOException {
 		List<List<VariablesValue>> vvs = PrismPathData.extractMEData(dataPath, vars, dataSize, stepSize, delimiter);
-		List<Integer> varsLength = PrismPathData.updateMEVarsLength(vvs);
+		List<Integer> varsLength = new ArrayList<>();
+//				PrismPathData.updateMEVarsLength(vvs);
 		return new VariablesValueInfo(vars, varsLength, vvs);
 	}
 

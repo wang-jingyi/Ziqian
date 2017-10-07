@@ -94,7 +94,7 @@ public class LAR {
 			fpm.translateToFormat(bestDTMC.getPrismModel(), data);
 			System.out.println("- Learned model wrote to : " + OUTPUT_MODEL_PATH + "/" + modelName + ".pm");
 			System.out.println("- Number of states in the learned model: " + bestDTMC.getPrismModel().getNumOfPrismStates());
-			TimeProfile.learning_end_time = System.nanoTime();;
+			TimeProfile.learning_end_time = System.nanoTime();
 			TimeProfile.learning_times.add(TimeProfile.nanoToSeconds(TimeProfile.learning_end_time
 					-TimeProfile.learning_start_time));
 			
@@ -162,7 +162,7 @@ public class LAR {
 						(TimeProfile.iteration_end_time-TimeProfile.iteration_start_time));
 				System.out.println("======= Fail to learn a new predicate, verification fails ======");
 				FileUtil.writeObject(Config.OUTPUT_MODEL_PATH + "/predicates", AlgoProfile.predicates);
-				TimeProfile.main_end_time = System.nanoTime();;
+				TimeProfile.main_end_time = System.nanoTime();
 				TimeProfile.main_time = TimeProfile.nanoToSeconds(TimeProfile.main_end_time-TimeProfile.main_start_time);
 				TimeProfile.outputTimeProfile();
 				TimeProfile.outputTimeProfile(GlobalConfigs.OUTPUT_MODEL_PATH+"/time_profile.txt");

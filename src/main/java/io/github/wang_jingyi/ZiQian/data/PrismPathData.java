@@ -18,7 +18,7 @@ public class PrismPathData {
 	 * @param: dataPath is a single file path
 	 * @param: variables to extract
 	 * */
-	public static List<VariablesValue>  extractSEData(String dataPath, List<String> vars, int ds, int stepSize, String delimiter) throws IOException{
+	public static List<VariablesValue>  extractSEData(String dataPath, List<String> vars, int data_size, int stepSize, String delimiter) throws IOException{
 		List<VariablesValue> values = new ArrayList<VariablesValue>();
 		FileReader reader = new FileReader(dataPath);
 		BufferedReader br = new BufferedReader(reader);
@@ -49,7 +49,7 @@ public class PrismPathData {
 				}
 				values.add(rivv);
 				cds ++;
-				if(cds>ds){
+				if(cds>=data_size){
 					break;
 				}
 			}
@@ -63,9 +63,7 @@ public class PrismPathData {
 		int totalSize = 0;
 		List<String> fus = FileUtil.filesInDir(dirPath);
 		for(String s : fus){
-			
-			int ds = Integer.MAX_VALUE;
-			
+			int ds = dataSize;
 			if(!Config.TERMINATE_SAMPLE){
 				ds = new Random().nextInt(2*dataSize/fus.size());
 			}

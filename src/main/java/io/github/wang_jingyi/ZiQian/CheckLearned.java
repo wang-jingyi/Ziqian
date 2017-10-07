@@ -1,16 +1,16 @@
 package io.github.wang_jingyi.ZiQian;
 
 
+import java.io.IOException;
+
 import io.github.wang_jingyi.ZiQian.exceptions.PrismNoResultException;
 import io.github.wang_jingyi.ZiQian.main.AlgoProfile;
-import io.github.wang_jingyi.ZiQian.main.Config;
 import io.github.wang_jingyi.ZiQian.main.GlobalConfigs;
 import io.github.wang_jingyi.ZiQian.main.PlatformDependent;
+import io.github.wang_jingyi.ZiQian.main.SwatConfig;
 import io.github.wang_jingyi.ZiQian.main.TimeProfile;
 import io.github.wang_jingyi.ZiQian.refine.ShellInteraction;
 import io.github.wang_jingyi.ZiQian.utils.FileUtil;
-
-import java.io.IOException;
 
 public class CheckLearned {
 	
@@ -42,9 +42,6 @@ public class CheckLearned {
 			result = ShellInteraction.executeCommand(prismCommandParas);
 		}
 		
-		
-//		System.out.println(result);
-		
 		TimeProfile.pmc_end_time = System.nanoTime();
 		TimeProfile.prism_model_check_times.add
 		(TimeProfile.nanoToSeconds(TimeProfile.pmc_end_time-TimeProfile.pmc_start_time));
@@ -64,7 +61,7 @@ public class CheckLearned {
 			TimeProfile.main_time = TimeProfile.nanoToSeconds(TimeProfile.main_end_time-TimeProfile.main_start_time);
 			TimeProfile.outputTimeProfile();
 			TimeProfile.outputTimeProfile(GlobalConfigs.OUTPUT_MODEL_PATH+"/time_profile.txt");
-			FileUtil.writeObject(Config.OUTPUT_MODEL_PATH + "/predicates", AlgoProfile.predicates);
+			FileUtil.writeObject(SwatConfig.OUTPUT_MODEL_PATH + "/predicates", AlgoProfile.predicates);
 			System.exit(0);
 		}
 		else{

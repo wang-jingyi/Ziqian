@@ -5,21 +5,25 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.commons.math3.linear.MatrixUtils;
+import org.apache.commons.math3.linear.RealMatrix;
+
 import io.github.wang_jingyi.ZiQian.Input;
 import io.github.wang_jingyi.ZiQian.Predicate;
 import io.github.wang_jingyi.ZiQian.prism.PrismModel;
 import io.github.wang_jingyi.ZiQian.prism.PrismState;
+import io.github.wang_jingyi.ZiQian.utils.MarkovChainUtil;
 import io.github.wang_jingyi.ZiQian.utils.StringUtil;
 
 public class LearnPST implements LearningDTMC{
 
 	private PSTNode root = new PSTNode();
 	private int numOfStates;
-	private double epsilon = 0.001; // default threshold
-	private int maxMemorySize = 50;
+	private double epsilon = 0.00000001; // default threshold
+	private int maxMemorySize = 1000;
 	private double selectionCriterion; // BIC score in this learning algorithm
 	private PrismModel PSA = new PrismModel(); // this will be used for generating .pm file later
-
+	
 
 	public LearnPST() {
 	}
@@ -50,21 +54,20 @@ public class LearnPST implements LearningDTMC{
 		assert data.getObservations().size()==1 : "=== not a single observation ===";
 		List<String> observation = data.getObservations().get(0);
 
-		System.out.println("- translating learned model to a PrismModel...");
+//		System.out.println("- translating learned model to a PrismModel...");
 		List<PrismState> prismStates = new ArrayList<PrismState>(); // list of prism states
 		List<PrismState> initialStates = new ArrayList<PrismState>(); // list of initial states
-
 		numOfStates = 1; //reset the number of state, since we may need to extend the tree
 
 		// extend original tree, leaf by leaf check until the desired property of PST holds
 		// this step should start from deepest node and add missing sons if necessary
 
-		System.out.println("- extend original tree to satisfy pst property");
+//		System.out.println("- extend original tree to satisfy pst property");
 		boolean pst_property_holds = false;
 		HashSet<PSTNode> testedLeaf = new HashSet<>();
 		while(!pst_property_holds){
 			List<PSTNode> leafs_in_length_order = findLeafInLengthOrder(root);
-			assert leafs_in_length_order.size()>0 : "=== no valid model learned ===";
+			assert leafs_in_length_order.size()>0 : "=== no valid model learned, adjust the learning parameter \\epsilon ===";
 			int current_leaf_num = leafs_in_length_order.size();
 			boolean traverse_over = false;
 			for(int j=current_leaf_num-1; j>=0; j--){
@@ -93,7 +96,7 @@ public class LearnPST implements LearningDTMC{
 		}
 
 		// build transitions and PrismState
-		System.out.println("- from PST to PFA");
+//		System.out.println("- from PST to PFA");
 		LinkedList<PSTNode> stack = new LinkedList<PSTNode>();
 		stack.add(root);
 		while(!stack.isEmpty()){
@@ -118,7 +121,7 @@ public class LearnPST implements LearningDTMC{
 				ps.setSigmas(sigmas);
 				numOfStates++;
 				prismStates.add(ps);
-				System.out.println("- add PrismState :: " + ps);
+//				System.out.println("- add PrismState :: " + ps);
 				if(transSum>0){
 					assert transSum>=0.9999999999999998 : "=== out transition probability not equal to 1 ===";
 				}
@@ -130,10 +133,10 @@ public class LearnPST implements LearningDTMC{
 				}
 			}
 		}
-
+		
+		RealMatrix transition_matrix = MatrixUtils.createRealMatrix(numOfStates,numOfStates);
 		// set nextStates
 		for(PrismState ps : prismStates){
-
 			if(ps.getSigmas().size()==0){ // not observed suffix, regard as a sink state
 				continue;
 			}
@@ -144,28 +147,39 @@ public class LearnPST implements LearningDTMC{
 				for(PrismState innps : prismStates){
 					if(StringUtil.equals(nextPSLabel, innps.getLabel()) || StringUtil.isSuffix(innps.getLabel(), nextPSLabel)){
 						ps.getNextStates().add(innps);
+						transition_matrix.setEntry(ps.getId()-1, innps.getId()-1,Double.parseDouble(ps.getSigmas().get(i)));
 						found = true;
 						break;
 					}
 				}
 				if(!found){
-					System.out.println("undefined transitions: from " + ps + ", next symbol: " + nextPSLabel);
+//					System.out.println("undefined transitions: from " + ps + ", next symbol: " + nextPSLabel);
 				}
 			}
 			assert ps.getSigmas().size()==ps.getNextStates().size() : "=== not every state has a emitting state ===";
 		}
-
+		
+		List<Double> init_distribution = new ArrayList<>();
+		double[] steady_state_distribution = MarkovChainUtil.computeSteadyStateDistribution(transition_matrix.getData());
+		for(int i=0; i<prismStates.size(); i++){
+//			if(steady_state_distribution[i]!=0){
+				initialStates.add(prismStates.get(i));
+				init_distribution.add(steady_state_distribution[i]);
+//			}
+		}
 		PSA.setPrismStates(prismStates);
 		PSA.setInitialStates(initialStates);
+		PSA.setInitialDistribution(init_distribution);
 		PSA.setPredicates(pset);
 		PSA.setNumOfPrismStates(numOfStates-1);
+		PSA.setTransitionMatrix(transition_matrix);
 
 	}
 
 	private void buildPST(Input data) {
 
 		List<String> observation = data.getObservations().get(0);
-		System.out.println("- build probabilistic suffix tree");
+//		System.out.println("- build probabilistic suffix tree");
 		
 		List<List<String>> candidates = new ArrayList<List<String>>();
 		List<Double> candsProb = new ArrayList<Double>();// for each candidate, there is a corresponding occurrence probability 
@@ -220,46 +234,46 @@ public class LearnPST implements LearningDTMC{
 		addMissingSons(root, data); // traverse and add missing nodes
 	}
 
-	private void calBIC(Input data) { // calculate BIC score
-		List<String> observation = data.getObservations().get(0);
-		selectionCriterion = 0;
-		//		assert numOfStates!=0 : "=== no model learned ===";
-		double logEventLikelihood = calLogEventsLikelihood(observation, data);
-		selectionCriterion = logEventLikelihood - (double)0.5 * numOfStates * (data.getAlphabet().size()-1) 
-				* Math.log(observation.size());
-	}
+//	private void calBIC(Input data) { // calculate BIC score
+//		List<String> observation = data.getObservations().get(0);
+//		selectionCriterion = 0;
+//		//		assert numOfStates!=0 : "=== no model learned ===";
+//		double logEventLikelihood = calLogEventsLikelihood(observation, data);
+//		selectionCriterion = logEventLikelihood - (double)0.5 * numOfStates * (data.getAlphabet().size()-1) 
+//				* Math.log(observation.size());
+//	}
 
-	// calculate the event likelihood given a PST, this will be used in calculating BIC
-	private double calLogEventsLikelihood(List<String> events, Input data) {
-		double logEventLikelihood = 0;
-		for(int i=0; i<events.size(); i++){
-			PSTNode deepestSuffix = findDeepestSuffix(events,i); // find the deepest suffix of the first i elements
-			double nextSymProb = findNextSymProb(deepestSuffix,events.get(i), data);
-			assert nextSymProb!=0 : "event probability equals 0.";
-			logEventLikelihood = logEventLikelihood + Math.log(nextSymProb);
-		}
-		return logEventLikelihood;
-	}
+//	// calculate the event likelihood given a PST, this will be used in calculating BIC
+//	private double calLogEventsLikelihood(List<String> events, Input data) {
+//		double logEventLikelihood = 0;
+//		for(int i=0; i<events.size(); i++){
+//			PSTNode deepestSuffix = findDeepestSuffix(events,i); // find the deepest suffix of the first i elements
+//			double nextSymProb = findNextSymProb(deepestSuffix,events.get(i), data);
+//			assert nextSymProb!=0 : "event probability equals 0.";
+//			logEventLikelihood = logEventLikelihood + Math.log(nextSymProb);
+//		}
+//		return logEventLikelihood;
+//	}
 
-	private double findNextSymProb(PSTNode currentNode, String t, Input data) {
-		List<String> observation = data.getObservations().get(0);
-		double nextSymProb = 1;
-		if(currentNode.getPSTEdges().size()==0){ // if current node is a leaf node, have to calculate transition probability with no edges available
-			nextSymProb = StringUtil.calNextSymbolTransProb(currentNode.getLabel(), t, observation);
-		}
-		else{  // not leaf
-			for(PSTEdge edge : currentNode.getPSTEdges()){
-				if(edge.getLabel().equals(t)){
-					nextSymProb = edge.getTransProb();
-					break;
-				}
-			}
-		}
-		if(nextSymProb==1){
-			System.out.println("bp");
-		}
-		return nextSymProb;
-	}
+//	private double findNextSymProb(PSTNode currentNode, String t, Input data) {
+//		List<String> observation = data.getObservations().get(0);
+//		double nextSymProb = 1;
+//		if(currentNode.getPSTEdges().size()==0){ // if current node is a leaf node, have to calculate transition probability with no edges available
+//			nextSymProb = StringUtil.calNextSymbolTransProb(currentNode.getLabel(), t, observation);
+//		}
+//		else{  // not leaf
+//			for(PSTEdge edge : currentNode.getPSTEdges()){
+//				if(edge.getLabel().equals(t)){
+//					nextSymProb = edge.getTransProb();
+//					break;
+//				}
+//			}
+//		}
+//		if(nextSymProb==1){
+//			System.out.println("bp");
+//		}
+//		return nextSymProb;
+//	}
 
 	// find the deepest suffix node in the tree of the candidate node to include
 	private PSTNode findDeepestSuffix(List<String> currentCand) {
@@ -307,23 +321,23 @@ public class LearnPST implements LearningDTMC{
 	//		return deepestSuffix;
 	//	}
 
-	private PSTNode findDeepestSuffix(List<String> events, int i) {
-		PSTNode currentNode = root;
-		if(i==0){
-			return currentNode;
-		}
-		else{
-			for(int j=i-1; j>=0; j--){ // start from the last element, reversely search until a leaf is reached 
-				for(PSTEdge edge : currentNode.getPSTEdges()){
-					if(edge.getLabel()==events.get(j)){
-						currentNode = edge.getDestPSTNode();
-						break;
-					}
-				}
-			}
-		}
-		return currentNode;
-	}
+//	private PSTNode findDeepestSuffix(List<String> events, int i) {
+//		PSTNode currentNode = root;
+//		if(i==0){
+//			return currentNode;
+//		}
+//		else{
+//			for(int j=i-1; j>=0; j--){ // start from the last element, reversely search until a leaf is reached 
+//				for(PSTEdge edge : currentNode.getPSTEdges()){
+//					if(edge.getLabel()==events.get(j)){
+//						currentNode = edge.getDestPSTNode();
+//						break;
+//					}
+//				}
+//			}
+//		}
+//		return currentNode;
+//	}
 
 	private List<PSTNode> findLeafInLengthOrder(PSTNode root){
 		List<PSTNode> leafs = new ArrayList<PSTNode>();

@@ -36,7 +36,7 @@ public class OverHigh implements Predicate, Serializable{
 		if(vv.getValues().size()==0){
 			return false;
 		}
-		double sensorValue = vv.getVarValue(vars.get(0)).getRawIntValue();
+		double sensorValue = vv.getVarValue(vars.get(0)).getRawDoubleValue();
 		if(sensorValue>threshold){
 			return true;
 		}

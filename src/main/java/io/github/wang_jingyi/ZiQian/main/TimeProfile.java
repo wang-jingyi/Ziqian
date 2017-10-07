@@ -60,7 +60,7 @@ public class TimeProfile {
 		sb.append("- Time for counterexample generation: " + ce_generation_times + " s\n");
 		sb.append("- Time for hypothesis testing: " + hypothesis_testing_times + " s\n");
 		sb.append("- Time for identifying spurious transtions: " + spurious_check_times + " s\n");
-		sb.append("- Time for generating a new predicate: " + refine_times + " s\n\n");
+		sb.append("- Time for generating a new predicate: " + refine_times + " s");
 		System.out.println(sb.toString());
 	}
 	

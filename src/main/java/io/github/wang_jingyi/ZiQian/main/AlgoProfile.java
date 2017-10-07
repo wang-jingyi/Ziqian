@@ -11,6 +11,7 @@ public class AlgoProfile {
 	public static boolean newIteration = false; // decide if DataPrefix will be calculated again
 	public static int iterationCount = 0;
 	public static List<Predicate> predicates = new ArrayList<>();
+	public static boolean loop_first = false;
 	
 	public static List<String> vars = new ArrayList<>(); // triggered variables 
 	public static List<Integer> varsLength;

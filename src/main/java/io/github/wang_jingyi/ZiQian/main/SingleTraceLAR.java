@@ -2,86 +2,78 @@ package io.github.wang_jingyi.ZiQian.main;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
-import io.github.wang_jingyi.ZiQian.CheckLearned;
 import io.github.wang_jingyi.ZiQian.Predicate;
 import io.github.wang_jingyi.ZiQian.data.SWaTInput;
-import io.github.wang_jingyi.ZiQian.exceptions.PrismNoResultException;
 import io.github.wang_jingyi.ZiQian.exceptions.UnsupportedTestingTypeException;
 import io.github.wang_jingyi.ZiQian.learn.LearnPST;
 import io.github.wang_jingyi.ZiQian.learn.LearningDTMC;
 import io.github.wang_jingyi.ZiQian.prism.FormatPrismModel;
 import io.github.wang_jingyi.ZiQian.prism.PrismModel;
 import io.github.wang_jingyi.ZiQian.prism.PrismState;
-import io.github.wang_jingyi.ZiQian.refine.Counterexample;
-import io.github.wang_jingyi.ZiQian.refine.CounterexampleGenerator;
-import io.github.wang_jingyi.ZiQian.refine.CounterexamplePath;
-import io.github.wang_jingyi.ZiQian.refine.ModelTesting;
 import io.github.wang_jingyi.ZiQian.refine.Refiner;
-import io.github.wang_jingyi.ZiQian.refine.Sampler;
-import io.github.wang_jingyi.ZiQian.refine.SingleSampleTest;
-import io.github.wang_jingyi.ZiQian.refine.SingleTraceSampler;
-import io.github.wang_jingyi.ZiQian.refine.SprtTest;
-import io.github.wang_jingyi.ZiQian.refine.TestEnvironment;
+import io.github.wang_jingyi.ZiQian.refine.SplittingPoint;
+import io.github.wang_jingyi.ZiQian.swat.SAnalyzer;
+import io.github.wang_jingyi.ZiQian.swat.SWaTIterationResult;
+import io.github.wang_jingyi.ZiQian.swat.Validator;
 import io.github.wang_jingyi.ZiQian.utils.FileUtil;
-import io.github.wang_jingyi.ZiQian.utils.StringUtil;
 
 public class SingleTraceLAR {
 
 	private List<Predicate> property;
 	private List<Predicate> predicate_set;
 	private int maximumIteration = 20;
-	private TestEnvironment te = TestEnvironment.te;
-	private Sampler sampler;
 	private String TRAINING_LOG_PATH;
 	private String TESTING_LOG_PATH;
 	private String OUTPUT_MODEL_PATH;
-	private String PROPERTY_LEARN_FILE;
-	private int PROPERTY_INDEX;
-	private int boundedSteps = -1;
-	private double safetyBound = 0.4;
 	private String MODEL_NAME;
-	private String TESTING_TYPE = "sst";
-	private int sstSampleSize = 10;
 	private int LARModelSize;
-	private double error_alpha = 0.05;
-	private double error_beta = 0.05;
-	private double confidence_inteval;
 	private int previous_count = 50;
 	private String data_delimiter;
 	private int data_step_size;
 	private int data_size;
 	private boolean terminate_sample;
 	private boolean selective_data_collection;
-	private double epsilon = 0.0000001;
+	private double epsilon = 0.00000001;
+	private double safety_thres = 1;
 
 
 	public void execute() throws FileNotFoundException, ClassNotFoundException, IOException, UnsupportedTestingTypeException{
 
-		AlgoProfile.predicates = predicate_set;
-
-		SWaTInput input = new SWaTInput(TRAINING_LOG_PATH, TESTING_LOG_PATH, predicate_set, previous_count, 
-				data_size, data_step_size, data_delimiter);
-		input.execute();
-
-		AlgoProfile.vars = input.getTraining_vvi().getVars();	
-		AlgoProfile.varsLength = input.getTraining_vvi().getVarsLength();
-
 		int iteration = 0;
 		while(iteration<maximumIteration){
+			
+			System.out.println("============ iteration " + (iteration+1) + " ============");
+			SWaTIterationResult iteration_result = new SWaTIterationResult();
+			iteration_result.setIteration(iteration+1);
+
+			AlgoProfile.predicates = predicate_set;
+			
+			TimeProfile.iteration_start_time = System.nanoTime();
+			
+			System.out.print("prepare data for learning...   ");
+			SWaTInput input = new SWaTInput(TRAINING_LOG_PATH, TESTING_LOG_PATH, predicate_set, previous_count, 
+					data_size, data_step_size, data_delimiter);
+			input.execute();
+
+			AlgoProfile.vars = input.getTraining_vvi().getVars();	
+			AlgoProfile.varsLength = input.getTraining_vvi().getVarsLength();
 
 			String modelName = MODEL_NAME + "_" + iteration;
 
 			// learning
+			System.out.print("learn...   ");
+			TimeProfile.learning_start_time = System.nanoTime();
+			
 			LearningDTMC learner = new LearnPST(epsilon);
 			learner.learn(input.getAbstractTrainingInput());
 			learner.PrismModelTranslation(input.getAbstractTrainingInput(), predicate_set, modelName);
-			identifyInitialStates(learner.getPrismModel(), input.getPreviousObservation());
+//			identifyInitialStates(learner.getPrismModel(), input.getPreviousObservation());
 			PrismModel bestDTMC = learner.getPrismModel();
-
-
+			
+			iteration_result.setNumber_of_state(bestDTMC.getNumOfPrismStates());
+			
 			// update LAR model size
 			if(bestDTMC.getNumOfPrismStates()==LARModelSize){
 				System.out.println("====== Cannot obtain a new linear predicate, verification fails ======");
@@ -95,55 +87,81 @@ public class SingleTraceLAR {
 			else{
 				LARModelSize = bestDTMC.getNumOfPrismStates();
 			}
+			
 
 			// translate learned model to .pm file
+//			System.out.println("write learned model into PRISM format...   ");
 			FormatPrismModel fpm = new FormatPrismModel("dtmc", OUTPUT_MODEL_PATH, modelName, true);
 			fpm.translateToFormat(learner.getPrismModel(),input.getAbstractTrainingInput());
-
-
-			// verify the property against the model
+//			System.out.println("- Learned model wrote to : " + OUTPUT_MODEL_PATH + "/" + modelName + ".pm");
+//			System.out.println("- Number of states in the learned model: " + bestDTMC.getNumOfPrismStates());
+			TimeProfile.learning_end_time = System.nanoTime();
+			TimeProfile.learning_times.add(TimeProfile.nanoToSeconds(TimeProfile.learning_end_time
+					-TimeProfile.learning_start_time));
+			
+			
+			// verify the safety property against the model
 			TimeProfile.pmc_start_time = System.nanoTime();
-			CheckLearned cl = new CheckLearned(OUTPUT_MODEL_PATH + "/" + modelName + ".pm" , 
-					PROPERTY_LEARN_FILE, PROPERTY_INDEX);
-			try {
-				cl.check();
-			} catch (PrismNoResultException e) {
-				e.printStackTrace();
+			
+			double model_unsafe_prob = 0;
+			for(PrismState state : bestDTMC.getPrismStates()){
+				if(state.getCurrentState().startsWith("11")){
+					model_unsafe_prob += bestDTMC.getInitialDistribution().get(state.getId()-1);
+				}
 			}
-
-			// counterexample generation
+			
+			iteration_result.setLearned_unsafe_prob(model_unsafe_prob);
+			
+			TimeProfile.pmc_end_time = System.nanoTime();
+			
+			if(model_unsafe_prob<safety_thres){
+				FileUtil.writeObject(OUTPUT_MODEL_PATH + "/predicates", AlgoProfile.predicates);
+				TimeProfile.main_end_time = System.nanoTime();;
+				TimeProfile.main_time = TimeProfile.nanoToSeconds(TimeProfile.main_end_time-TimeProfile.main_start_time);
+				TimeProfile.outputTimeProfile();
+				TimeProfile.outputTimeProfile(GlobalConfigs.OUTPUT_MODEL_PATH+"/time_profile.txt");
+				System.out.println("\n" + iteration_result);
+				System.out.println("\n====== property verified ======");
+				System.exit(0);
+			}
+			
+			// validate if the learned model is spurious
+			
+			System.out.print("valildate the learned result...   ");
+			
+			TimeProfile.spurious_start_time= System.nanoTime();
+			Validator val = new Validator(safety_thres, input.getAbstractTestingInput());
+			
+			iteration_result.setTest_unsafe_prob(val.getTesting_unsafe_prob());
+			
+			System.out.print("look for spurious transitions...   ");
+			
+			TimeProfile.spurious_end_time = System.nanoTime();
+			TimeProfile.spurious_check_times.add(TimeProfile.nanoToSeconds(TimeProfile.spurious_end_time
+					-TimeProfile.spurious_start_time));
+			
+			if(!val.isSpurious(model_unsafe_prob)){
+				FileUtil.writeObject(OUTPUT_MODEL_PATH + "/predicates", AlgoProfile.predicates);
+				TimeProfile.main_end_time = System.nanoTime();;
+				TimeProfile.main_time = TimeProfile.nanoToSeconds(TimeProfile.main_end_time-TimeProfile.main_start_time);
+				TimeProfile.outputTimeProfile();
+				TimeProfile.outputTimeProfile(GlobalConfigs.OUTPUT_MODEL_PATH+"/time_profile.txt");
+				System.out.println("\n" + iteration_result);
+				System.out.println("\n======= property violated ======");
+				System.exit(0);
+			}
+			
 			TimeProfile.ce_generation_start_time = System.nanoTime();
-			CounterexampleGenerator counterg = new CounterexampleGenerator(bestDTMC,  // generate counterexamples
-					boundedSteps, safetyBound);
-			List<CounterexamplePath> counterPaths = counterg.generateCounterexamples();
-			TimeProfile.ce_generation_end_time = System.nanoTime();;
+			SAnalyzer analyzer = new SAnalyzer(input.getAbstractTestingInput());
+			List<SplittingPoint> sps = analyzer.findSplitingStates(bestDTMC);
+			TimeProfile.ce_generation_end_time = System.nanoTime();
 			TimeProfile.ce_generation_times.add(TimeProfile.nanoToSeconds(TimeProfile.ce_generation_end_time
 					-TimeProfile.ce_generation_start_time));
 
-			ModelTesting mt = new ModelTesting();
-			if(TESTING_TYPE.equalsIgnoreCase("sst")){
-				mt.setHypothesisTesting(new SingleSampleTest(sstSampleSize));
-			}
-			else if(TESTING_TYPE.equalsIgnoreCase("sprt")){
-				mt.setHypothesisTesting(new SprtTest(safetyBound, error_alpha, error_beta, confidence_inteval));
-			}
-			else{
-				throw new UnsupportedTestingTypeException();
-			}
-
-			// find spurious transitions
-			Counterexample ce = new Counterexample(bestDTMC, counterPaths, mt.getHypothesisTesting());
-
-			// validate counterexample
-			sampler = new SingleTraceSampler(SwatConfig.DECOMPOSED_DATA_PATH, input.getAbstractTestingInput(), bestDTMC, ce, 
-					input.getPreviousObservation());
-			te.init(input.getPredicates(), sampler, input.getAbstractTrainingInput(), SwatConfig.DELIMITER, SwatConfig.STEP_SIZE);
-			ce.analyze(te);
-
-
 			// refinement
+			System.out.print("refine the abstraction...   ");
 			TimeProfile.refine_start_time = System.nanoTime();
-			Refiner refiner = new Refiner(ce.getSortedSplittingPoints(), input.getTraining_vvi(), input.getPredicates(), bestDTMC, terminate_sample,
+			Refiner refiner = new Refiner(sps, input.getTesting_vvi(), input.getPredicates(), bestDTMC, terminate_sample,
 					selective_data_collection);
 			Predicate newPredicate = refiner.refine();
 			TimeProfile.refine_end_time = System.nanoTime();
@@ -154,8 +172,8 @@ public class SingleTraceLAR {
 				TimeProfile.iteration_end_time = System.nanoTime();
 				TimeProfile.iteration_times.add(TimeProfile.nanoToSeconds
 						(TimeProfile.iteration_end_time-TimeProfile.iteration_start_time));
-				System.out.println("======= Fail to learn a new predicate, verification fails ======");
-				FileUtil.writeObject(SwatConfig.OUTPUT_MODEL_PATH + "/predicates", AlgoProfile.predicates);
+				System.out.println("\n======= Fail to learn a new predicate, verification fails ======");
+				FileUtil.writeObject(OUTPUT_MODEL_PATH + "/predicates", AlgoProfile.predicates);
 				TimeProfile.main_end_time = System.nanoTime();;
 				TimeProfile.main_time = TimeProfile.nanoToSeconds(TimeProfile.main_end_time-TimeProfile.main_start_time);
 				TimeProfile.outputTimeProfile();
@@ -163,16 +181,28 @@ public class SingleTraceLAR {
 				System.exit(0);
 			}
 
-			input.getPredicates().add(newPredicate);
+			predicate_set.add(newPredicate);
 			TimeProfile.iteration_end_time = System.nanoTime();
-			TimeProfile.iteration_times.add(TimeProfile.nanoToSeconds(TimeProfile.iteration_end_time-TimeProfile.iteration_start_time));
+			double iteration_time = TimeProfile.nanoToSeconds(TimeProfile.iteration_end_time-TimeProfile.iteration_start_time);
+			TimeProfile.iteration_times.add(TimeProfile.nanoToSeconds
+					(TimeProfile.iteration_end_time-TimeProfile.iteration_start_time));
+			iteration_result.setIteration_time(iteration_time);
+			
+			System.out.println("\n" + iteration_result);
+			
 			AlgoProfile.predicates = property;
 			AlgoProfile.newIteration = true;
 			AlgoProfile.iterationCount++;
+			iteration ++;
 		}
 
 	}
 	
+
+	public void setSafety_thres(double safety_thres) {
+		this.safety_thres = safety_thres;
+	}
+
 
 	public String getOUTPUT_MODEL_PATH() {
 		return OUTPUT_MODEL_PATH;
@@ -194,13 +224,6 @@ public class SingleTraceLAR {
 		this.maximumIteration = maximumIteration;
 	}
 
-	public void setTe(TestEnvironment te) {
-		this.te = te;
-	}
-
-	public void setSampler(Sampler sampler) {
-		this.sampler = sampler;
-	}
 
 	public void setTRAINING_LOG_PATH(String tRAINING_LOG_PATH) {
 		TRAINING_LOG_PATH = tRAINING_LOG_PATH;
@@ -214,49 +237,16 @@ public class SingleTraceLAR {
 		OUTPUT_MODEL_PATH = oUTPUT_MODEL_PATH;
 	}
 
-	public void setPROPERTY_LEARN_FILE(String pROPERTY_LEARN_FILE) {
-		PROPERTY_LEARN_FILE = pROPERTY_LEARN_FILE;
-	}
-
-	public void setPROPERTY_INDEX(int pROPERTY_INDEX) {
-		PROPERTY_INDEX = pROPERTY_INDEX;
-	}
-
-	public void setBoundedSteps(int boundedSteps) {
-		this.boundedSteps = boundedSteps;
-	}
-
-	public void setSafetyBound(double safetyBound) {
-		this.safetyBound = safetyBound;
-	}
 
 	public void setMODEL_NAME(String mODEL_NAME) {
 		MODEL_NAME = mODEL_NAME;
 	}
 
-	public void setTESTING_TYPE(String tESTING_TYPE) {
-		TESTING_TYPE = tESTING_TYPE;
-	}
-
-	public void setSstSampleSize(int sstSampleSize) {
-		this.sstSampleSize = sstSampleSize;
-	}
 
 	public void setLARModelSize(int lARModelSize) {
 		LARModelSize = lARModelSize;
 	}
 
-	public void setError_alpha(double error_alpha) {
-		this.error_alpha = error_alpha;
-	}
-
-	public void setError_beta(double error_beta) {
-		this.error_beta = error_beta;
-	}
-
-	public void setConfidence_inteval(double confidence_inteval) {
-		this.confidence_inteval = confidence_inteval;
-	}
 
 	public void setPrevious_count(int previous_count) {
 		this.previous_count = previous_count;
@@ -282,17 +272,15 @@ public class SingleTraceLAR {
 		this.selective_data_collection = selective_data_collection;
 	}
 
-	private void identifyInitialStates(PrismModel model, List<String> previous_observation){
-
-		List<PrismState> states = model.getPrismStates();
-		List<PrismState> iss = new ArrayList<>();
-		for(PrismState state : states){
-			if(StringUtil.isSuffix(state.getLabel(), previous_observation)){
-				iss.add(state);
-			}
-		}
-		model.setInitialStates(iss);
-	}
-
-
+//	private void identifyInitialStates(PrismModel model, List<String> previous_observation){
+//
+//		List<PrismState> states = model.getPrismStates();
+//		List<PrismState> iss = new ArrayList<>();
+//		for(PrismState state : states){
+//			if(StringUtil.isSuffix(state.getLabel(), previous_observation)){
+//				iss.add(state);
+//			}
+//		}
+//		model.setInitialStates(iss);
+//	}
 }

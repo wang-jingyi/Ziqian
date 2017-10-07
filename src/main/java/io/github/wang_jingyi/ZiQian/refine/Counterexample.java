@@ -1,5 +1,6 @@
 package io.github.wang_jingyi.ZiQian.refine;
 
+import io.github.wang_jingyi.ZiQian.main.AlgoProfile;
 import io.github.wang_jingyi.ZiQian.main.GlobalConfigs;
 import io.github.wang_jingyi.ZiQian.main.TimeProfile;
 import io.github.wang_jingyi.ZiQian.prism.PrismModel;
@@ -190,24 +191,24 @@ public class Counterexample implements SplitPointFinder{
 		}
 		
 		List<SplittingPoint> finalsps = new ArrayList<>();
-//		if(Config.LOOP_FIRST){
-//			// put splitting points of loops in front
-//			List<Integer> loops = new ArrayList<>();
-//			for(int i=0; i<sps.size(); i++){ // find looping splitting point 
-//				SplittingPoint sp = sps.get(i);
-//				if(sp.getCurrentStateId()==sp.getNextStateId()){
-//					loops.add(i);
-//					finalsps.add(sp);
-//				}
-//			}
-//			
-//			int tmp = 0;
-//			for(int k=0; k<loops.size(); k++){
-//				int j = loops.get(k);
-//				sps.remove(j-tmp);
-//				tmp ++;
-//			}
-//		}
+		if(AlgoProfile.loop_first){
+			// put splitting points of loops in front
+			List<Integer> loops = new ArrayList<>();
+			for(int i=0; i<sps.size(); i++){ // find looping splitting point 
+				SplittingPoint sp = sps.get(i);
+				if(sp.getCurrentStateId()==sp.getNextStateId()){
+					loops.add(i);
+					finalsps.add(sp);
+				}
+			}
+			
+			int tmp = 0;
+			for(int k=0; k<loops.size(); k++){
+				int j = loops.get(k);
+				sps.remove(j-tmp);
+				tmp ++;
+			}
+		}
 		finalsps.addAll(sps);
 		System.out.println("- Maximum deviation: " + probDeviation.get(sps.get(0)));
 		return finalsps;

@@ -31,7 +31,7 @@ public class FormatPrismModel implements ModelTranslation{
 		this.fileName = fileName;
 		this.abstraction = abs;
 	}
-	
+
 	public FormatPrismModel(String modelType, String outputFilePath, String fileName) {
 		this.modelType = modelType;
 		this.outputFilePath = outputFilePath;
@@ -56,15 +56,15 @@ public class FormatPrismModel implements ModelTranslation{
 			FileWriter fw1 = new FileWriter(labelFile,false);
 			BufferedWriter bw = new BufferedWriter(fw);
 			BufferedWriter bw1 = new BufferedWriter(fw1);
-			
+
 			if(abstraction){ // abstract case
 				bw.write(ToDotPM(pm,data));
 			}
-			
+
 			else{ // non-abstract case
 				bw.write(ToDotPM(pm,data,AlgoProfile.vars,AlgoProfile.varsLength));
 			}
-			
+
 			bw1.write(labelToFile(pm));
 			bw.flush();
 			bw1.flush();
@@ -85,7 +85,7 @@ public class FormatPrismModel implements ModelTranslation{
 		}
 		return sb.toString();
 	}
-	
+
 	private String ToDotPM(PrismModel pm, Input data, List<String> vars, List<Integer> varsLength){
 		StringBuilder sb = new StringBuilder();
 		sb.append(modelType + " \n \n");
@@ -93,7 +93,18 @@ public class FormatPrismModel implements ModelTranslation{
 		// module
 		sb.append("module " + fileName + "\n");
 		assert pm.getInitialStates().size()<=1 : "more than one initial state.";
-		sb.append("s:[1.." + pm.getNumOfPrismStates() + "] init 1" + "; \n"); //
+		sb.append("s:[0.." + pm.getNumOfPrismStates() + "] init 0" + "; \n"); //
+
+		// take care of initial distribution
+		sb.append("[]s=0 -> ");
+		for(int i=0; i<pm.getInitialStates().size(); i++){
+			if(i==0){
+				sb.append(pm.getInitialDistribution().get(i) + ":(s'=" + pm.getInitialStates().get(i).getId() + ")");
+				continue;
+			}
+			sb.append(" + " + pm.getInitialDistribution().get(i) + " :(s'=" + pm.getInitialStates().get(i).getId() + ")");	
+		}
+		sb.append(";\n");
 
 		// state transitions
 		for(int i=0; i<pm.getNumOfPrismStates(); i++){
@@ -147,8 +158,8 @@ public class FormatPrismModel implements ModelTranslation{
 		}
 
 		return sb.toString();
-		
-		
+
+
 	}
 
 	private String ToDotPM(PrismModel pm, Input data) {
@@ -157,8 +168,19 @@ public class FormatPrismModel implements ModelTranslation{
 
 		// module
 		sb.append("module " + fileName + "\n");
-		
-		sb.append("s:[1.." + pm.getNumOfPrismStates() + "] init " + pm.getInitialStates().get(0).getId() + "; \n"); //
+
+		sb.append("s:[0.." + pm.getNumOfPrismStates() + "] init " + 0 + "; \n"); //
+
+		// take care of initial distribution
+		sb.append("[]s=0 -> ");
+		for(int i=0; i<pm.getInitialStates().size(); i++){
+			if(i==0){
+				sb.append(pm.getInitialDistribution().get(i) + ":(s'=" + pm.getInitialStates().get(i).getId() + ")");
+				continue;
+			}
+			sb.append(" + " + pm.getInitialDistribution().get(i) + " :(s'=" + pm.getInitialStates().get(i).getId() + ")");	
+		}
+		sb.append(";\n");
 
 		// state transitions
 		for(int i=0; i<pm.getNumOfPrismStates(); i++){
@@ -198,7 +220,7 @@ public class FormatPrismModel implements ModelTranslation{
 						validStateID.add(ps.getId());
 					}
 				}
-				
+
 				if(validStateID.size()!=0){
 					sb.append("label \"" + pre.getPredicateName()+"\" = s=" + validStateID.get(0) );
 					if(validStateID.size()>1){
@@ -228,7 +250,7 @@ public class FormatPrismModel implements ModelTranslation{
 					validUnfairAIndex.add(ps.getId());
 				}
 			}
-			
+
 			if(validUnfairAIndex.size()!=0){
 				sb.append("label \" unfairA \" = s=" + validUnfairAIndex.get(0));
 				if(validUnfairAIndex.size()>1){
@@ -241,7 +263,7 @@ public class FormatPrismModel implements ModelTranslation{
 			else{
 				sb.append("label \" unfairA \" = s=0;\n" ); // non-reachable
 			}
-			
+
 			if(validUnfairBIndex.size()!=0){
 				sb.append("label \" unfairB \" = s=" + validUnfairBIndex.get(0));
 				if(validUnfairBIndex.size()>1){

@@ -85,7 +85,5 @@ public class MarkovChain {
 		double[] dis = transitionMatrix.getRow(currentState);
 		return nextState(dis);
 	}
-
-
-
+	
 }

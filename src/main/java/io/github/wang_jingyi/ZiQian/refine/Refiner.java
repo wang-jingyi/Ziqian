@@ -1,5 +1,9 @@
 package io.github.wang_jingyi.ZiQian.refine;
 
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.List;
+
 import io.github.wang_jingyi.ZiQian.Predicate;
 import io.github.wang_jingyi.ZiQian.PredicateAbstraction;
 import io.github.wang_jingyi.ZiQian.data.VariablesValue;
@@ -10,17 +14,15 @@ import io.github.wang_jingyi.ZiQian.main.SwatConfig;
 import io.github.wang_jingyi.ZiQian.prism.PrismModel;
 import io.github.wang_jingyi.ZiQian.utils.FileUtil;
 import io.github.wang_jingyi.ZiQian.utils.NumberUtil;
-
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.List;
-
 import libsvm.LibSVM;
 import libsvm.svm_parameter;
 import net.sf.javaml.core.Dataset;
 import net.sf.javaml.core.DefaultDataset;
 import net.sf.javaml.core.DenseInstance;
 import net.sf.javaml.core.Instance;
+import net.sf.javaml.featureselection.FeatureScoring;
+import net.sf.javaml.featureselection.ranking.RankingFromScoring;
+import net.sf.javaml.featureselection.scoring.GainRatio;
 
 public class Refiner{
 
@@ -57,7 +59,7 @@ public class Refiner{
 
 	public LearnedPredicate refine() throws FileNotFoundException{
 		for(int i=0; i<spuriousTransitions.size(); i++){
-			System.out.println("--- Current splitting point: " + spuriousTransitions.get(i).toString());
+//			System.out.println("--- Current splitting point: " + spuriousTransitions.get(i).toString());
 			Dataset ds = collectDataSet(vvi.getVarsValues(), predicates, spuriousTransitions.get(i), pm);
 			if(ds==null){ // if the dataset is null, i.e., only has one label, then it's not classifiable
 				continue;
@@ -174,7 +176,7 @@ public class Refiner{
 			}
 		}
 
-		System.out.println("- Instance in the dataset: " + ds.size() + ":   postive instance: " + posCount + ",   negative instance: " + negCount);
+//		System.out.println("- Instance in the dataset: " + ds.size() + ":   postive instance: " + posCount + ",   negative instance: " + negCount);
 		return ds;
 
 	}
@@ -204,10 +206,10 @@ public class Refiner{
 //		rfs.build(ds);
 		
 		svm_para.kernel_type = 2;
-		svm_para.gamma = 0.1;
+		svm_para.gamma = 100;
 		svm_para.C = 1;
 
-		System.out.println("- Kernel type: " + svm_para.kernel_type);
+//		System.out.println("- Kernel type: " + svm_para.kernel_type);
 		svm.setParameters(svm_para);
 
 
@@ -243,81 +245,15 @@ public class Refiner{
 			sumCount++;
 		}
 		classifyAccuracy = (double)rightCount/sumCount;
-		System.out.println("- Classification accuracy : " + classifyAccuracy);
+//		System.out.println("- Classification accuracy : " + classifyAccuracy);
 
 		if(rightCount==negCount || rightCount==posCount){ // all data are in one side, fail to classify
-			System.out.println("=== Fail to find a linear splitting predicate ===");
+//			System.out.println("=== Fail to find a linear splitting predicate ===");
 			return null;
 		}
 
 		LearnedPredicate newPredicate = new LearnedPredicate(svm,"learned_predicate_" + AlgoProfile.iterationCount, newVars);
 		return newPredicate;
 	}
-
-	//	private Dataset normalizeDataset(Dataset ds){
-	//		Instance maxValuesIns = DatasetTools.maxAttributes(ds);
-	//		for(densen  
-	//				Instance ins : ds){
-	//			ins = ins.divide(maxValuesIns);
-	//			System.out.println("normalized instance: " + ins);
-	//		}
-	//		return ds;
-	//	}
-
-	//	private LearnedPredicate unsupervisedClassify(Dataset ds){
-	//
-	//		System.out.println("build cluster...");
-	//		//		System.out.println(ds.toString());
-	//		KMeans km = new KMeans(2);
-	//		Dataset[] dss = km.cluster(ds);
-	//
-	//		System.out.println("instance in first cluster: " + dss[0].size());
-	//		System.out.println("instance in second cluster: " + dss[1].size());
-	//
-	//		Dataset labeledDataset = new DefaultDataset();
-	//		for(Instance ins : dss[0]){
-	//			ins.setClassValue("positive");
-	//		}
-	//		for(Instance ins : dss[1]){
-	//			ins.setClassValue("negative");
-	//		}
-	//		labeledDataset.addAll(dss[0]);
-	//		labeledDataset.addAll(dss[1]);
-	//
-	//		LibSVM svm = new LibSVM();
-	//		svm.buildClassifier(labeledDataset);
-	//		double[] weights = svm.getWeights();
-	//
-	//		List<Integer> ind = selectWeightElements(weights);
-	//		for(int i=0; i<ind.size(); i++){
-	//			newVars.add(allVars.get(ind.get(i)));
-	//		}
-	//
-	//
-	//		System.out.println("weights of the classifier: " + NumberUtil.ArrayToString(svm.getWeights()));
-	//
-	//		int rightCount = 0;
-	//		int sumCount = 0;
-	//		System.out.println("calculate accuracy...");
-	//
-	//		for(Instance ins : labeledDataset){
-	//			if(svm.classify(ins).equals(ins.classValue())){
-	//				rightCount ++;
-	//			}
-	//			sumCount++;
-	//		}
-	//
-	//		classifyAccuracy = (double)rightCount/sumCount;
-	//		System.out.println("accuracy : " + classifyAccuracy);
-	//
-	//		if(rightCount==negCount || rightCount==posCount){ // all data are in one side, fail to classify
-	//			System.out.println("fail to find a splitting predicate...");
-	//			return null;
-	//		}
-	//
-	//		LearnedPredicate newPredicate = new LearnedPredicate(svm,"learned_predicate_" + AlgoProfile.iterationCount, newVars);
-	//		return newPredicate;
-	//	}
-
 
 }

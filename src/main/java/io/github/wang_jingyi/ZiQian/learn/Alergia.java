@@ -302,6 +302,7 @@ public class Alergia implements LearningDTMC{
 
 			}
 		}
+		
 
 		if(pb==0){
 			pfb = 0;
