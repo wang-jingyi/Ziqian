@@ -6,9 +6,7 @@ import io.github.wang_jingyi.ZiQian.utils.FileUtil;
 
 public class SwatConfig {
 
-	public static String SWAT_EVALUATION_ROOT = PlatformDependent.SWAT_EVALUATION_PATH;
-	public static String BATCH = "data_batch_2";
-	public static String MODEL_PATH = SWAT_EVALUATION_ROOT + "/" + BATCH;
+	public static String MODEL_PATH = PlatformDependent.PROJECT_DIR + "/resource/case_study";
 	public static String DATA_PATH = MODEL_PATH + "/training";
 	public static String PROPERTY_LEARN_FILE = MODEL_PATH + "/swat.pctl";
 	public static int PROPERTY_INDEX = 1;
@@ -32,8 +30,6 @@ public class SwatConfig {
 	// parameters for single trace learning of SWaT
 	public static String TRAINING_LOG_PATH = MODEL_PATH + "/training";
 	public static String TESTING_LOG = MODEL_PATH + "/testing";
-	public static int PREVIOUS_COUNT = 10;
-	public static String DECOMPOSED_DATA_PATH = MODEL_PATH + "/decomposed";
 
 
 	public static void writePropertyLearnFile() throws FileNotFoundException{
