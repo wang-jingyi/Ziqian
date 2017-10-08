@@ -36,7 +36,6 @@ public class SingleTraceLAR {
 	private boolean terminate_sample;
 	private boolean selective_data_collection;
 	private double epsilon = 0.00000001;
-	private double safety_thres = 1;
 
 
 	public void execute() throws FileNotFoundException, ClassNotFoundException, IOException, UnsupportedTestingTypeException{
@@ -56,6 +55,11 @@ public class SingleTraceLAR {
 			SWaTInput input = new SWaTInput(TRAINING_LOG_PATH, TESTING_LOG_PATH, predicate_set, previous_count, 
 					data_size, data_step_size, data_delimiter);
 			input.execute();
+			
+			Validator val = new Validator(input.getAbstractTrainingInput().getObservations().get(0), input.getAbstractTestingInput());
+			double safety_thres = val.getSafe_thres();
+			iteration_result.setTraining_unsafe_prob(val.getTraining_unsafe_prob());
+			iteration_result.setTest_unsafe_prob(val.getTesting_unsafe_prob());
 
 			AlgoProfile.vars = input.getTraining_vvi().getVars();	
 			AlgoProfile.varsLength = input.getTraining_vvi().getVarsLength();
@@ -76,7 +80,8 @@ public class SingleTraceLAR {
 			
 			// update LAR model size
 			if(bestDTMC.getNumOfPrismStates()==LARModelSize){
-				System.out.println("====== Cannot obtain a new linear predicate, verification fails ======");
+				System.out.println("\n" + iteration_result);
+				System.out.println("\n====== Cannot obtain a new linear predicate, verification fails ======");
 				TimeProfile.main_end_time = System.nanoTime();;
 				TimeProfile.main_time = TimeProfile.nanoToSeconds(TimeProfile.main_end_time-TimeProfile.main_start_time);
 				TimeProfile.outputTimeProfile();
@@ -110,18 +115,24 @@ public class SingleTraceLAR {
 				}
 			}
 			
+			
 			iteration_result.setLearned_unsafe_prob(model_unsafe_prob);
 			
 			TimeProfile.pmc_end_time = System.nanoTime();
 			
 			if(model_unsafe_prob<safety_thres){
+				TimeProfile.iteration_end_time = System.nanoTime();
+				TimeProfile.iteration_times.add(TimeProfile.nanoToSeconds
+						(TimeProfile.iteration_end_time-TimeProfile.iteration_start_time));
+				double iteration_time = TimeProfile.nanoToSeconds(TimeProfile.iteration_end_time-TimeProfile.iteration_start_time);
+				iteration_result.setIteration_time(iteration_time);
+				System.out.println("\n" + iteration_result);
+				System.out.println("\n====== property verified ======");
 				FileUtil.writeObject(OUTPUT_MODEL_PATH + "/predicates", AlgoProfile.predicates);
 				TimeProfile.main_end_time = System.nanoTime();;
 				TimeProfile.main_time = TimeProfile.nanoToSeconds(TimeProfile.main_end_time-TimeProfile.main_start_time);
 				TimeProfile.outputTimeProfile();
 				TimeProfile.outputTimeProfile(GlobalConfigs.OUTPUT_MODEL_PATH+"/time_profile.txt");
-				System.out.println("\n" + iteration_result);
-				System.out.println("\n====== property verified ======");
 				System.exit(0);
 			}
 			
@@ -130,9 +141,6 @@ public class SingleTraceLAR {
 			System.out.print("valildate the learned result...   ");
 			
 			TimeProfile.spurious_start_time= System.nanoTime();
-			Validator val = new Validator(safety_thres, input.getAbstractTestingInput());
-			
-			iteration_result.setTest_unsafe_prob(val.getTesting_unsafe_prob());
 			
 			System.out.print("look for spurious transitions...   ");
 			
@@ -141,13 +149,18 @@ public class SingleTraceLAR {
 					-TimeProfile.spurious_start_time));
 			
 			if(!val.isSpurious(model_unsafe_prob)){
+				TimeProfile.iteration_end_time = System.nanoTime();
+				double iteration_time = TimeProfile.nanoToSeconds(TimeProfile.iteration_end_time-TimeProfile.iteration_start_time);
+				TimeProfile.iteration_times.add(TimeProfile.nanoToSeconds
+						(TimeProfile.iteration_end_time-TimeProfile.iteration_start_time));
+				iteration_result.setIteration_time(iteration_time);
+				System.out.println("\n" + iteration_result);
+				System.out.println("\n======= property violated ======");
 				FileUtil.writeObject(OUTPUT_MODEL_PATH + "/predicates", AlgoProfile.predicates);
 				TimeProfile.main_end_time = System.nanoTime();;
 				TimeProfile.main_time = TimeProfile.nanoToSeconds(TimeProfile.main_end_time-TimeProfile.main_start_time);
 				TimeProfile.outputTimeProfile();
 				TimeProfile.outputTimeProfile(GlobalConfigs.OUTPUT_MODEL_PATH+"/time_profile.txt");
-				System.out.println("\n" + iteration_result);
-				System.out.println("\n======= property violated ======");
 				System.exit(0);
 			}
 			
@@ -172,6 +185,9 @@ public class SingleTraceLAR {
 				TimeProfile.iteration_end_time = System.nanoTime();
 				TimeProfile.iteration_times.add(TimeProfile.nanoToSeconds
 						(TimeProfile.iteration_end_time-TimeProfile.iteration_start_time));
+				double iteration_time = TimeProfile.nanoToSeconds(TimeProfile.iteration_end_time-TimeProfile.iteration_start_time);
+				iteration_result.setIteration_time(iteration_time);
+				System.out.println("\n" + iteration_result);
 				System.out.println("\n======= Fail to learn a new predicate, verification fails ======");
 				FileUtil.writeObject(OUTPUT_MODEL_PATH + "/predicates", AlgoProfile.predicates);
 				TimeProfile.main_end_time = System.nanoTime();;
@@ -197,12 +213,6 @@ public class SingleTraceLAR {
 		}
 
 	}
-	
-
-	public void setSafety_thres(double safety_thres) {
-		this.safety_thres = safety_thres;
-	}
-
 
 	public String getOUTPUT_MODEL_PATH() {
 		return OUTPUT_MODEL_PATH;

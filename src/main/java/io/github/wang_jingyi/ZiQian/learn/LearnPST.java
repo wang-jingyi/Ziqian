@@ -123,7 +123,7 @@ public class LearnPST implements LearningDTMC{
 				prismStates.add(ps);
 //				System.out.println("- add PrismState :: " + ps);
 				if(transSum>0){
-					assert transSum>=0.9999999999999998 : "=== out transition probability not equal to 1 ===";
+					assert transSum==1 : "=== out transition probability not equal to 1 ===";
 				}
 
 			}
@@ -134,7 +134,7 @@ public class LearnPST implements LearningDTMC{
 			}
 		}
 		
-		RealMatrix transition_matrix = MatrixUtils.createRealMatrix(numOfStates,numOfStates);
+		RealMatrix transition_matrix = MatrixUtils.createRealMatrix(numOfStates-1,numOfStates-1);
 		// set nextStates
 		for(PrismState ps : prismStates){
 			if(ps.getSigmas().size()==0){ // not observed suffix, regard as a sink state

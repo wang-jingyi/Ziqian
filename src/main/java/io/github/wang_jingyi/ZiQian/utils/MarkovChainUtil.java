@@ -64,7 +64,11 @@ public class MarkovChainUtil {
 //                x.print(9, 6);
             }
         }
-        
+        double steady_sum = 0;
+        for(double d : x.getColumnPackedCopy()){
+        	steady_sum = steady_sum + d;
+        }
+        assert Math.abs(steady_sum-1) < 1e-12: "====== steady distribution summed to " + steady_sum +  ", not 1 ======";
         return x.getColumnPackedCopy();
 	}
 	

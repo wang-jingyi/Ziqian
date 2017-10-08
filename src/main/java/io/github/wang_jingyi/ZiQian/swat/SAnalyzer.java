@@ -34,9 +34,9 @@ public class SAnalyzer implements SplitPointFinder{
 	private List<SplittingPoint> findAllSplittingPoints(PrismModel pm) {
 		List<PrismState> all_states = pm.getPrismStates();
 
-		for(int j=0; j<all_states.size(); j++){
+		for(int j=1; j<all_states.size(); j++){ // dummy initial state is excluded
 			PrismState current_state = all_states.get(j);
-			for(int i=0; i<current_state.getNextStates().size(); i++){
+			for(int i=1; i<current_state.getNextStates().size(); i++){
 				PrismState next_state = current_state.getNextStates().get(i);
 				SplittingPoint sp = new SplittingPoint(current_state.getId(), next_state.getId());
 				boolean flag = false;

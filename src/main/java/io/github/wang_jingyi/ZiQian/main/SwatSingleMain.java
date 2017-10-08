@@ -47,7 +47,6 @@ public class SwatSingleMain {
 		lar.setData_size(SwatConfig.DATA_SIZE);
 		lar.setData_step_size(SwatConfig.STEP_SIZE); // sampling step size of data
 		lar.setData_delimiter(SwatConfig.DELIMITER); // delimiter of data file
-		lar.setSafety_thres(SwatConfig.SAFETY_THRESHOLD); // safety threshold
 		lar.setEpsilon(SwatConfig.epsilon); // learning parameter
 		
 		TimeProfile.main_start_time = System.nanoTime();
