@@ -13,6 +13,8 @@ public class AlgoProfile {
 	public static List<Predicate> predicates = new ArrayList<>();
 	public static boolean loop_first = false;
 	
+	public static boolean collect_training_data = true;
+	
 	public static List<String> vars = new ArrayList<>(); // triggered variables 
 	public static List<Integer> varsLength;
 	

@@ -12,6 +12,7 @@ import io.github.wang_jingyi.ZiQian.data.VariablesValueInfo;
 import io.github.wang_jingyi.ZiQian.exceptions.UnsupportedLearningTypeException;
 import io.github.wang_jingyi.ZiQian.exceptions.UnsupportedTestingTypeException;
 import io.github.wang_jingyi.ZiQian.swat.property.OverHigh;
+import io.github.wang_jingyi.ZiQian.swat.property.UnderLow;
 
 public class SwatSingleMain {
 
@@ -31,8 +32,12 @@ public class SwatSingleMain {
 
 		List<Predicate> pres = new ArrayList<>();
 		pres.add(new TruePredicate());
-		pres.add(new OverHigh(SwatConfig.SENSOR,SwatConfig.SENSOR_THRES)); // specify safety property SENSOR>SENSOR_THRES
-//		pres.add(new UnderLow(SwatConfig.SENSOR, SwatConfig.SENSOR_THRES));
+		if(SwatConfig.HIGH){
+			pres.add(new OverHigh(SwatConfig.SENSOR,SwatConfig.SENSOR_THRES)); // specify safety property SENSOR>SENSOR_THRES
+		}
+		else{
+			pres.add(new UnderLow(SwatConfig.SENSOR, SwatConfig.SENSOR_THRES)); // specify safety property SENSOR<SENSOR_THRES
+		}
 		
 		AlgoProfile.predicates = pres;
 
@@ -48,6 +53,8 @@ public class SwatSingleMain {
 		lar.setData_step_size(SwatConfig.STEP_SIZE); // sampling step size of data
 		lar.setData_delimiter(SwatConfig.DELIMITER); // delimiter of data file
 		lar.setEpsilon(SwatConfig.epsilon); // learning parameter
+		
+		System.out.println("++++++ current experiment: " + SwatConfig.SENSOR + ", threshold: " + SwatConfig.SENSOR_THRES + " ++++++");
 		
 		TimeProfile.main_start_time = System.nanoTime();
 		lar.execute(); // execute LAR

@@ -1,6 +1,7 @@
 package io.github.wang_jingyi.ZiQian;
 
 import io.github.wang_jingyi.ZiQian.data.VariablesValue;
+import io.github.wang_jingyi.ZiQian.main.AlgoProfile;
 import io.github.wang_jingyi.ZiQian.utils.StringUtil;
 
 import java.util.ArrayList;
@@ -43,8 +44,8 @@ public class PredicateAbstraction implements Abstraction{
 				}
 			}
 		}
-		
-		assert bad_state_happened==true : "====== unsafe states don't show up, please adjust the threshold or step size. ======";
+		if(AlgoProfile.collect_training_data)
+			assert bad_state_happened==true : "====== unsafe states don't show up, please adjust the threshold or step size. ======";
 //		System.out.println("------Data information------");
 //		System.out.println("- alphabet: " + alpha);
 //		System.out.println("- alphabet size: " + alpha.size());

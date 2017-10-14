@@ -128,6 +128,7 @@ public class SingleTraceLAR {
 				iteration_result.setIteration_time(iteration_time);
 				System.out.println("\n" + iteration_result);
 				System.out.println("\n====== property verified ======");
+				AlgoProfile.result = "true";
 				FileUtil.writeObject(OUTPUT_MODEL_PATH + "/predicates", AlgoProfile.predicates);
 				TimeProfile.main_end_time = System.nanoTime();;
 				TimeProfile.main_time = TimeProfile.nanoToSeconds(TimeProfile.main_end_time-TimeProfile.main_start_time);

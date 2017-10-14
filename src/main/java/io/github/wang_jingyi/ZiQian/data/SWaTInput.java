@@ -7,6 +7,7 @@ import java.util.List;
 import io.github.wang_jingyi.ZiQian.Input;
 import io.github.wang_jingyi.ZiQian.Predicate;
 import io.github.wang_jingyi.ZiQian.PredicateAbstraction;
+import io.github.wang_jingyi.ZiQian.main.AlgoProfile;
 
 public class SWaTInput {
 	
@@ -44,9 +45,9 @@ public class SWaTInput {
 			training_vvi = epd.getVariablesValueInfo(varsSet);
 			PredicateAbstraction pa = new PredicateAbstraction(predicates);
 			training_input = pa.abstractInput(training_vvi.getVarsValues());
+			AlgoProfile.collect_training_data = false;
 			
-			
-			ExtractPrismData epd1 = new ExtractPrismData(testing_log, data_size, step_size, delimiter);
+			ExtractPrismData epd1 = new ExtractPrismData(testing_log, Integer.MAX_VALUE, step_size, delimiter);
 			testing_vvi = epd1.getVariablesValueInfo(varsSet);
 			Input testing_data = pa.abstractInput(testing_vvi.getVarsValues());
 			testing_input = testing_data.getObservations().get(0);
