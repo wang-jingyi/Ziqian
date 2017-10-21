@@ -1,5 +1,7 @@
 package io.github.wang_jingyi.ZiQian.learn;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -10,8 +12,10 @@ import org.apache.commons.math3.linear.RealMatrix;
 
 import io.github.wang_jingyi.ZiQian.Input;
 import io.github.wang_jingyi.ZiQian.Predicate;
+import io.github.wang_jingyi.ZiQian.main.AlgoProfile;
 import io.github.wang_jingyi.ZiQian.prism.PrismModel;
 import io.github.wang_jingyi.ZiQian.prism.PrismState;
+import io.github.wang_jingyi.ZiQian.utils.FileUtil;
 import io.github.wang_jingyi.ZiQian.utils.MarkovChainUtil;
 import io.github.wang_jingyi.ZiQian.utils.StringUtil;
 
@@ -19,7 +23,7 @@ public class LearnPST implements LearningDTMC{
 
 	private PSTNode root = new PSTNode();
 	private int numOfStates;
-	private double epsilon = 0.00000001; // default threshold
+	private double epsilon = 0.01; // default threshold
 	private int maxMemorySize = 1000;
 	private double selectionCriterion; // BIC score in this learning algorithm
 	private PrismModel PSA = new PrismModel(); // this will be used for generating .pm file later
@@ -57,6 +61,7 @@ public class LearnPST implements LearningDTMC{
 //		System.out.println("- translating learned model to a PrismModel...");
 		List<PrismState> prismStates = new ArrayList<PrismState>(); // list of prism states
 		List<PrismState> initialStates = new ArrayList<PrismState>(); // list of initial states
+		boolean one_state_model = false;
 		numOfStates = 1; //reset the number of state, since we may need to extend the tree
 
 		// extend original tree, leaf by leaf check until the desired property of PST holds
@@ -64,14 +69,22 @@ public class LearnPST implements LearningDTMC{
 
 //		System.out.println("- extend original tree to satisfy pst property");
 		boolean pst_property_holds = false;
+//		
+//		if(AlgoProfile.iterationCount==2){
+//			System.out.println("bp");
+//		}
+		
 		HashSet<PSTNode> testedLeaf = new HashSet<>();
 		while(!pst_property_holds){
 			List<PSTNode> leafs_in_length_order = findLeafInLengthOrder(root);
-			assert leafs_in_length_order.size()>0 : "=== no valid model learned, adjust the learning parameter \\epsilon ===";
+			if(leafs_in_length_order.size()==0){ // the tree only has a root node
+				one_state_model = true;
+				break;
+			}
+//			assert leafs_in_length_order.size()>0 : "=== no valid model learned, adjust the learning parameter \\epsilon ===";
 			int current_leaf_num = leafs_in_length_order.size();
 			boolean traverse_over = false;
-			for(int j=current_leaf_num-1; j>=0; j--){
-
+			for(int j=current_leaf_num-1; j>=0; j--){ // test pst property
 				PSTNode current_leaf = leafs_in_length_order.get(j);
 				if(testedLeaf.contains(current_leaf)){
 					continue;
@@ -94,7 +107,26 @@ public class LearnPST implements LearningDTMC{
 				pst_property_holds = true;
 			}
 		}
-
+		
+		int[] occ_count = new int[data.getAlphabet().size()];
+		List<Double> occ_probs = new ArrayList<>();
+		if(one_state_model){ // the tree only has a root node
+			for(String s : observation){
+				int id = StringUtil.getStringIndex(s, data.getAlphabet());
+				occ_count[id] ++;
+			}
+			
+			for(int i=0; i<occ_count.length; i++){
+				double occ_prob = (double)occ_count[i]/observation.size();
+				occ_probs.add(occ_prob);
+			}
+			
+			for(int i=0; i<data.getAlphabet().size(); i++){
+				System.out.println("--- " + data.getAlphabet().get(i) + " occurrence probability: " + occ_probs.get(i));
+			}
+			return;
+		}
+		
 		// build transitions and PrismState
 //		System.out.println("- from PST to PFA");
 		LinkedList<PSTNode> stack = new LinkedList<PSTNode>();
@@ -135,6 +167,7 @@ public class LearnPST implements LearningDTMC{
 		}
 		
 		RealMatrix transition_matrix = MatrixUtils.createRealMatrix(numOfStates-1,numOfStates-1);
+		
 		// set nextStates
 		for(PrismState ps : prismStates){
 			if(ps.getSigmas().size()==0){ // not observed suffix, regard as a sink state
@@ -147,20 +180,38 @@ public class LearnPST implements LearningDTMC{
 				for(PrismState innps : prismStates){
 					if(StringUtil.equals(nextPSLabel, innps.getLabel()) || StringUtil.isSuffix(innps.getLabel(), nextPSLabel)){
 						ps.getNextStates().add(innps);
-						transition_matrix.setEntry(ps.getId()-1, innps.getId()-1,Double.parseDouble(ps.getSigmas().get(i)));
+						transition_matrix.setEntry(ps.getId()-1, innps.getId()-1,ps.getTransitionProb().get(i));
 						found = true;
 						break;
 					}
 				}
-				if(!found){
-//					System.out.println("undefined transitions: from " + ps + ", next symbol: " + nextPSLabel);
-				}
+				assert found==true : "====== pst property is not satisfied ======";
 			}
 			assert ps.getSigmas().size()==ps.getNextStates().size() : "=== not every state has a emitting state ===";
 		}
 		
 		List<Double> init_distribution = new ArrayList<>();
 		double[] steady_state_distribution = MarkovChainUtil.computeSteadyStateDistribution(transition_matrix.getData());
+		
+//		List<Integer> target_states = new ArrayList<>();
+//		for(PrismState state : prismStates){
+//			if(state.getCurrentState().startsWith("11")){
+//				target_states.add(state.getId()-1);
+//			}
+//		}
+////		
+//		try {
+//			FileUtil.writeObject("/Users/jingyi/imcis/evaluation/swat/LIT401>1000/transition_matrix", transition_matrix);
+//			FileUtil.writeObject("/Users/jingyi/imcis/evaluation/swat/LIT401<1000/target_states", target_states);
+//		} catch (FileNotFoundException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		
+		
 		for(int i=0; i<prismStates.size(); i++){
 //			if(steady_state_distribution[i]!=0){
 				initialStates.add(prismStates.get(i));

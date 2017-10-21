@@ -27,11 +27,11 @@ public class PrismState {
 		return label.get(labelLength-1);
 	}
 	
-	
 
 	@Override
 	public String toString() {
-		return "PrismState [id=" + id + ", label=" + label + "]";
+		return "PrismState [id=" + id + ", label=" + label + ", transitionProb=" + transitionProb + ", sigmas=" + sigmas
+				+ "]";
 	}
 
 	public List<String> getLabel() {

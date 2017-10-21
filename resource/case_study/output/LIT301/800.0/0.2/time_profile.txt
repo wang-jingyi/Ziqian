@@ -1,10 +1,10 @@
 
-++++++ Running time profile for the run starting at 2017/10/10 16:11:21 ++++++
+++++++ Running time profile for the run starting at 2017/10/20 20:33:45 ++++++
 --- Verification result: true ---
---- Time for whole algorithm: 2.073479 s
-=== Time for each iteration: [2.052559] s ===
+--- Time for whole algorithm: 1.95904 s
+=== Time for each iteration: [1.947805] s ===
 ::: Divided time for each iteration :::
-- Time for learning: [1.567477] s
+- Time for learning: [1.410254] s
 - Time for PRISM model checking: [] s
 - Time for counterexample generation: [] s
 - Time for hypothesis testing: [] s

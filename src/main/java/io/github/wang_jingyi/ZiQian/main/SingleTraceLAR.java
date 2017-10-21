@@ -9,6 +9,7 @@ import io.github.wang_jingyi.ZiQian.data.SWaTInput;
 import io.github.wang_jingyi.ZiQian.exceptions.UnsupportedTestingTypeException;
 import io.github.wang_jingyi.ZiQian.learn.LearnPST;
 import io.github.wang_jingyi.ZiQian.learn.LearningDTMC;
+import io.github.wang_jingyi.ZiQian.learn.PSTGoldenSearch;
 import io.github.wang_jingyi.ZiQian.prism.FormatPrismModel;
 import io.github.wang_jingyi.ZiQian.prism.PrismModel;
 import io.github.wang_jingyi.ZiQian.prism.PrismState;
@@ -46,7 +47,9 @@ public class SingleTraceLAR {
 			System.out.println("============ iteration " + (iteration+1) + " ============");
 			SWaTIterationResult iteration_result = new SWaTIterationResult();
 			iteration_result.setIteration(iteration+1);
-
+			
+			
+			AlgoProfile.iterationCount = iteration + 1;
 			AlgoProfile.predicates = predicate_set;
 			
 			TimeProfile.iteration_start_time = System.nanoTime();
@@ -70,7 +73,9 @@ public class SingleTraceLAR {
 			System.out.print("learn...   ");
 			TimeProfile.learning_start_time = System.nanoTime();
 			
-			LearningDTMC learner = new LearnPST(epsilon);
+			LearningDTMC learner = 
+//					new PSTGoldenSearch(1e-2, 2).selectCriterion(input.getAbstractTrainingInput()); 
+					new LearnPST(epsilon);
 			learner.learn(input.getAbstractTrainingInput());
 			learner.PrismModelTranslation(input.getAbstractTrainingInput(), predicate_set, modelName);
 //			identifyInitialStates(learner.getPrismModel(), input.getPreviousObservation());
@@ -173,10 +178,10 @@ public class SingleTraceLAR {
 					-TimeProfile.ce_generation_start_time));
 
 			// refinement
-			System.out.print("refine the abstraction...   ");
+			System.out.print("------ refine the abstraction...   ");
 			TimeProfile.refine_start_time = System.nanoTime();
-			Refiner refiner = new Refiner(sps, input.getTesting_vvi(), input.getPredicates(), bestDTMC, terminate_sample,
-					selective_data_collection);
+			Refiner refiner = new Refiner(sps, input.getTraining_vvi(), input.getPredicates(), bestDTMC, terminate_sample,
+					selective_data_collection); // we should use the training data to refine the abstraction
 			Predicate newPredicate = refiner.refine();
 			TimeProfile.refine_end_time = System.nanoTime();
 			TimeProfile.refine_times.add(TimeProfile.nanoToSeconds(TimeProfile.refine_end_time

@@ -3,6 +3,7 @@ package io.github.wang_jingyi.ZiQian.refine;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import io.github.wang_jingyi.ZiQian.Predicate;
 import io.github.wang_jingyi.ZiQian.PredicateAbstraction;
@@ -12,17 +13,16 @@ import io.github.wang_jingyi.ZiQian.main.AlgoProfile;
 import io.github.wang_jingyi.ZiQian.main.GlobalConfigs;
 import io.github.wang_jingyi.ZiQian.main.SwatConfig;
 import io.github.wang_jingyi.ZiQian.prism.PrismModel;
+import io.github.wang_jingyi.ZiQian.prism.PrismState;
 import io.github.wang_jingyi.ZiQian.utils.FileUtil;
 import io.github.wang_jingyi.ZiQian.utils.NumberUtil;
+import io.github.wang_jingyi.ZiQian.utils.StringUtil;
 import libsvm.LibSVM;
 import libsvm.svm_parameter;
 import net.sf.javaml.core.Dataset;
 import net.sf.javaml.core.DefaultDataset;
 import net.sf.javaml.core.DenseInstance;
 import net.sf.javaml.core.Instance;
-import net.sf.javaml.featureselection.FeatureScoring;
-import net.sf.javaml.featureselection.ranking.RankingFromScoring;
-import net.sf.javaml.featureselection.scoring.GainRatio;
 
 public class Refiner{
 
@@ -45,7 +45,7 @@ public class Refiner{
 		this.predicates = pres;
 		this.pm = pm;
 	}
-	
+
 	public Refiner(List<SplittingPoint> sps, VariablesValueInfo vvi, List<Predicate> pres, PrismModel pm, boolean ts, boolean sdc) {
 		super();
 		this.spuriousTransitions = sps;
@@ -55,12 +55,20 @@ public class Refiner{
 		this.terminateSample = ts;
 		this.selectiveDataCollection = sdc;
 	}
-	
+
 
 	public LearnedPredicate refine() throws FileNotFoundException{
 		for(int i=0; i<spuriousTransitions.size(); i++){
-//			System.out.println("--- Current splitting point: " + spuriousTransitions.get(i).toString());
-			Dataset ds = collectDataSet(vvi.getVarsValues(), predicates, spuriousTransitions.get(i), pm);
+			SplittingPoint current_sp = spuriousTransitions.get(new Random().nextInt(spuriousTransitions.size()));
+			System.out.println("--- current splitting point: " + current_sp.toString());
+			Dataset ds = null;
+			if(vvi.getVarsValues().size()==1){
+				ds = collectDataSetFromSingleTrace(vvi.getVarsValues().get(0), predicates, current_sp, pm);
+			}
+			else{
+				ds = collectDataSet(vvi.getVarsValues(), predicates, current_sp, pm);
+			}
+
 			if(ds==null){ // if the dataset is null, i.e., only has one label, then it's not classifiable
 				continue;
 			}
@@ -97,6 +105,69 @@ public class Refiner{
 	//		}
 	//		return collectDataSet(vvs, predicates, sp, pm);
 	//	}
+
+	private Dataset collectDataSetFromSingleTrace(List<VariablesValue> vvl, List<Predicate> predicates, SplittingPoint sp, PrismModel pm){
+
+		// reset postive/negative count 
+		posCount = 0;
+		negCount = 0;
+
+		Dataset ds = new DefaultDataset();
+		int featureSize = AlgoProfile.vars.size();
+		PredicateAbstraction pa = new PredicateAbstraction(predicates);
+
+		List<String> testing_log = pa.abstractList(vvl); // abstract list of values
+		List<Integer> id_list = new ArrayList<>();
+
+		PrismState currentPS = null;
+		PrismState state = pm.getPrismStates().get(sp.getCurrentStateId()-1);
+		int start = -1;
+		for(int i=1; i<=testing_log.size(); i++){
+			if(StringUtil.isSuffix(state.getLabel(), testing_log.subList(0, i))){
+				id_list.add(state.getId());
+				currentPS = state;
+				start = i;
+				break;
+			}
+			id_list.add(-1);
+		}
+		
+		assert start!=-1 : "====== state is not found in the log ======";
+
+		for(int i=start; i<testing_log.size()-1; i++){
+			
+			int nextStateID = StringUtil.getStringIndex(testing_log.get(i), currentPS.getSigmas());
+			assert nextStateID!=-1 : "====== new transition happens ======";
+			PrismState nextPS = currentPS.getNextStates().get(nextStateID);
+			int nextID = nextPS.getId();
+			id_list.add(nextID);
+			currentPS = nextPS;
+		}
+
+		for(int i=0; i<id_list.size()-1; i++){
+
+			if(id_list.get(i)==sp.getCurrentStateId() && id_list.get(i+1)==sp.getNextStateId()){ // positive instance
+				double[] values = new double[featureSize];
+				for(int j=0; j<vvl.get(i).getValues().size(); j++){ // store the concrete values of the state
+					values[j] = vvl.get(i).getValues().get(j).getRawDoubleValue();
+				}
+				Instance ins = new DenseInstance(values,"positive");
+				ds.add(ins);
+				posCount++;
+			}
+			else{
+				double[] values = new double[featureSize];
+				for(int j=0; j<vvl.get(i).getValues().size(); j++){ // store the concrete values of the state
+					values[j] = vvl.get(i).getValues().get(j).getRawDoubleValue();
+				}
+				Instance ins = new DenseInstance(values,"negative");
+				ds.add(ins);
+				negCount++; // update negative instance count
+			}
+		}
+		return ds;
+
+	}
 
 	private Dataset collectDataSet(List<List<VariablesValue>> vvs, List<Predicate> predicates, SplittingPoint sp, PrismModel pm){
 
@@ -176,40 +247,40 @@ public class Refiner{
 			}
 		}
 
-//		System.out.println("- Instance in the dataset: " + ds.size() + ":   postive instance: " + posCount + ",   negative instance: " + negCount);
+		//		System.out.println("- Instance in the dataset: " + ds.size() + ":   postive instance: " + posCount + ",   negative instance: " + negCount);
 		return ds;
 
 	}
 
-//	private List<Integer> selectWeightElements(double[] weights){
-//		List<Integer> ind = new ArrayList<>();
-//		for(int i=0; i<weights.length; i++){
-//			if(weights[i]!=0){
-//				ind.add(i);
-//			}
-//		}
-//		return ind;
-//	}
+	//	private List<Integer> selectWeightElements(double[] weights){
+	//		List<Integer> ind = new ArrayList<>();
+	//		for(int i=0; i<weights.length; i++){
+	//			if(weights[i]!=0){
+	//				ind.add(i);
+	//			}
+	//		}
+	//		return ind;
+	//	}
 
 	private LearnedPredicate supervisedClassify(Dataset ds) throws FileNotFoundException {
 
 		// dataset normalization between [0,1]
-//		System.out.println("- Normalize dataset");
-//		NormalizeMidrange dnm = new NormalizeMidrange(0.5, 1);
-//		dnm.filter(ds);
+		//		System.out.println("- Normalize dataset");
+		//		NormalizeMidrange dnm = new NormalizeMidrange(0.5, 1);
+		//		dnm.filter(ds);
 
 		LibSVM svm = new LibSVM();
 		svm_parameter svm_para = (svm_parameter) svm.getParameters().clone();
-		
-//		FeatureScoring fs = new GainRatio();
-//		RankingFromScoring rfs = new RankingFromScoring(fs);
-//		rfs.build(ds);
-		
+
+		//		FeatureScoring fs = new GainRatio();
+		//		RankingFromScoring rfs = new RankingFromScoring(fs);
+		//		rfs.build(ds);
+
 		svm_para.kernel_type = 2;
 		svm_para.gamma = 100;
 		svm_para.C = 1;
 
-//		System.out.println("- Kernel type: " + svm_para.kernel_type);
+		System.out.println("- Kernel type: " + svm_para.kernel_type);
 		svm.setParameters(svm_para);
 
 
@@ -230,11 +301,11 @@ public class Refiner{
 		FileUtil.writeStringToFile(SwatConfig.OUTPUT_MODEL_PATH+"/swat" + (AlgoProfile.iterationCount+1)+"_classifier.txt", svm_log.toString());
 
 
-//		double[] weights = svm.getWeights();
-//		List<Integer> ind = selectWeightElements(weights);
-//		for(int i=0; i<ind.size(); i++){
-//			newVars.add(allVars.get(ind.get(i)));
-//		}
+		//		double[] weights = svm.getWeights();
+		//		List<Integer> ind = selectWeightElements(weights);
+		//		for(int i=0; i<ind.size(); i++){
+		//			newVars.add(allVars.get(ind.get(i)));
+		//		}
 
 		int rightCount = 0;
 		int sumCount = 0;
@@ -245,10 +316,10 @@ public class Refiner{
 			sumCount++;
 		}
 		classifyAccuracy = (double)rightCount/sumCount;
-//		System.out.println("- Classification accuracy : " + classifyAccuracy);
+		System.out.println("- Classification accuracy : " + classifyAccuracy);
 
 		if(rightCount==negCount || rightCount==posCount){ // all data are in one side, fail to classify
-//			System.out.println("=== Fail to find a linear splitting predicate ===");
+			System.out.println("=== Fail to find a linear splitting predicate ===");
 			return null;
 		}
 

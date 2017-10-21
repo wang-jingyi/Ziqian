@@ -12,16 +12,14 @@ public class SwatConfig {
 	public static int PROPERTY_INDEX = 1;
 	public static int BOUNDED_STEP = 100;
 
-
-
 	// parameters for swat case study
-	public static String SENSOR = "LIT101"; // sensor name in string
-	public static double SENSOR_THRES = 500; // ac>7.05tion threshold
-	public static boolean HIGH = false;
+	public static String SENSOR = "PIT501"; // sensor name in string
+	public static double SENSOR_THRES = 30; // action threshold
+	public static boolean HIGH = true;
 	public static double SAFETY_THRESHOLD = 0.2; // how much more than the training unsafe probability
-	public static int DATA_SIZE = 300000; // limit of data size for learning
+	public static int DATA_SIZE = 100000; // limit of data size for learning
 	public static int STEP_SIZE = 60; // sample frequency
-	public static double epsilon = 0.001; // parameter in the learning algorithm
+	public static double epsilon = 0.01; // parameter in the learning algorithm
 	
 
 	public static String DELIMITER = ",";
