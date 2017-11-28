@@ -198,8 +198,12 @@ public class PrismPathData {
 		return executions;
 	}
 	
-	// first line is variables
-	// data starts from second line
+	/**
+	 * @param dirPath the file path holding all the system paths
+	 * @param delimter delimiter of the data 
+	 * @return the list of variables that are boolean, double or float type
+	 * @throws IOException
+	 */
 	public static List<String> extractPathVars(String dirPath, String delimter) throws IOException{
 		List<String> vars = new ArrayList<>();
 		for(String s : FileUtil.filesInDir(dirPath)){

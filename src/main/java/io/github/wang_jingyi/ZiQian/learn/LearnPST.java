@@ -1,7 +1,5 @@
 package io.github.wang_jingyi.ZiQian.learn;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -12,10 +10,8 @@ import org.apache.commons.math3.linear.RealMatrix;
 
 import io.github.wang_jingyi.ZiQian.Input;
 import io.github.wang_jingyi.ZiQian.Predicate;
-import io.github.wang_jingyi.ZiQian.main.AlgoProfile;
 import io.github.wang_jingyi.ZiQian.prism.PrismModel;
 import io.github.wang_jingyi.ZiQian.prism.PrismState;
-import io.github.wang_jingyi.ZiQian.utils.FileUtil;
 import io.github.wang_jingyi.ZiQian.utils.MarkovChainUtil;
 import io.github.wang_jingyi.ZiQian.utils.StringUtil;
 
@@ -24,7 +20,7 @@ public class LearnPST implements LearningDTMC{
 	private PSTNode root = new PSTNode();
 	private int numOfStates;
 	private double epsilon = 0.01; // default threshold
-	private int maxMemorySize = 1000;
+	private int maxMemorySize = 10;
 	private double selectionCriterion; // BIC score in this learning algorithm
 	private PrismModel PSA = new PrismModel(); // this will be used for generating .pm file later
 	

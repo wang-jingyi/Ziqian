@@ -25,21 +25,21 @@ public class ExampleMain {
 		//				{0.5, 0.1, 0, 0, 0, 0, 0.4},
 		//				{0, 0, 0, 0, 0, 0, 1}};
 
-//				double[][] matrix = new double[][]{
-//						{0.999,0.0009,0.0001,0},
-//						{0,0,0.05,0.95},
-//						{0,0,0,1},
-//						{0,0,0,1}
-//				};
+				double[][] matrix = new double[][]{
+						{0.999,0.0009,0.0001,0},
+						{0,0,0.05,0.95},
+						{0,0,0,1},
+						{0,0,0,1}
+				};
 		
 		
-		// hollow matrix
-		double[][] matrix = new double[][]{
-				{0,0.992,0.003,0.005},
-				{0.98,0,0.01,0.01},
-				{0.4,0.13,0,0.47},
-				{0.42,0.2,0.38,0}
-		};
+//		// hollow matrix
+//		double[][] matrix = new double[][]{
+//				{0,0.992,0.003,0.005},
+//				{0.98,0,0.01,0.01},
+//				{0.4,0.13,0,0.47},
+//				{0.42,0.2,0.38,0}
+//		};
 		
 		// queuing model
 //		double[][] matrix = new double[][]{
@@ -59,9 +59,9 @@ public class ExampleMain {
 		
 		ALConfig.stateNumber = 4;
 		ALConfig.pathLength = ALConfig.stateNumber;
-//		String modelName = "toy_example";
+		String modelName = "toy_example";
 //		String modelName = "queue_model";
-		String modelName = "hollow_matrix";
+//		String modelName = "hollow_matrix";
 		
 		int itPathNumber = 5000;
 		int repeatTime = 20;

@@ -6,12 +6,17 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author wangjingyi
+ *
+ */
 public class ExtractPrismData implements FormatVariablesValue{
 	
-	private String dataPath;
-	private int stepSize;
-	private int dataSize;
-	private String delimiter;
+	private String dataPath; // path of data in prism format
+	private int stepSize; // sample size
+	private int dataSize; // total number of data
+	private String delimiter; // delimiter of data file
+	
 	
 	public ExtractPrismData(String datapath, int datasize, int stepSize, String delimiter) {
 		this.dataPath = datapath;
