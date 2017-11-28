@@ -20,12 +20,12 @@ public class SingtelTest {
 	
 	static String data_path = "/Users/jingyi/Ziqian/resource/singtel";
 	static String output_path = "/Users/jingyi/Ziqian/resource/singtel/output";
-	static double epsilon = 0.002;
+	static double epsilon = 0.0001;
 	
 	public static void main(String[] args) throws IOException, ClassNotFoundException{
 		
 		String model_name = "singtel";
-		int data_size = 10000;
+		int data_size = 100000;
 		int step_size = 1;
 		String delimiter = ",";
 		

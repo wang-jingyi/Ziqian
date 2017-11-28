@@ -14,7 +14,6 @@ public class SWaTInput {
 	String training_log;
 	String testing_log;
 	List<Predicate> predicates;
-	int previous_count = 100;
 	VariablesValueInfo training_vvi;
 	VariablesValueInfo testing_vvi;
 	List<String> varsSet;
@@ -30,7 +29,6 @@ public class SWaTInput {
 		this.training_log = training_log;
 		this.testing_log = testing_log;
 		this.predicates = predicates;
-		this.previous_count = previous_count;
 		this.previous_observation = new ArrayList<>();
 		this.data_size = data_size;
 		this.step_size = step_size;
@@ -51,7 +49,6 @@ public class SWaTInput {
 			testing_vvi = epd1.getVariablesValueInfo(varsSet);
 			Input testing_data = pa.abstractInput(testing_vvi.getVarsValues());
 			testing_input = testing_data.getObservations().get(0);
-			previous_observation = testing_data.getObservations().get(0).subList(0, previous_count);
 			
 		} catch (IOException e) {
 			e.printStackTrace();
