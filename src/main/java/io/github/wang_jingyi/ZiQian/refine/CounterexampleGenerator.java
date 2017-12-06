@@ -92,7 +92,7 @@ public class CounterexampleGenerator {
 				}
 				else{
 					lastAccProb = accProb;
-					step = step ++;
+					step ++;
 				}
 
 			}

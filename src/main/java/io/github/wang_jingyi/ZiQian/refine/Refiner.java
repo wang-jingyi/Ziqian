@@ -3,7 +3,6 @@ package io.github.wang_jingyi.ZiQian.refine;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import io.github.wang_jingyi.ZiQian.Predicate;
 import io.github.wang_jingyi.ZiQian.PredicateAbstraction;
@@ -23,6 +22,7 @@ import net.sf.javaml.core.Dataset;
 import net.sf.javaml.core.DefaultDataset;
 import net.sf.javaml.core.DenseInstance;
 import net.sf.javaml.core.Instance;
+import net.sf.javaml.filter.normalize.NormalizeMidrange;
 
 public class Refiner{
 
@@ -59,7 +59,7 @@ public class Refiner{
 
 	public LearnedPredicate refine() throws FileNotFoundException{
 		for(int i=0; i<spuriousTransitions.size(); i++){
-			SplittingPoint current_sp = spuriousTransitions.get(new Random().nextInt(spuriousTransitions.size()));
+			SplittingPoint current_sp = spuriousTransitions.get(i);
 			System.out.println("--- current splitting point: " + current_sp.toString());
 			Dataset ds = null;
 			if(vvi.getVarsValues().size()==1){
@@ -131,11 +131,11 @@ public class Refiner{
 			}
 			id_list.add(-1);
 		}
-		
+
 		assert start!=-1 : "====== state is not found in the log ======";
 
 		for(int i=start; i<testing_log.size()-1; i++){
-			
+
 			int nextStateID = StringUtil.getStringIndex(testing_log.get(i), currentPS.getSigmas());
 			assert nextStateID!=-1 : "====== new transition happens ======";
 			PrismState nextPS = currentPS.getNextStates().get(nextStateID);
@@ -265,9 +265,9 @@ public class Refiner{
 	private LearnedPredicate supervisedClassify(Dataset ds) throws FileNotFoundException {
 
 		// dataset normalization between [0,1]
-		//		System.out.println("- Normalize dataset");
-		//		NormalizeMidrange dnm = new NormalizeMidrange(0.5, 1);
-		//		dnm.filter(ds);
+		//				System.out.println("- Normalize dataset");
+		//				NormalizeMidrange dnm = new NormalizeMidrange(0.5, 1);
+		//				dnm.filter(ds);
 
 		LibSVM svm = new LibSVM();
 		svm_parameter svm_para = (svm_parameter) svm.getParameters().clone();
@@ -277,7 +277,7 @@ public class Refiner{
 		//		rfs.build(ds);
 
 		svm_para.kernel_type = 2;
-		svm_para.gamma = 100;
+		svm_para.gamma = 10;
 		svm_para.C = 1;
 
 		System.out.println("- Kernel type: " + svm_para.kernel_type);

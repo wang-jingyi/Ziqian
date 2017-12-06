@@ -424,9 +424,12 @@ public class Alergia implements LearningDTMC{
 		}
 		
 		initialStates.add(prismStates.get(0)); // empty state as the initial state
+		List<Double> init_dist = new ArrayList<>();
+		init_dist.add(1.0);
 		
 		probabilisticPrefixAutomata.setPrismStates(prismStates);
 		probabilisticPrefixAutomata.setInitialStates(initialStates);
+		probabilisticPrefixAutomata.setInitialDistribution(init_dist);
 		probabilisticPrefixAutomata.setPredicates(predicates);
 		probabilisticPrefixAutomata.setNumOfPrismStates(numOfStates);
 	}
