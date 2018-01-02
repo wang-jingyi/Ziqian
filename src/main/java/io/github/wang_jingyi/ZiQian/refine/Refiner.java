@@ -264,11 +264,12 @@ public class Refiner{
 
 	private LearnedPredicate supervisedClassify(Dataset ds) throws FileNotFoundException {
 
-		// dataset normalization between [0,1]
-		//				System.out.println("- Normalize dataset");
-		//				NormalizeMidrange dnm = new NormalizeMidrange(0.5, 1);
-		//				dnm.filter(ds);
+		//  dataset normalization between [0,1]
+		//	System.out.println("- Normalize dataset");
+		//	NormalizeMidrange dnm = new NormalizeMidrange(0.5, 1);
+		//  dnm.filter(ds);
 
+		
 		LibSVM svm = new LibSVM();
 		svm_parameter svm_para = (svm_parameter) svm.getParameters().clone();
 

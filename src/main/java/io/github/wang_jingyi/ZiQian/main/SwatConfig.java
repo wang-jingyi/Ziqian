@@ -1,7 +1,10 @@
 package io.github.wang_jingyi.ZiQian.main;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
+import io.github.wang_jingyi.ZiQian.prism.ExportPrismMC;
+import io.github.wang_jingyi.ZiQian.utils.ExternalCaller;
 import io.github.wang_jingyi.ZiQian.utils.FileUtil;
 
 public class SwatConfig {
@@ -13,8 +16,8 @@ public class SwatConfig {
 	public static int BOUNDED_STEP = 100;
 
 	// parameters for swat case study
-	public static String SENSOR = "PIT501"; // sensor name in string
-	public static double SENSOR_THRES = 30; // action threshold
+	public static String SENSOR = "FIT502"; // sensor name in string
+	public static double SENSOR_THRES = 1.3; // action threshold
 	public static boolean HIGH = true;
 	public static double SAFETY_THRESHOLD = 0.2; // how much more than the training unsafe probability
 	public static int DATA_SIZE = 100000; // limit of data size for learning
@@ -49,5 +52,16 @@ public class SwatConfig {
 	public static void processDirs(){
 		FileUtil.createDir(OUTPUT_MODEL_PATH);
 		FileUtil.cleanDirectory(OUTPUT_MODEL_PATH);
+	}
+	
+	public static void main(String[] args) throws IOException{
+		System.out.println("--- " + SENSOR + "- sensor thres: " + SENSOR_THRES+ " - safety thres: " + SAFETY_THRESHOLD);
+		ExternalCaller.executeCommand(new String[]{PlatformDependent.PRISM_PATH, OUTPUT_MODEL_PATH+"/swat_0.pm", 
+				"-exportmodel", OUTPUT_MODEL_PATH+"/out.all" });
+		ExportPrismMC epmc = new ExportPrismMC(OUTPUT_MODEL_PATH, "out");
+		epmc.execute();
+		FileUtil.writeObject(OUTPUT_MODEL_PATH+"/transition_matrix", epmc.getTransition_matrix());
+		FileUtil.writeObject(OUTPUT_MODEL_PATH+"/target_states", epmc.getTarget_states());
+		System.out.println("=== transition matrix and target states saved.");
 	}
 }
