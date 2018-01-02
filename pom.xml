@@ -85,19 +85,6 @@
 			<version>0.7.1</version>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/com.joptimizer/joptimizer -->
-		<dependency>
-			<groupId>com.joptimizer</groupId>
-			<artifactId>joptimizer</artifactId>
-			<version>3.4.0</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.gurobi.www</groupId>
-			<artifactId>gurobi</artifactId>
-			<version>6.5</version>
-		</dependency>
-
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>

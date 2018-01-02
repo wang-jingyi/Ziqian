@@ -1,9 +1,5 @@
 package io.github.wang_jingyi.ZiQian.data;
 
-import io.github.wang_jingyi.ZiQian.utils.FileUtil;
-import io.github.wang_jingyi.ZiQian.utils.ListUtil;
-import io.github.wang_jingyi.ZiQian.utils.NumberUtil;
-
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -11,7 +7,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import cern.jet.random.engine.MersenneTwister;
+import org.apache.commons.math3.random.MersenneTwister;
+
+import io.github.wang_jingyi.ZiQian.utils.FileUtil;
+import io.github.wang_jingyi.ZiQian.utils.ListUtil;
+import io.github.wang_jingyi.ZiQian.utils.NumberUtil;
 
 public class DataProcessor {
 
