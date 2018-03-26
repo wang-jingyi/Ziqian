@@ -69,6 +69,7 @@ public class SprtTest implements HypothesisTest{
 					}
 					counter++;
 				}
+				System.out.println("- Training samples tested: " + counter);
 				force_break = true; // all training data tested, force break
 			}
 			aid = Math.pow(p1, bi) * Math.pow((1-p1), sampleSize-bi) / Math.pow(p0, bi) / Math.pow((1-p0), sampleSize-bi);

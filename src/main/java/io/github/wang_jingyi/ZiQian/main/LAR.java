@@ -72,6 +72,8 @@ public class LAR {
 			PredicateAbstraction pa = new PredicateAbstraction(property);
 			Input data = pa.abstractInput(vvi.getVarsValues());
 			
+			System.out.println("------ Data information ------");
+			System.out.println("- Data total length: " + vvi.getTotalLength());
 			
 			String modelName = MODEL_NAME + "_" + iteration;
 			DTMCLearner learner = new DTMCLearner();

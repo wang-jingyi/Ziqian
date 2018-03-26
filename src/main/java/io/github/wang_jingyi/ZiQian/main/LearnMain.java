@@ -58,7 +58,7 @@ public class LearnMain {
 		
 		if(Config.LEARN_METHOD.equals("AA")){
 			System.out.println("learn by aalergia...");
-			ModelSelection gs = new AAlergia(Math.pow(2, -6), Math.pow(2, 6)); //
+			ModelSelection gs = new AAlergia(1, Math.pow(2, 6)); //
 			LearningDTMC bestDTMC = gs.selectCriterion(data);
 			bestDTMC.PrismModelTranslation(data, pl, Config.MODEL_NAME+Config.DATA_SIZE); //
 			// format to .pm file

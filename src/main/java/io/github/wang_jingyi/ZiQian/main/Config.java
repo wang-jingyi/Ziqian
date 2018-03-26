@@ -16,12 +16,12 @@ public class Config {
 	/**  set initially  **/
 	public static final boolean SWAT = false; // take extra care of swat, simulation is done differently
 	public static final boolean EGL = false; // egl case
-			public static final String MODEL_NAME = "nand";
+//			public static final String MODEL_NAME = "nand";
 //		public static String MODEL_NAME = "egl";
-//	public static String MODEL_NAME = "crowds";
+	public static String MODEL_NAME = "crowds";
 //			public static final String MODEL_NAME = "swat";
-//		public static final String MODEL_SETTING = "TotalRuns=5,CrowdSize=5";
-			public static final String MODEL_SETTING = "N=60,K=3";
+		public static final String MODEL_SETTING = "TotalRuns=5,CrowdSize=10";
+//			public static final String MODEL_SETTING = "N=60,K=3";
 //		public static String MODEL_SETTING = "L=2,N=10";
 	public static int ELG_L = 2;
 	public static int EGL_N = 10;
@@ -34,7 +34,7 @@ public class Config {
 	public static final int CONVERGE_TEST_DATA_SIZE = 50000; // data size of learning for convergence test
 	public static int PROPERTY_INDEX = 1; // index of the property in the property file
 	public static int BOUNDED_STEP = -1; // bounded step of the property, -1 if unbounded
-	public static double SAFETY_THRESHOLD = 1.0; // safety threshold of safety property
+	public static double SAFETY_THRESHOLD = 0.12576; // safety threshold of safety property
 	public static boolean TERMINATE_SAMPLE = true; // if a sample would terminate
 	public static boolean SELECTIVE_DATA_COLLECTION = false; // if all data is collected or each one a trace
 	public static String LEARN_METHOD = "AA";

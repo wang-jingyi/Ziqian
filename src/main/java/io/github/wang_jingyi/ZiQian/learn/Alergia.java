@@ -75,7 +75,7 @@ public class Alergia implements LearningDTMC{
 		}
 		Collections.sort(validStateIndex);
 		numOfStates = validStateIndex.size();
-		System.out.println("--- Number of states in the learned model: " + numOfStates);
+//		System.out.println("--- Number of states in the learned model: " + numOfStates);
 	}
 
 	private void calculateCriterion(Input data) {

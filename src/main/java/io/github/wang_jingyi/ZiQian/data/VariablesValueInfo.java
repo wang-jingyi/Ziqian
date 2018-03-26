@@ -17,6 +17,7 @@ public class VariablesValueInfo {
 	}
 	
 	private void updateTotalLength(){
+		totalLength = 0;
 		for(List<VariablesValue> vvl : varsValues){
 			totalLength += vvl.size();
 		}
@@ -35,6 +36,7 @@ public class VariablesValueInfo {
 	}
 
 	public int getTotalLength() {
+		updateTotalLength();
 		return totalLength;
 	}
 

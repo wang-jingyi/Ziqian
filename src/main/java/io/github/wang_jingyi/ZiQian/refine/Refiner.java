@@ -22,7 +22,6 @@ import net.sf.javaml.core.Dataset;
 import net.sf.javaml.core.DefaultDataset;
 import net.sf.javaml.core.DenseInstance;
 import net.sf.javaml.core.Instance;
-import net.sf.javaml.filter.normalize.NormalizeMidrange;
 
 public class Refiner{
 
@@ -264,10 +263,10 @@ public class Refiner{
 
 	private LearnedPredicate supervisedClassify(Dataset ds) throws FileNotFoundException {
 
-		//  dataset normalization between [0,1]
-		//	System.out.println("- Normalize dataset");
-		//	NormalizeMidrange dnm = new NormalizeMidrange(0.5, 1);
-		//  dnm.filter(ds);
+//		  dataset normalization between [0,1]
+//			System.out.println("- Normalize dataset");
+//			NormalizeMidrange dnm = new NormalizeMidrange(0.5, 1);
+//		  dnm.filter(ds);
 
 		
 		LibSVM svm = new LibSVM();
@@ -277,9 +276,9 @@ public class Refiner{
 		//		RankingFromScoring rfs = new RankingFromScoring(fs);
 		//		rfs.build(ds);
 
-		svm_para.kernel_type = 2;
-		svm_para.gamma = 10;
-		svm_para.C = 1;
+//		svm_para.kernel_type = 0;
+//		svm_para.gamma = 10;
+//		svm_para.C = 1;
 
 		System.out.println("- Kernel type: " + svm_para.kernel_type);
 		svm.setParameters(svm_para);
