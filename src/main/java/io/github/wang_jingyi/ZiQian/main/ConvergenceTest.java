@@ -53,7 +53,7 @@ public class ConvergenceTest {
 
 		String modelName = Config.MODEL_NAME + "_" + name;
 
-		ModelSelection gs = new AAlergia(0, 2); //
+		ModelSelection gs = new AAlergia(1, 64); //
 		LearningDTMC bestDTMC = gs.selectCriterion(data);
 		bestDTMC.PrismModelTranslation(data, pres, modelName); //
 

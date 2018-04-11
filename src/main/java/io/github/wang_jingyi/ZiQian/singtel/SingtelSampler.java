@@ -31,4 +31,9 @@ public class SingtelSampler implements Sampler{
 		return SingtelConfig.TESTING_PATH+"/ds_" + (667+sample_count) + ".csv";
 	}
 
+	@Override
+	public void setOutputFilePath(String outputFilePath) {
+		return;
+	}
+
 }

@@ -54,5 +54,10 @@ public class SwatSampler implements Sampler{
 	public boolean isDecomposed() {
 		return false;
 	}
+
+	@Override
+	public void setOutputFilePath(String outputFilePath) {
+		this.outputFilePath = outputFilePath;
+	}
 	
 }

@@ -115,4 +115,9 @@ public class SingleTraceSampler implements Sampler{
 		}
 	}
 
+	@Override
+	public void setOutputFilePath(String outputFilePath) {
+		return;
+	}
+
 }

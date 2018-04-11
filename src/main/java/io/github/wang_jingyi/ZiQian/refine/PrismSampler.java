@@ -31,6 +31,7 @@ public class PrismSampler implements Sampler{
 					modelPath,"-const", simulationConfig,
 					"-simpath",Integer.toString(simulationLength), latestSampleFilePath};
 		}
+		simulationCount++;
 		ShellInteraction.executeCommand(commandParas);
 		
 	}
@@ -43,6 +44,11 @@ public class PrismSampler implements Sampler{
 	@Override
 	public String getOutputFilePath() {
 		return outputFilePath;
+	}
+	
+	@Override
+	public void setOutputFilePath(String outputFilePath) {
+		this.outputFilePath = outputFilePath;
 	}
 
 	@Override

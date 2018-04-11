@@ -8,6 +8,7 @@ import io.github.wang_jingyi.ZiQian.DTMCLearner;
 import io.github.wang_jingyi.ZiQian.Input;
 import io.github.wang_jingyi.ZiQian.Predicate;
 import io.github.wang_jingyi.ZiQian.PredicateAbstraction;
+import io.github.wang_jingyi.ZiQian.data.ExtractPrismData;
 import io.github.wang_jingyi.ZiQian.data.VariablesValueInfo;
 import io.github.wang_jingyi.ZiQian.exceptions.PrismNoResultException;
 import io.github.wang_jingyi.ZiQian.exceptions.UnsupportedLearningTypeException;
@@ -64,7 +65,14 @@ public class LAR {
 		
 		int iteration = 0;
 		while(iteration<maximumIteration){
+			
 			iteration++;
+			
+			// store the new sampled paths in separate directories
+			String iter_testing_path = Config.TESTING_PATH+"/iter_"+iteration;
+			FileUtil.createDir(iter_testing_path);
+			sampler.setOutputFilePath(Config.TESTING_PATH+"/iter_"+iteration);
+			
 			TimeProfile.iteration_start_time = System.nanoTime();;
 			System.out.println("\n****** Iteration : " + iteration + " ******\n");
 			
@@ -79,7 +87,7 @@ public class LAR {
 			DTMCLearner learner = new DTMCLearner();
 			
 			if(LEARNING_TYPE.equals("AA")){
-				learner.setLearner(new AAlergia(0,2).selectCriterion(data));
+				learner.setLearner(new AAlergia(1,64).selectCriterion(data));
 			}
 			else if(LEARNING_TYPE.equals("GA")){
 				learner.setLearner(new LearnMergeEvolutions());
@@ -99,6 +107,11 @@ public class LAR {
 			TimeProfile.learning_end_time = System.nanoTime();
 			TimeProfile.learning_times.add(TimeProfile.nanoToSeconds(TimeProfile.learning_end_time
 					-TimeProfile.learning_start_time));
+			
+			/*
+			 * test for AA and GA with basic abstraction
+			 * */ 
+//			System.exit(0);
 			
 			// update LAR model size
 			if(bestDTMC.getPrismModel().getNumOfPrismStates()==LARModelSize){
@@ -171,7 +184,14 @@ public class LAR {
 				System.exit(0);
 			}
 			
+			// add the new predicate to the predicate set
 			property.add(newPredicate);
+			
+			// update the training data
+			ExtractPrismData epd = new ExtractPrismData(iter_testing_path, Config.DATA_SIZE, Config.STEP_SIZE, Config.DELIMITER);
+			VariablesValueInfo new_testing_vvi = epd.getVariablesValueInfo(vvi.getVars());
+			vvi.updateVariableVarInfo(new_testing_vvi.getVarsValues());
+			
 			TimeProfile.iteration_end_time = System.nanoTime();
 			TimeProfile.iteration_times.add(TimeProfile.nanoToSeconds(TimeProfile.iteration_end_time-TimeProfile.iteration_start_time));
 			AlgoProfile.predicates = property;

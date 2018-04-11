@@ -9,8 +9,8 @@ import io.github.wang_jingyi.ZiQian.PredicateAbstraction;
 import io.github.wang_jingyi.ZiQian.data.VariablesValue;
 import io.github.wang_jingyi.ZiQian.data.VariablesValueInfo;
 import io.github.wang_jingyi.ZiQian.main.AlgoProfile;
+import io.github.wang_jingyi.ZiQian.main.Config;
 import io.github.wang_jingyi.ZiQian.main.GlobalConfigs;
-import io.github.wang_jingyi.ZiQian.main.SwatConfig;
 import io.github.wang_jingyi.ZiQian.prism.PrismModel;
 import io.github.wang_jingyi.ZiQian.prism.PrismState;
 import io.github.wang_jingyi.ZiQian.utils.FileUtil;
@@ -298,7 +298,7 @@ public class Refiner{
 		svm_log.append(allVars.toString() + "\n");
 		svm_log.append("- Weights of the classifier: \n");
 		svm_log.append(NumberUtil.ArrayToString(svm.getWeights()));
-		FileUtil.writeStringToFile(SwatConfig.OUTPUT_MODEL_PATH+"/swat" + (AlgoProfile.iterationCount+1)+"_classifier.txt", svm_log.toString());
+		FileUtil.writeStringToFile(GlobalConfigs.OUTPUT_MODEL_PATH+"/" + Config.MODEL_NAME + (AlgoProfile.iterationCount+1)+"_classifier.txt", svm_log.toString());
 
 
 		//		double[] weights = svm.getWeights();

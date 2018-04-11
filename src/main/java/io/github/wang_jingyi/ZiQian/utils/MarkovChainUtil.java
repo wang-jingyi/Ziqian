@@ -5,7 +5,6 @@ import org.apache.commons.math3.linear.OpenMapRealMatrix;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.SparseRealMatrix;
 
-import Jama.EigenvalueDecomposition;
 import Jama.Matrix;
 
 /**

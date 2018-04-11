@@ -245,10 +245,13 @@ public class LearnMergeEvolutions implements LearningDTMC{
 		
 		
 		initialStates.add(prismStates.get(0)); // empty states as initial states
+		List<Double> initDistribution = new ArrayList<>();
+		initDistribution.add(1.0);
 		
 		pm.setNumOfPrismStates(prismStates.size());
 		pm.setPrismStates(prismStates);
 		pm.setInitialStates(initialStates);
+		pm.setInitialDistribution(initDistribution);
 		pm.setPredicates(predicates);
 	}
 

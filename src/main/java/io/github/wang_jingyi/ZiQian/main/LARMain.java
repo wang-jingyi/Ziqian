@@ -10,12 +10,12 @@ import io.github.wang_jingyi.ZiQian.TruePredicate;
 import io.github.wang_jingyi.ZiQian.data.ExtractPrismData;
 import io.github.wang_jingyi.ZiQian.data.PrismPathData;
 import io.github.wang_jingyi.ZiQian.data.VariablesValueInfo;
-import io.github.wang_jingyi.ZiQian.example.CrowdPositive;
 import io.github.wang_jingyi.ZiQian.exceptions.SimulationException;
 import io.github.wang_jingyi.ZiQian.exceptions.UnsupportedLearningTypeException;
 import io.github.wang_jingyi.ZiQian.exceptions.UnsupportedTestingTypeException;
-import io.github.wang_jingyi.ZiQian.refine.PrismSampler;
+import io.github.wang_jingyi.ZiQian.refine.SwatSampler;
 import io.github.wang_jingyi.ZiQian.refine.TestEnvironment;
+import io.github.wang_jingyi.ZiQian.swat.property.UnderLow;
 import io.github.wang_jingyi.ZiQian.utils.FileUtil;
 
 public class LARMain {
@@ -40,12 +40,13 @@ public class LARMain {
 		List<Predicate> pres = new ArrayList<>();
 		pres.add(new TruePredicate());
 //		pres.add(new OverHigh(Config.SENSOR,Config.SENSOR_THRES));
-//		pres.add(new NandReliable(60));
+//		pres.add(new NandReliable(40));
 //		pres.add(new EglFormulaA());
 //		pres.add(new EglFormulaB());
-		pres.add(new CrowdPositive());
-//		pres.add(new UnderLow("LIT101",250));
+//		pres.add(new CrowdPositive());
+		pres.add(new UnderLow("LIT101",250));
 //		pres.add(new OverHigh("LS602",580));
+//		pres.add(new EglUnfairA());
 
 		AlgoProfile.predicates = pres;
 
@@ -57,8 +58,8 @@ public class LARMain {
 		lar.setOUTPUT_MODEL_PATH(Config.OUTPUT_MODEL_PATH); // path of output models
 		GlobalConfigs.OUTPUT_MODEL_PATH = lar.getOUTPUT_MODEL_PATH(); 
 		lar.setProperty(pres); // property to verify, initial predicate set
-		lar.setSampler(new PrismSampler(Config.ORIG_MODEL_FILE, Config.TESTING_PATH, Config.MODEL_SETTING)); // set sampler for new traces
-//		lar.setSampler(new SwatSampler(false, Config.OUTPUT_MODEL_PATH, Config.SWAT_SAMPLE_STEP, Config.SWAT_RECORD_STEP, Config.SWAT_RUNNING_TIME));
+//		lar.setSampler(new PrismSampler(Config.ORIG_MODEL_FILE, Config.TESTING_PATH, Config.MODEL_SETTING)); // set sampler for new traces
+		lar.setSampler(new SwatSampler(false, Config.OUTPUT_MODEL_PATH, Config.SWAT_SAMPLE_STEP, Config.SWAT_RECORD_STEP, Config.SWAT_RUNNING_TIME));
 		lar.setTe(te); // set testing environment
 		lar.setVvi(vvi); // set variable values information
 		lar.setBoundedSteps(-1); // unbounded property

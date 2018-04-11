@@ -8,6 +8,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -346,6 +347,17 @@ public class FileUtil {
 		if(!theDir.exists()){
 			theDir.mkdirs();
 		}
+	}
+	
+	public static String[] foldersInDir(String dirPath){
+		File file = new File(dirPath);
+		String[] directories = file.list(new FilenameFilter() {
+		  @Override
+		  public boolean accept(File current, String name) {
+		    return new File(current, name).isDirectory();
+		  }
+		});
+		return directories;
 	}
 
 }

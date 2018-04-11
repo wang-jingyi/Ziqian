@@ -7,7 +7,6 @@ import io.github.wang_jingyi.ZiQian.exceptions.PrismNoResultException;
 import io.github.wang_jingyi.ZiQian.main.AlgoProfile;
 import io.github.wang_jingyi.ZiQian.main.GlobalConfigs;
 import io.github.wang_jingyi.ZiQian.main.PlatformDependent;
-import io.github.wang_jingyi.ZiQian.main.SwatConfig;
 import io.github.wang_jingyi.ZiQian.main.TimeProfile;
 import io.github.wang_jingyi.ZiQian.refine.ShellInteraction;
 import io.github.wang_jingyi.ZiQian.utils.FileUtil;
@@ -61,7 +60,7 @@ public class CheckLearned {
 			TimeProfile.main_time = TimeProfile.nanoToSeconds(TimeProfile.main_end_time-TimeProfile.main_start_time);
 			TimeProfile.outputTimeProfile();
 			TimeProfile.outputTimeProfile(GlobalConfigs.OUTPUT_MODEL_PATH+"/time_profile.txt");
-			FileUtil.writeObject(SwatConfig.OUTPUT_MODEL_PATH + "/predicates", AlgoProfile.predicates);
+			FileUtil.writeObject(GlobalConfigs.OUTPUT_MODEL_PATH + "/predicates", AlgoProfile.predicates);
 			System.exit(0);
 		}
 		else{

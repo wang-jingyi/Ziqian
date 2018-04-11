@@ -16,6 +16,10 @@ public class VariablesValueInfo {
 		updateTotalLength();
 	}
 	
+	public void updateVariableVarInfo(List<List<VariablesValue>> newVarsValues){
+		varsValues.addAll(newVarsValues);
+	}
+	
 	private void updateTotalLength(){
 		totalLength = 0;
 		for(List<VariablesValue> vvl : varsValues){
