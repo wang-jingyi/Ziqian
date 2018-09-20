@@ -53,7 +53,7 @@ public class SprtTest implements HypothesisTest{
 				sampleSize++;
 				System.out.println("- New sample: " + sampleSize);
 				List<VariablesValue> vvs = PrismPathData.extractSEData(te.getSampler().getLatestSample(), 
-						AlgoProfile.vars,Integer.MAX_VALUE,te.getData_step_size(),te.getData_delimiter()); // variables values of last simulation
+						AlgoProfile.vars,Integer.MAX_VALUE, te.getData_step_size(), te.getData_delimiter()); // variables values of last simulation
 				PredicateAbstraction pa = new PredicateAbstraction(te.getPredicates());
 				List<String> concrete_trace = pa.abstractList(vvs);
 				if(te.test(concrete_trace,ce)){ // the sample is in the counterexample

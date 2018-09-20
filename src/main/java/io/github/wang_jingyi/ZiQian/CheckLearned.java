@@ -59,8 +59,8 @@ public class CheckLearned {
 			TimeProfile.main_end_time = System.nanoTime();
 			TimeProfile.main_time = TimeProfile.nanoToSeconds(TimeProfile.main_end_time-TimeProfile.main_start_time);
 			TimeProfile.outputTimeProfile();
-			TimeProfile.outputTimeProfile(GlobalConfigs.OUTPUT_MODEL_PATH+"/time_profile.txt");
-			FileUtil.writeObject(GlobalConfigs.OUTPUT_MODEL_PATH + "/predicates", AlgoProfile.predicates);
+			TimeProfile.outputTimeProfile(AlgoProfile.result_output_path + "/time_profile.txt");
+			FileUtil.writeObject(AlgoProfile.result_output_path + "/predicates", AlgoProfile.predicates);
 			System.exit(0);
 		}
 		else{

@@ -59,6 +59,7 @@ public class LearnMergeEvolutions implements LearningDTMC{
 		System.out.println("- Create pipelines that applies cross-over and mutation...");
 		List<EvolutionaryOperator<int[]>> operators
 		= new LinkedList<EvolutionaryOperator<int[]>>();
+//		operators.add(new MergeMutation(dp, 1));
 		operators.add(new IntArrayCrossover());
 		EvolutionaryOperator<int[]> pipeline
 		= new EvolutionPipeline<int[]>(operators);
@@ -89,7 +90,7 @@ public class LearnMergeEvolutions implements LearningDTMC{
 				});
 		
 		System.out.println("- Evolving");
-		resultGrouping = engine.evolve(10, 2, new GenerationCount(1));
+		resultGrouping = engine.evolve(50, 10, new GenerationCount(10));
 		
 	}
 	

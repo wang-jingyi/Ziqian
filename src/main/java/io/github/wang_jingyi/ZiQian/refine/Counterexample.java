@@ -1,6 +1,5 @@
 package io.github.wang_jingyi.ZiQian.refine;
 
-import io.github.wang_jingyi.ZiQian.main.AlgoProfile;
 import io.github.wang_jingyi.ZiQian.main.GlobalConfigs;
 import io.github.wang_jingyi.ZiQian.main.TimeProfile;
 import io.github.wang_jingyi.ZiQian.prism.PrismModel;
@@ -31,11 +30,13 @@ public class Counterexample implements SplitPointFinder{
 	private HypothesisTest ht;
 	private List<SplittingPoint> allSplittingPoints;
 	private List<SplittingPoint> sortedSplittingPoints; // splitting point with probability deviation 0 is not included
+	private boolean loop_first;
 
-	public Counterexample(PrismModel pm, List<CounterexamplePath> cps, HypothesisTest ht) {
+	public Counterexample(PrismModel pm, List<CounterexamplePath> cps, HypothesisTest ht, boolean loop_first) {
 		this.pm = pm;
 		this.counterPaths = cps;
 		this.ht = ht;
+		this.loop_first = loop_first;
 		updateLongestPaths();
 	}
 
@@ -191,7 +192,7 @@ public class Counterexample implements SplitPointFinder{
 		}
 		
 		List<SplittingPoint> finalsps = new ArrayList<>();
-		if(AlgoProfile.loop_first){
+		if(loop_first){
 			// put splitting points of loops in front
 			List<Integer> loops = new ArrayList<>();
 			for(int i=0; i<sps.size(); i++){ // find looping splitting point 

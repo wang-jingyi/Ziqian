@@ -1,6 +1,5 @@
 package io.github.wang_jingyi.ZiQian.data;
 
-import io.github.wang_jingyi.ZiQian.main.Config;
 import io.github.wang_jingyi.ZiQian.utils.FileUtil;
 import io.github.wang_jingyi.ZiQian.utils.StringUtil;
 
@@ -58,13 +57,13 @@ public class PrismPathData {
 		return values;
 	}
 
-	public static List<List<VariablesValue>> extractMEData(String dirPath, List<String> vars, int dataSize, int stepSize, String delimiter) throws IOException{
+	public static List<List<VariablesValue>> extractMEData(String dirPath, List<String> vars, int dataSize, int stepSize, String delimiter, boolean random_length) throws IOException{
 		List<List<VariablesValue>> mv = new ArrayList<List<VariablesValue>>();
 		int totalSize = 0;
 		List<String> fus = FileUtil.filesInDir(dirPath);
 		for(String s : fus){
 			int ds = dataSize;
-			if(!Config.TERMINATE_SAMPLE){
+			if(random_length){
 				ds = new Random().nextInt(2*dataSize/fus.size());
 			}
 			

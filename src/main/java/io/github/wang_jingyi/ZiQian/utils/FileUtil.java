@@ -359,5 +359,27 @@ public class FileUtil {
 		});
 		return directories;
 	}
+	
+	/**
+	 * @param property_path the property path
+	 * @return the safety threshold in the property file
+	 * @throws IOException 
+	 * @throws NumberFormatException 
+	 */
+	public static double extractSafetyThreshold(String property_path) throws NumberFormatException, IOException{
+		String line = null;
+		BufferedReader stream = null;
+		try {
+			stream = new BufferedReader(new FileReader(property_path));
+			while ((line = stream.readLine()) != null) {
+				line = line.split("F")[0]; // reserve the part with threshold
+				return NumberUtil.extractDoubleFromString(line);
+			}
+		} finally {
+			if (stream != null)
+				stream.close();
+		}
+		return -1;
+	}
 
 }

@@ -143,6 +143,15 @@ public class NumberUtil {
     	}
     	return nzl;
     }
+    
+    public static double extractDoubleFromString(String str){
+    	return Double.parseDouble(str.replaceAll("[^0-9\\.]+", ""));
+    }
+    
+    
+    public static int extractIntFromString(String str){
+    	return Integer.parseInt(str.replaceAll("[^0-9\\.]+", ""));
+    }
      
     public static List<String> extractNumbersFromString(String str){
 		str = str.replaceAll("[^0-9]+", " ");

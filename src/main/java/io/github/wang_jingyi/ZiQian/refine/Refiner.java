@@ -1,21 +1,20 @@
 package io.github.wang_jingyi.ZiQian.refine;
 
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.List;
-
 import io.github.wang_jingyi.ZiQian.Predicate;
 import io.github.wang_jingyi.ZiQian.PredicateAbstraction;
 import io.github.wang_jingyi.ZiQian.data.VariablesValue;
 import io.github.wang_jingyi.ZiQian.data.VariablesValueInfo;
 import io.github.wang_jingyi.ZiQian.main.AlgoProfile;
-import io.github.wang_jingyi.ZiQian.main.Config;
-import io.github.wang_jingyi.ZiQian.main.GlobalConfigs;
 import io.github.wang_jingyi.ZiQian.prism.PrismModel;
 import io.github.wang_jingyi.ZiQian.prism.PrismState;
 import io.github.wang_jingyi.ZiQian.utils.FileUtil;
 import io.github.wang_jingyi.ZiQian.utils.NumberUtil;
 import io.github.wang_jingyi.ZiQian.utils.StringUtil;
+
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.List;
+
 import libsvm.LibSVM;
 import libsvm.svm_parameter;
 import net.sf.javaml.core.Dataset;
@@ -31,11 +30,12 @@ public class Refiner{
 	private PrismModel pm;
 	private int negCount;
 	private int posCount;
-	private boolean terminateSample;
+	private boolean random_length;
 	private boolean selectiveDataCollection;
 	private double classifyAccuracy;
 	private List<String> allVars = AlgoProfile.vars;
 	private List<String> newVars = new ArrayList<>();
+	private double min_svm_accuracy;
 
 	public Refiner(List<SplittingPoint> sps, VariablesValueInfo vvi, List<Predicate> pres, PrismModel pm) {
 		super();
@@ -45,14 +45,15 @@ public class Refiner{
 		this.pm = pm;
 	}
 
-	public Refiner(List<SplittingPoint> sps, VariablesValueInfo vvi, List<Predicate> pres, PrismModel pm, boolean ts, boolean sdc) {
+	public Refiner(List<SplittingPoint> sps, VariablesValueInfo vvi, List<Predicate> pres, PrismModel pm, boolean random_length, boolean sdc, double min_svm_accuracy) {
 		super();
 		this.spuriousTransitions = sps;
 		this.vvi = vvi;
 		this.predicates = pres;
 		this.pm = pm;
-		this.terminateSample = ts;
+		this.random_length = random_length;
 		this.selectiveDataCollection = sdc;
+		this.min_svm_accuracy = min_svm_accuracy;
 	}
 
 
@@ -201,7 +202,7 @@ public class Refiner{
 				}
 
 				if(i==vvls.size()-1){ // the last observation must be a negative instance
-					if(terminateSample){ 
+					if(!random_length){ 
 						// sample will terminate like crowds/nand; 
 						// if not terminate, we dont know whether it's positive or negative
 						Instance ins = new DenseInstance(values,"negative");
@@ -285,11 +286,11 @@ public class Refiner{
 
 
 		// output collected data for reference
-		StringBuilder sb = new StringBuilder();
-		for(Instance ins : ds){
-			sb.append(ins.toString() + "\n");
-		}
-		FileUtil.writeStringToFile(GlobalConfigs.PROJECT_ROOT+"/tmp/collected_data.txt", sb.toString());
+//		StringBuilder sb = new StringBuilder();
+//		for(Instance ins : ds){
+//			sb.append(ins.toString() + "\n");
+//		}
+//		FileUtil.writeStringToFile(GlobalConfigs.PROJECT_ROOT+"/tmp/collected_data.txt", sb.toString());
 
 		svm.buildClassifier(ds);
 
@@ -298,7 +299,7 @@ public class Refiner{
 		svm_log.append(allVars.toString() + "\n");
 		svm_log.append("- Weights of the classifier: \n");
 		svm_log.append(NumberUtil.ArrayToString(svm.getWeights()));
-		FileUtil.writeStringToFile(GlobalConfigs.OUTPUT_MODEL_PATH+"/" + Config.MODEL_NAME + (AlgoProfile.iterationCount+1)+"_classifier.txt", svm_log.toString());
+		FileUtil.writeStringToFile(AlgoProfile.result_output_path + "/" + AlgoProfile.model_name + (AlgoProfile.iterationCount+1)+"_classifier.txt", svm_log.toString());
 
 
 		//		double[] weights = svm.getWeights();
@@ -317,6 +318,10 @@ public class Refiner{
 		}
 		classifyAccuracy = (double)rightCount/sumCount;
 		System.out.println("- Classification accuracy : " + classifyAccuracy);
+		
+		if(classifyAccuracy<min_svm_accuracy){
+			return null;
+		}
 
 		if(rightCount==negCount || rightCount==posCount){ // all data are in one side, fail to classify
 			System.out.println("=== Fail to find a linear splitting predicate ===");

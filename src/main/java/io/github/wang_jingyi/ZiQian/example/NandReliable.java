@@ -6,6 +6,7 @@ import java.util.List;
 
 import io.github.wang_jingyi.ZiQian.Predicate;
 import io.github.wang_jingyi.ZiQian.data.VariablesValue;
+import io.github.wang_jingyi.ZiQian.utils.NumberUtil;
 
 public class NandReliable implements Predicate, Serializable{
 	
@@ -43,6 +44,14 @@ public class NandReliable implements Predicate, Serializable{
 		}
 		return false;
 	}
-
+	
+	/**
+	 * @param model_setting setting of nand
+	 * @return N
+	 */
+	public static int extractN(String model_setting){
+		String NPart = model_setting.split(",")[0];
+		return NumberUtil.extractIntFromString(NPart);
+	}
 
 }
