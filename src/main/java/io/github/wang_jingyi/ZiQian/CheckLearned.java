@@ -1,15 +1,14 @@
 package io.github.wang_jingyi.ZiQian;
 
 
-import java.io.IOException;
-
 import io.github.wang_jingyi.ZiQian.exceptions.PrismNoResultException;
 import io.github.wang_jingyi.ZiQian.main.AlgoProfile;
-import io.github.wang_jingyi.ZiQian.main.GlobalConfigs;
 import io.github.wang_jingyi.ZiQian.main.PlatformDependent;
 import io.github.wang_jingyi.ZiQian.main.TimeProfile;
 import io.github.wang_jingyi.ZiQian.refine.ShellInteraction;
 import io.github.wang_jingyi.ZiQian.utils.FileUtil;
+
+import java.io.IOException;
 
 public class CheckLearned {
 	

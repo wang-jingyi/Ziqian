@@ -12,7 +12,8 @@ public class FrequencyTest {
 	// calculate frequency of underflow for swat system
 	public static void main(String[] args) throws IOException{
 		
-		ExtractPrismData epd = new ExtractPrismData(Config.DATA_PATH, Config.DATA_SIZE, Config.STEP_SIZE, Config.DELIMITER);
+		boolean random_length = false;
+		ExtractPrismData epd = new ExtractPrismData(Config.DATA_PATH, Config.DATA_SIZE, Config.STEP_SIZE, Config.DELIMITER, random_length);
 		VariablesValueInfo vvl = epd.getVariablesValueInfo();
 		
 		int count = 0;

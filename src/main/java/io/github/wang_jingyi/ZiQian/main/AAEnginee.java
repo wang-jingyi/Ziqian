@@ -10,7 +10,6 @@ import io.github.wang_jingyi.ZiQian.learn.AAlergia;
 import io.github.wang_jingyi.ZiQian.learn.LearningDTMC;
 import io.github.wang_jingyi.ZiQian.learn.ModelSelection;
 import io.github.wang_jingyi.ZiQian.prism.FormatPrismModel;
-import io.github.wang_jingyi.ZiQian.utils.FileUtil;
 import io.github.wang_jingyi.ZiQian.utils.LearnUtil;
 
 import java.io.FileNotFoundException;
@@ -29,8 +28,9 @@ public class AAEnginee {
 	int data_step;
 	int data_length;
 	double max_epsilon;
+	boolean random_length;
 
-	public AAEnginee(String model_name, String trace_path, String result_path, String vars_path, String delimiter, int data_step, int data_length, double max_epsilon) {
+	public AAEnginee(String model_name, String trace_path, String result_path, String vars_path, String delimiter, int data_step, int data_length, double max_epsilon, boolean random_length) {
 		this.model_name = model_name;
 		this.trace_path = trace_path;
 		this.result_path = result_path;
@@ -39,17 +39,18 @@ public class AAEnginee {
 		this.data_step = data_step;
 		this.data_length = data_length;
 		this.max_epsilon = max_epsilon;
+		this.random_length = random_length;
 	}
 
 	public void execute() throws FileNotFoundException, ClassNotFoundException, IOException {
-		ExtractPrismData epd = new ExtractPrismData(trace_path, data_length, data_step, delimiter);
+		ExtractPrismData epd = new ExtractPrismData(trace_path, data_length, data_step, delimiter, random_length);
 		VariablesValueInfo vvl = epd.getVariablesValueInfo();
 
-		for(String testing_dir : FileUtil.foldersInDir(Config.TESTING_PATH)){
-			ExtractPrismData epd_test = new ExtractPrismData(Config.TESTING_PATH+"/"+testing_dir, Integer.MAX_VALUE, Config.STEP_SIZE, Config.DELIMITER);
-			VariablesValueInfo vvi_test = epd_test.getVariablesValueInfo();
-			vvl.updateVariableVarInfo(vvi_test.getVarsValues());
-		}
+//		for(String testing_dir : FileUtil.foldersInDir(Config.TESTING_PATH)){
+//			ExtractPrismData epd_test = new ExtractPrismData(Config.TESTING_PATH+"/"+testing_dir, Integer.MAX_VALUE, Config.STEP_SIZE, Config.DELIMITER);
+//			VariablesValueInfo vvi_test = epd_test.getVariablesValueInfo();
+//			vvl.updateVariableVarInfo(vvi_test.getVarsValues());
+//		}
 		
 		List<String> vars = LearnUtil.extractVarsFromFile(vars_path);
 		AlgoProfile.vars = vars;

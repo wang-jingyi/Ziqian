@@ -34,7 +34,7 @@ public class ExtractPrismDataTest {
 	public void testExtractData() throws IOException, ClassNotFoundException, PrismNoResultException{
 		String modelPath = "/crowds/TotalRuns=5,CrowdSize=10/paths";
 		int dataSize = Integer.MAX_VALUE;
-		ExtractPrismData epd = new ExtractPrismData(PlatformDependent.CAV_MODEL_ROOT+modelPath, dataSize, 1, " ");
+		ExtractPrismData epd = new ExtractPrismData(PlatformDependent.CAV_MODEL_ROOT+modelPath, dataSize, 1, " ", false);
 		VariablesValueInfo vvl = epd.getVariablesValueInfo();
 		
 		AlgoProfile.vars = vvl.getVars();
@@ -84,7 +84,7 @@ public class ExtractPrismDataTest {
 		te.init(pres, sampler,data," ",1);
 //		HypothesisTest sst = new SingleSampleTest(5);
 		HypothesisTest sst = new SprtTest(0.2, 0.1, 0.1, 0.1);
-		Counterexample ce = new Counterexample(bestDTMC.getPrismModel(), counterPaths, sst);
+		Counterexample ce = new Counterexample(bestDTMC.getPrismModel(), counterPaths, sst, false);
 		System.out.println("analyzing counterexample...");
 		ce.analyze(te);
 		

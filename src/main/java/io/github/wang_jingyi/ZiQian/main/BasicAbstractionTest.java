@@ -26,33 +26,35 @@ public class BasicAbstractionTest {
 	public static void main(String[] args) throws FileNotFoundException, ClassNotFoundException, IOException, UnsupportedLearningTypeException {
 
 		Config.initConfig();
-		
+
 		List<Predicate> pres = new ArrayList<>();
 		pres.add(new TruePredicate());
-//		pres.add(new OverHigh(Config.SENSOR,Config.SENSOR_THRES));
+		//		pres.add(new OverHigh(Config.SENSOR,Config.SENSOR_THRES));
 		pres.add(new NandReliable(60));
-//		pres.add(new EglFormulaA());
-//		pres.add(new EglFormulaB());
-//		pres.add(new CrowdPositive());
-//		pres.add(new UnderLow("LIT101",250));
-//		pres.add(new OverHigh("LS602",580));
-//		pres.add(new EglUnfairA());
+		//		pres.add(new EglFormulaA());
+		//		pres.add(new EglFormulaB());
+		//		pres.add(new CrowdPositive());
+		//		pres.add(new UnderLow("LIT101",250));
+		//		pres.add(new OverHigh("LS602",580));
+		//		pres.add(new EglUnfairA());
+
+		boolean random_length = false;
 
 		List<String> varsSet = PrismPathData.extractPathVars(Config.DATA_PATH, Config.DELIMITER);
-		ExtractPrismData epd = new ExtractPrismData(Config.DATA_PATH, Config.DATA_SIZE, Config.STEP_SIZE, Config.DELIMITER);
+		ExtractPrismData epd = new ExtractPrismData(Config.DATA_PATH, Config.DATA_SIZE, Config.STEP_SIZE, Config.DELIMITER, random_length);
 		VariablesValueInfo vvi = epd.getVariablesValueInfo(varsSet);
-		
+
 		for(String testing_dir : FileUtil.foldersInDir(Config.TESTING_PATH)){
-			ExtractPrismData epd_test = new ExtractPrismData(Config.TESTING_PATH+"/"+testing_dir, Integer.MAX_VALUE, Config.STEP_SIZE, Config.DELIMITER);
+			ExtractPrismData epd_test = new ExtractPrismData(Config.TESTING_PATH+"/"+testing_dir, Integer.MAX_VALUE, Config.STEP_SIZE, Config.DELIMITER, random_length);
 			VariablesValueInfo vvi_test = epd_test.getVariablesValueInfo(varsSet);
 			vvi.updateVariableVarInfo(vvi_test.getVarsValues());
 		}
-		
+
 		PredicateAbstraction pa = new PredicateAbstraction(pres);
 		Input data = pa.abstractInput(vvi.getVarsValues());
-		
+
 		DTMCLearner learner = new DTMCLearner();
-		
+
 		if(Config.LEARN_METHOD.equals("AA")){
 			learner.setLearner(new AAlergia(1,64).selectCriterion(data));
 		}
@@ -62,7 +64,7 @@ public class BasicAbstractionTest {
 		else{
 			throw new UnsupportedLearningTypeException();
 		}
-		
+
 		LearningDTMC bestDTMC = learner.getLearner();
 		bestDTMC.learn(data);
 		bestDTMC.PrismModelTranslation(data, pa.getPredicates(), Config.MODEL_NAME);

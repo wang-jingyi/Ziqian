@@ -23,7 +23,7 @@ public class ConvergenceTest {
 //		Config.initConfig();
 		@SuppressWarnings("unchecked")
 		List<Predicate> pres = (List<Predicate>) FileUtil.readObject(Config.OUTPUT_MODEL_PATH+"/predicates");
-
+		
 		//		if(FileUtil.isDirEmpty(Config.DATA_PATH_LOT)){
 		//			for(int i=1; i<=2000; i++){
 		//				System.out.println("simulation: " + i);
@@ -32,10 +32,10 @@ public class ConvergenceTest {
 		//			}
 		//		}
 
-
+		boolean random_length = false;
 		List<String> varsSet = PrismPathData.extractPathVars(Config.DATA_PATH, Config.DELIMITER);
 		//
-		ExtractPrismData epd_lot = new ExtractPrismData(Config.DATA_PATH, Config.CONVERGE_TEST_DATA_SIZE, Config.STEP_SIZE, Config.DELIMITER);
+		ExtractPrismData epd_lot = new ExtractPrismData(Config.DATA_PATH, Config.CONVERGE_TEST_DATA_SIZE, Config.STEP_SIZE, Config.DELIMITER, random_length);
 		VariablesValueInfo vvi_lot = epd_lot.getVariablesValueInfo(varsSet);
 
 		long start_time = System.nanoTime();

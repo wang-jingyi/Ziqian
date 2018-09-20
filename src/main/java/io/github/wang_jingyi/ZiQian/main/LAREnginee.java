@@ -114,6 +114,8 @@ public class LAREnginee {
 			System.exit(0);
 		}
 		
+		TimeProfile.main_start_time = System.nanoTime();
+		
 		List<String> varsSet 
 		= PrismPathData.extractPathVars(trace_path, delimiter);
 

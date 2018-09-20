@@ -31,7 +31,7 @@ public class CrowdMain {
 			List<String> varsSet 
 			= PrismPathData.extractPathVars(Config.DATA_PATH, Config.DELIMITER);
 			
-			ExtractPrismData epd = new ExtractPrismData(Config.DATA_PATH, Config.DATA_SIZE, Config.STEP_SIZE, Config.DELIMITER);
+			ExtractPrismData epd = new ExtractPrismData(Config.DATA_PATH, Config.DATA_SIZE, Config.STEP_SIZE, Config.DELIMITER, false);
 			VariablesValueInfo vvi = epd.getVariablesValueInfo(varsSet);
 			
 			AlgoProfile.vars = vvi.getVars();	

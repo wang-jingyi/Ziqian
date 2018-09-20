@@ -1,11 +1,5 @@
 package io.github.wang_jingyi.ZiQian.singtel;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import io.github.wang_jingyi.ZiQian.Input;
 import io.github.wang_jingyi.ZiQian.Predicate;
 import io.github.wang_jingyi.ZiQian.TruePredicate;
@@ -15,6 +9,12 @@ import io.github.wang_jingyi.ZiQian.data.VariablesValueInfo;
 import io.github.wang_jingyi.ZiQian.learn.LearnPST;
 import io.github.wang_jingyi.ZiQian.learn.LearningDTMC;
 import io.github.wang_jingyi.ZiQian.prism.FormatPrismModel;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SingtelTest {
 	
@@ -32,7 +32,7 @@ public class SingtelTest {
 		List<String> varsSet 
 		= PrismPathData.extractPathVars(data_path, delimiter);
 
-		ExtractPrismData epd = new ExtractPrismData(data_path, data_size, step_size, delimiter);
+		ExtractPrismData epd = new ExtractPrismData(data_path, data_size, step_size, delimiter, true);
 		VariablesValueInfo vvi = epd.getVariablesValueInfo(varsSet);
 		
 		List<Predicate> pres = new ArrayList<>();

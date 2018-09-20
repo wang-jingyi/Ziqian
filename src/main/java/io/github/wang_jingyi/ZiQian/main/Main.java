@@ -81,7 +81,8 @@ public class Main {
 		
 		
 		System.out.println("data path: " + Config.DATA_PATH) ;
-		ExtractPrismData epd = new ExtractPrismData(Config.DATA_PATH, Config.DATA_SIZE, Config.STEP_SIZE, Config.DELIMITER);
+		ExtractPrismData epd = new ExtractPrismData(Config.DATA_PATH, Config.DATA_SIZE, Config.STEP_SIZE, 
+				Config.DELIMITER, !Config.TERMINATE_SAMPLE);
 		VariablesValueInfo vvl = epd.getVariablesValueInfo(varsSet);
 		
 		AlgoProfile.vars = vvl.getVars();	
@@ -165,7 +166,9 @@ public class Main {
 		
 //		HypothesisTest sst = new SingleSampleTest(1);
 		HypothesisTest sst = new SprtTest(0.2, 0.1, 0.1, 0.1);
-		Counterexample ce = new Counterexample(bestDTMC.getPrismModel(), counterPaths, sst);
+	
+		boolean loop_first = false;
+		Counterexample ce = new Counterexample(bestDTMC.getPrismModel(), counterPaths, sst, loop_first);
 		System.out.println("analyzing counterexample...");
 		ce.analyze(te);
 		

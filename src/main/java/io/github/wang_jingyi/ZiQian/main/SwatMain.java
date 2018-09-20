@@ -27,7 +27,9 @@ public class SwatMain {
 		List<String> varsSet 
 		= PrismPathData.extractPathVars(SwatConfig.DATA_PATH, SwatConfig.DELIMITER);
 
-		ExtractPrismData epd = new ExtractPrismData(SwatConfig.DATA_PATH, SwatConfig.DATA_SIZE, SwatConfig.STEP_SIZE, SwatConfig.DELIMITER);
+		boolean terminate = false;
+		ExtractPrismData epd = new ExtractPrismData(SwatConfig.DATA_PATH, SwatConfig.DATA_SIZE, 
+				SwatConfig.STEP_SIZE, SwatConfig.DELIMITER, !terminate);
 		VariablesValueInfo vvi = epd.getVariablesValueInfo(varsSet);
 
 		AlgoProfile.vars = vvi.getVars();	

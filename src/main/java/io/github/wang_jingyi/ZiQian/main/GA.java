@@ -44,6 +44,9 @@ public class GA implements Callable<Void>{
 	@Option(names = {"--prob"}, description = "The probability to select the winner.")
 	private double select_prob = 0.9;
 	
+	@Option(names = {"--random_length"}, description = "Whether the sample length is randmized.")
+	private boolean random_length = false;
+	
 	public static void main(String[] args) throws Exception {
 		CommandLine.call(new AA(), args);
 	}
@@ -51,7 +54,7 @@ public class GA implements Callable<Void>{
 	@Override
 	public Void call() throws Exception {
 		GAEnginee enginee = new GAEnginee(model_name, trace_path, result_path, vars_path, delimiter, data_step, data_length, 
-				mutation_rate, gen_num, gen_size, select_prob);
+				mutation_rate, gen_num, gen_size, select_prob, random_length);
 		enginee.execute();
 		return null;
 	}

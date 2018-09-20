@@ -158,14 +158,16 @@ public class LAR {
 				throw new UnsupportedTestingTypeException();
 			}
 			
-			Counterexample ce = new Counterexample(bestDTMC.getPrismModel(), counterPaths, mt.getHypothesisTesting());
+			boolean loop_first = false;
+			Counterexample ce = new Counterexample(bestDTMC.getPrismModel(), counterPaths, mt.getHypothesisTesting(), loop_first);
 			ce.analyze(te);
 			
 			System.out.println("------ Refine the predicate set ------");
 			
+			double svm_min_acc = 0.8;
 			TimeProfile.refine_start_time = System.nanoTime();
 			Refiner refiner = new Refiner(ce.getSortedSplittingPoints(), vvi, property, bestDTMC.getPrismModel(), terminate_sample,
-					selective_data_collection);
+					selective_data_collection, svm_min_acc);
 			Predicate newPredicate = refiner.refine();
 			TimeProfile.refine_end_time = System.nanoTime();
 			TimeProfile.refine_times.add(TimeProfile.nanoToSeconds(TimeProfile.refine_end_time
@@ -188,7 +190,7 @@ public class LAR {
 			property.add(newPredicate);
 			
 			// update the training data
-			ExtractPrismData epd = new ExtractPrismData(iter_testing_path, Config.DATA_SIZE, Config.STEP_SIZE, Config.DELIMITER);
+			ExtractPrismData epd = new ExtractPrismData(iter_testing_path, Config.DATA_SIZE, Config.STEP_SIZE, Config.DELIMITER, !terminate_sample);
 			VariablesValueInfo new_testing_vvi = epd.getVariablesValueInfo(vvi.getVars());
 			vvi.updateVariableVarInfo(new_testing_vvi.getVarsValues());
 			

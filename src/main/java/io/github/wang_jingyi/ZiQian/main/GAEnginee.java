@@ -8,7 +8,6 @@ import io.github.wang_jingyi.ZiQian.data.VariablesValueInfo;
 import io.github.wang_jingyi.ZiQian.example.CrowdPositive;
 import io.github.wang_jingyi.ZiQian.learn.evolution.LearnMergeEvolutions;
 import io.github.wang_jingyi.ZiQian.prism.FormatPrismModel;
-import io.github.wang_jingyi.ZiQian.utils.FileUtil;
 import io.github.wang_jingyi.ZiQian.utils.LearnUtil;
 
 import java.io.IOException;
@@ -28,11 +27,12 @@ public class GAEnginee {
 	int gen_num;
 	int gen_size;
 	double select_prob;
+	boolean random_length;
 
 	public GAEnginee(String model_name, String trace_path, String result_path,
 			String vars_path, String delimiter, int data_step, int data_length,
 			double mutation_rate, int gen_num, int gen_size,
-			double select_prob) {
+			double select_prob, boolean random_length) {
 		this.model_name = model_name;
 		this.trace_path = trace_path;
 		this.result_path = result_path;
@@ -44,19 +44,20 @@ public class GAEnginee {
 		this.gen_num = gen_num;
 		this.gen_size = gen_size;
 		this.select_prob = select_prob;
+		this.random_length = random_length;
 	}
 
 	public void execute() throws IOException {
 
-		ExtractPrismData epd = new ExtractPrismData(trace_path, data_length, data_step, delimiter);
+		ExtractPrismData epd = new ExtractPrismData(trace_path, data_length, data_step, delimiter, random_length);
 		VariablesValueInfo vvl = epd.getVariablesValueInfo();
 
-		for(String testing_dir : FileUtil.foldersInDir(Config.TESTING_PATH)){
-			ExtractPrismData epd_test = new ExtractPrismData(Config.TESTING_PATH+"/"+testing_dir, Integer.MAX_VALUE, Config.STEP_SIZE, Config.DELIMITER);
-			VariablesValueInfo vvi_test = epd_test.getVariablesValueInfo();
-			vvl.updateVariableVarInfo(vvi_test.getVarsValues());
-		}
-		
+//		for(String testing_dir : FileUtil.foldersInDir(Config.TESTING_PATH)){
+//			ExtractPrismData epd_test = new ExtractPrismData(Config.TESTING_PATH+"/"+testing_dir, Integer.MAX_VALUE, data_step, delimiter, random_length);
+//			VariablesValueInfo vvi_test = epd_test.getVariablesValueInfo();
+//			vvl.updateVariableVarInfo(vvi_test.getVarsValues());
+//		}
+//		
 		List<String> vars = LearnUtil.extractVarsFromFile(vars_path);
 		AlgoProfile.vars = vars;
 		
@@ -79,10 +80,10 @@ public class GAEnginee {
 		System.out.println("- learn by evolution...");
 		LearnMergeEvolutions bestDTMC = new LearnMergeEvolutions();
 		bestDTMC.learn(data);
-		bestDTMC.PrismModelTranslation(data, pl, Config.MODEL_NAME+Config.DATA_SIZE);
+		bestDTMC.PrismModelTranslation(data, pl, model_name+data_length);
 		// format to .pm file
 		System.out.println("--- formatting the model to .pm file for model checking...");
-		FormatPrismModel fpm = new FormatPrismModel("dtmc", Config.GA_OUTPUT_PATH, Config.MODEL_NAME+Config.DATA_SIZE);
+		FormatPrismModel fpm = new FormatPrismModel("dtmc", result_path, model_name+data_length);
 		fpm.translateToFormat(bestDTMC.getPrismModel(), data);
 		TimeProfile.learning_end_time = System.nanoTime();
 		

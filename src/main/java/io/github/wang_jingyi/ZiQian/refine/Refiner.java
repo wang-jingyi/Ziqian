@@ -45,7 +45,8 @@ public class Refiner{
 		this.pm = pm;
 	}
 
-	public Refiner(List<SplittingPoint> sps, VariablesValueInfo vvi, List<Predicate> pres, PrismModel pm, boolean random_length, boolean sdc, double min_svm_accuracy) {
+	public Refiner(List<SplittingPoint> sps, VariablesValueInfo vvi, List<Predicate> pres, PrismModel pm, 
+			boolean random_length, boolean sdc, double min_svm_accuracy) {
 		super();
 		this.spuriousTransitions = sps;
 		this.vvi = vvi;

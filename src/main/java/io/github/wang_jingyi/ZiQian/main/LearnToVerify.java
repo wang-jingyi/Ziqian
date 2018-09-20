@@ -66,7 +66,7 @@ public class LearnToVerify implements Callable<Void>{
 	@Option(names = {"--sampler"}, description = "The sampler to sample a new path.")
 	private String sampler = "prism";
 	
-	@Option(names = {"--random_length"}, description = "Whether the system is terminating.")
+	@Option(names = {"--random_length"}, description = "Whether the sample length is randmized.")
 	private boolean random_length = false;
 	
 	public static void main(String[] args) throws Exception {

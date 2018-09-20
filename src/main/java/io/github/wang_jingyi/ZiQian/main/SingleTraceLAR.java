@@ -179,8 +179,9 @@ public class SingleTraceLAR {
 			// refinement
 			System.out.print("------ refine the abstraction...   ");
 			TimeProfile.refine_start_time = System.nanoTime();
-			Refiner refiner = new Refiner(sps, input.getTraining_vvi(), input.getPredicates(), bestDTMC, terminate_sample,
-					selective_data_collection); // we should use the training data to refine the abstraction
+			double min_svm_acc = 0.8;
+			Refiner refiner = new Refiner(sps, input.getTraining_vvi(), input.getPredicates(), bestDTMC, !terminate_sample,
+					selective_data_collection, min_svm_acc); // we should use the training data to refine the abstraction
 			Predicate newPredicate = refiner.refine();
 			TimeProfile.refine_end_time = System.nanoTime();
 			TimeProfile.refine_times.add(TimeProfile.nanoToSeconds(TimeProfile.refine_end_time

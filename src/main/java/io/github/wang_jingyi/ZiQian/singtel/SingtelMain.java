@@ -36,7 +36,7 @@ public class SingtelMain {
 		= PrismPathData.extractPathVars(SingtelConfig.DATA_PATH, SingtelConfig.DELIMITER);
 		
 		ExtractPrismData epd = new ExtractPrismData(SingtelConfig.DATA_PATH, SingtelConfig.DATA_SIZE, 
-				SingtelConfig.STEP_SIZE, SingtelConfig.DELIMITER);
+				SingtelConfig.STEP_SIZE, SingtelConfig.DELIMITER, !SingtelConfig.TERMINATE_SAMPLE);
 		VariablesValueInfo vvi = epd.getVariablesValueInfo(varsSet);
 
 		AlgoProfile.vars = vvi.getVars();	

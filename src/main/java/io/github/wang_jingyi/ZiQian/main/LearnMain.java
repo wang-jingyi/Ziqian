@@ -21,11 +21,12 @@ public class LearnMain {
 
 	public static void main(String[] args) throws IOException, ClassNotFoundException{
 		
-		ExtractPrismData epd = new ExtractPrismData(Config.DATA_PATH, Config.DATA_SIZE, 1, Config.DELIMITER);
+		ExtractPrismData epd = new ExtractPrismData(Config.DATA_PATH, Config.DATA_SIZE, 1, Config.DELIMITER, !Config.TERMINATE_SAMPLE);
 		VariablesValueInfo vvl = epd.getVariablesValueInfo();
 		
 		for(String testing_dir : FileUtil.foldersInDir(Config.TESTING_PATH)){
-			ExtractPrismData epd_test = new ExtractPrismData(Config.TESTING_PATH+"/"+testing_dir, Integer.MAX_VALUE, Config.STEP_SIZE, Config.DELIMITER);
+			ExtractPrismData epd_test = new ExtractPrismData(Config.TESTING_PATH+"/"+testing_dir, 
+					Integer.MAX_VALUE, Config.STEP_SIZE, Config.DELIMITER, !Config.TERMINATE_SAMPLE);
 			VariablesValueInfo vvi_test = epd_test.getVariablesValueInfo();
 			vvl.updateVariableVarInfo(vvi_test.getVarsValues());
 		}
