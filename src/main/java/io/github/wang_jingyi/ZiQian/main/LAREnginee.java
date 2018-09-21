@@ -94,8 +94,7 @@ public class LAREnginee {
 		double safety_thres = FileUtil.extractSafetyThreshold(property_path);
 		assert safety_thres!=-1;
 		
-		Date date = new Date();
-		String result_root_path = result_path + "/" + model_setting + "/thres="+ safety_thres + "/exp-" + LearnUtil.formatTime(date, "hh:mm:ss");
+		String result_root_path = result_path + "/" + model_setting + "/thres="+ safety_thres + "/exp-" + LearnUtil.formatTime(new Date(), "hh:mm:ss");
 		String testing_path = result_root_path + "/lar_paths";
 		String result_model_path = result_root_path + "/lar_models";
 		

@@ -11,6 +11,11 @@ import java.util.List;
 public class LearnUtil {
 	
 	
+	/**
+	 * @param vars_path the path to store the variables to learn from, the variables are delimtered by ,
+	 * @return the set of variables to learn from
+	 * @throws IOException
+	 */
 	public static List<String> extractVarsFromFile(String vars_path) throws IOException{
 		
 		String line = null;
