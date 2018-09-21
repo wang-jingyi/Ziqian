@@ -3,7 +3,7 @@
 ***Ziqian*** (named after a famous student of the Confucius) is an academic tool maintained in Singapore University of Technology and Design (SUTD), Singapore, to learn a discrete-time Markov Chain (DTMC) from system traces using different algorithms. The learned DTMC can then be used for the purpose of probabilistic model checking or other system analysis tasks like runtime monitoring. 
 
 ## Ziqian implements: ##
-* AA: AAlergia algorithm documented in the paper ["Learning Probabilistic Automata for Model Checking"](Learning Probabilistic Automata for Model Checking) 
+* AA: AAlergia algorithm documented in the paper ["Learning Probabilistic Automata for Model Checking"](https://ieeexplore.ieee.org/abstract/document/6042035/) 
 * GA: Evolutionary algorithm documented in the paper ["Learning Probabilistic Models for Model Checking: an Evolutionary Approach and an Empirical Study"](https://link.springer.com/article/10.1007/s10009-018-0492-7)
 * LAR: A property-guided learning algorithm based on abstraction refinement documented in the paper ["Automatically Verifying Discrete-Time Complex Systems through Learning, Abstraction and Refinement"](https://arxiv.org/abs/1610.06371)
 
