@@ -18,17 +18,23 @@
 * After cloning the project, import the project as a maven project to Eclipse.
 
 ### Dependencies ###
-The following external tools is not included in maven repository and have to be manually installed to your local maven repository. The required library 'PRISM' and 'javaml' .jar files are already in /ext under project folder. Make sure that Maven has been installed in your system by running "mvn -version" in command line. 
+The following external tools have to be manually installed to your local maven repository. The required library 'PRISM' and 'javaml' .jar files are already in /ext under project folder. Make sure that Maven has been installed in your system by running "mvn -version" in command line. 
 
-* Install PRISM to Maven
+* Install PRISM source to Maven
 
 Execute 'mvn install:install-file -Dfile=./ext/prism.jar -DgroupId=oxford.modelchecker 
     -DartifactId=prism -Dversion=4.2.1 -Dpackaging=jar' in command line
-
-* Install javaml to Maven
+    
+* Install javaml to Maven (for SVM)
 
 Execute 'mvn install:install-file -Dfile=./ext/javaml-0.1.7/javaml-0.1.7.jar -DgroupId=net.sf 
     -DartifactId=javaml -Dversion=0.1.7 -Dpackaging=jar' in command line
+
+
+* Install PRISM tool (for probabilistic model checking)
+
+Download PRISM from [here](https://www.prismmodelchecker.org/download.php). After install PRISM to your machine, update PlatformDependent.PRISM_PATH to the path where PRISM is installed.
+
 
 After installing the dependencies to your machine, update the project.
 
