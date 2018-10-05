@@ -61,9 +61,11 @@ public class LAREnginee {
 	int max_epsilon;
 	String sampler;
 	boolean random_length;
+	long random_seed;
 
 	public LAREnginee(String model_name, String trace_path, String property_path, String result_path, String model_and_config, String model_setting, double alpha, double beta, double sigma, 
-			double min_svm_accuracy, int max_iteration, boolean selective_collect, boolean loop_first, String delimiter, int data_step, int data_length, int max_epsilon, String sampler, boolean random_length) {
+			double min_svm_accuracy, int max_iteration, boolean selective_collect, boolean loop_first, String delimiter, int data_step, int data_length, 
+			int max_epsilon, String sampler, boolean random_length, long random_seed) {
 		
 		this.model_name = model_name;
 		this.trace_path = trace_path;
@@ -84,6 +86,7 @@ public class LAREnginee {
 		this.max_epsilon = max_epsilon;
 		this.sampler = sampler;
 		this.random_length = random_length;
+		this.random_seed = random_seed;
 	}
 
 	public void execute() throws ClassNotFoundException, IOException {
@@ -105,8 +108,12 @@ public class LAREnginee {
 			path_sampler = new PrismSampler(model, testing_path, model_setting);
 		}
 		else if(sampler.equals("swat")){
-			path_sampler = new SwatSampler(false, result_model_path, 
-					AlgoProfile.SWAT_SAMPLE_STEP, AlgoProfile.SWAT_RECORD_STEP, AlgoProfile.SWAT_RUNNING_TIME);
+			String[] ms = model_setting.split(",");
+			assert ms.length==2 : "====== Wrong model setting of swat ======";
+			int sample_step = Integer.valueOf(ms[0]);
+			int record_step = Integer.valueOf(ms[1]);
+			path_sampler = new SwatSampler(model, false, result_model_path, 
+					sample_step, record_step, AlgoProfile.SWAT_RUNNING_TIME);
 		}
 		else{
 			System.out.println("====== Sampler not supported =======");
@@ -118,7 +125,7 @@ public class LAREnginee {
 		List<String> varsSet 
 		= PrismPathData.extractPathVars(trace_path, delimiter);
 
-		ExtractPrismData epd = new ExtractPrismData(trace_path, data_length, data_step, delimiter, random_length);
+		ExtractPrismData epd = new ExtractPrismData(trace_path, data_length, data_step, delimiter, random_length, random_seed);
 		VariablesValueInfo vvi = epd.getVariablesValueInfo(varsSet);
 		
 		
@@ -262,7 +269,7 @@ public class LAREnginee {
 			property.add(newPredicate);
 			
 			// update the training data
-			ExtractPrismData new_epd = new ExtractPrismData(iter_testing_path, data_length, data_step, delimiter, random_length);
+			ExtractPrismData new_epd = new ExtractPrismData(iter_testing_path, data_length, data_step, delimiter, random_length, random_seed);
 			VariablesValueInfo new_testing_vvi = new_epd.getVariablesValueInfo(vvi.getVars());
 			vvi.updateVariableVarInfo(new_testing_vvi.getVarsValues());
 			

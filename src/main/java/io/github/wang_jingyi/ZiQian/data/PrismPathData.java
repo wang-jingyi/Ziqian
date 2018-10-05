@@ -57,14 +57,40 @@ public class PrismPathData {
 		return values;
 	}
 
-	public static List<List<VariablesValue>> extractMEData(String dirPath, List<String> vars, int dataSize, int stepSize, String delimiter, boolean random_length) throws IOException{
+	public static List<List<VariablesValue>> extractMEData(String dirPath, List<String> vars, int dataSize, int stepSize,
+			String delimiter, boolean random_length, long random_seed) throws IOException{
 		List<List<VariablesValue>> mv = new ArrayList<List<VariablesValue>>();
 		int totalSize = 0;
 		List<String> fus = FileUtil.filesInDir(dirPath);
+		Random rng = new Random(random_seed);
+		
 		for(String s : fus){
 			int ds = dataSize;
 			if(random_length){
-				ds = new Random().nextInt(2*dataSize/fus.size());
+				ds = rng.nextInt(2*dataSize/fus.size());
+			}
+			
+			List<VariablesValue> v = extractSEData(s, vars, ds, stepSize, delimiter);
+			mv.add(v);
+			totalSize = totalSize + v.size();
+			if(totalSize>=dataSize){
+				break;
+			}
+		}
+		return mv;
+	}
+	
+	public static List<List<VariablesValue>> extractMEData(String dirPath, List<String> vars, int dataSize, int stepSize,
+			String delimiter, boolean random_length) throws IOException{
+		List<List<VariablesValue>> mv = new ArrayList<List<VariablesValue>>();
+		int totalSize = 0;
+		List<String> fus = FileUtil.filesInDir(dirPath);
+		Random rng = new Random();
+		
+		for(String s : fus){
+			int ds = dataSize;
+			if(random_length){
+				ds = rng.nextInt(2*dataSize/fus.size());
 			}
 			
 			List<VariablesValue> v = extractSEData(s, vars, ds, stepSize, delimiter);

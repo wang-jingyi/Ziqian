@@ -35,11 +35,12 @@ public class AAEnginee {
 	int data_length;
 	double max_epsilon;
 	boolean random_length;
+	long random_seed;
 	String additional_trace_path;
 	String model_setting;
 
 	public AAEnginee(String model_name, String trace_path, String result_path, String vars_path, String delimiter, int data_step, 
-			int data_length, double max_epsilon, boolean random_length, String additional_trace_path, String model_setting) {
+			int data_length, double max_epsilon, boolean random_length, long random_seed, String additional_trace_path, String model_setting) {
 		this.model_name = model_name;
 		this.trace_path = trace_path;
 		this.result_path = result_path;
@@ -49,18 +50,20 @@ public class AAEnginee {
 		this.data_length = data_length;
 		this.max_epsilon = max_epsilon;
 		this.random_length = random_length;
+		this.random_seed = random_seed;
 		this.additional_trace_path = additional_trace_path;
 		this.model_setting = model_setting;
 	}
 
 	public void execute() throws FileNotFoundException, ClassNotFoundException, IOException {
-		ExtractPrismData epd = new ExtractPrismData(trace_path, data_length, data_step, delimiter, random_length);
+		ExtractPrismData epd = new ExtractPrismData(trace_path, data_length, data_step, delimiter, random_length, random_seed);
 		VariablesValueInfo vvl = epd.getVariablesValueInfo();
 		
 		// add the LAR testing traces into AA for fair comparison (LAR testing traces)
 		if(additional_trace_path!=null){
 			for(String testing_dir : FileUtil.foldersInDir(additional_trace_path)){
-				ExtractPrismData epd_test = new ExtractPrismData(additional_trace_path + "/" + testing_dir, Integer.MAX_VALUE, data_step, delimiter, random_length);
+				ExtractPrismData epd_test = new ExtractPrismData(additional_trace_path + "/" + testing_dir, Integer.MAX_VALUE, data_step,
+						delimiter, random_length, random_seed);
 				VariablesValueInfo vvi_test = epd_test.getVariablesValueInfo();
 				vvl.updateVariableVarInfo(vvi_test.getVarsValues());
 			}

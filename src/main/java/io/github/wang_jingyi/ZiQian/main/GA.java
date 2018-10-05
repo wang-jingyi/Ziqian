@@ -47,6 +47,9 @@ public class GA implements Callable<Void>{
 	@Option(names = {"--random_length"}, description = "Whether the sample length is randmized.")
 	private boolean random_length = false;
 	
+	@Option(names = {"--random_seed"}, description = "The random seed for random generator.")
+	private long random_seed = 777;
+	
 	@Option(names = {"--additional_traces"}, description = "Add additional traces to learn from.")
 	private String additional_trace_path = null;
 	
@@ -60,7 +63,7 @@ public class GA implements Callable<Void>{
 	@Override
 	public Void call() throws Exception {
 		GAEnginee enginee = new GAEnginee(model_name, trace_path, result_path, vars_path, delimiter, data_step, data_length, 
-				mutation_rate, gen_num, gen_size, select_prob, random_length, additional_trace_path, model_setting);
+				mutation_rate, gen_num, gen_size, select_prob, random_length, random_seed, additional_trace_path, model_setting);
 		enginee.execute();
 		return null;
 	}

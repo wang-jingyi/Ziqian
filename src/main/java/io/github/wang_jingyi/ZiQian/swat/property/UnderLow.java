@@ -23,7 +23,7 @@ public class UnderLow implements Predicate, Serializable{
 	
 	@Override
 	public String getPredicateName() {
-		return "swat_error";
+		return "underflow";
 	}
 
 	@Override

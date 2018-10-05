@@ -34,13 +34,14 @@ public class GAEnginee {
 	int gen_size;
 	double select_prob;
 	boolean random_length;
+	long random_seed;
 	String additional_trace_path;
 	String model_setting;
 
 	public GAEnginee(String model_name, String trace_path, String result_path,
 			String vars_path, String delimiter, int data_step, int data_length,
 			double mutation_rate, int gen_num, int gen_size,
-			double select_prob, boolean random_length, String additional_trace_path, String model_setting) {
+			double select_prob, boolean random_length, long random_seed, String additional_trace_path, String model_setting) {
 		this.model_name = model_name;
 		this.trace_path = trace_path;
 		this.result_path = result_path;
@@ -53,19 +54,21 @@ public class GAEnginee {
 		this.gen_size = gen_size;
 		this.select_prob = select_prob;
 		this.random_length = random_length;
+		this.random_seed = random_seed;
 		this.additional_trace_path = additional_trace_path;
 		this.model_setting = model_setting;
 	}
 
 	public void execute() throws IOException {
 
-		ExtractPrismData epd = new ExtractPrismData(trace_path, data_length, data_step, delimiter, random_length);
+		ExtractPrismData epd = new ExtractPrismData(trace_path, data_length, data_step, delimiter, random_length, random_seed);
 		VariablesValueInfo vvl = epd.getVariablesValueInfo();
 		
 		// add the additional traces into GA for fair comparison (LAR testing traces) 
 		if(additional_trace_path!=null){
 			for(String testing_dir : FileUtil.foldersInDir(additional_trace_path)){
-				ExtractPrismData epd_test = new ExtractPrismData(additional_trace_path + "/" + testing_dir, Integer.MAX_VALUE, data_step, delimiter, random_length);
+				ExtractPrismData epd_test = new ExtractPrismData(additional_trace_path + "/" + testing_dir, Integer.MAX_VALUE, 
+						data_step, delimiter, random_length, random_seed);
 				VariablesValueInfo vvi_test = epd_test.getVariablesValueInfo();
 				vvl.updateVariableVarInfo(vvi_test.getVarsValues());
 			}

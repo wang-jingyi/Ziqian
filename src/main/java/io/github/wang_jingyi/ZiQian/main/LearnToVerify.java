@@ -69,6 +69,9 @@ public class LearnToVerify implements Callable<Void>{
 	@Option(names = {"--random_length"}, description = "Whether the sample length is randmized.")
 	private boolean random_length = false;
 	
+	@Option(names = {"--random_seed"}, description = "The random seed for random generator.")
+	private long random_seed = 777;
+	
 	public static void main(String[] args) throws Exception {
 		CommandLine.call(new LearnToVerify(), args);
 	}
@@ -76,7 +79,7 @@ public class LearnToVerify implements Callable<Void>{
 	@Override
 	public Void call() throws Exception {
 		LAREnginee enginee = new LAREnginee(model_name, trace_path, property_path, result_path, model, model_setting, alpha, beta, sigma, min_svm_accuracy,
-				max_iteration, selective_collect, loop_first, delimiter, data_step, data_length, max_epsilon, sampler, random_length);
+				max_iteration, selective_collect, loop_first, delimiter, data_step, data_length, max_epsilon, sampler, random_length, random_seed);
 		enginee.execute();
 		return null;
 	}

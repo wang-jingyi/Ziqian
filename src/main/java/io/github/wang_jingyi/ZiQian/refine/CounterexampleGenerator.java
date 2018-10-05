@@ -286,6 +286,7 @@ public class CounterexampleGenerator {
 						DefaultWeightedEdge edge = graph.addEdge(ps.getId(), nextStates.get(j).getId());
 						if(edge==null || transProb.get(j)==null){
 							System.out.println("breakout");
+							continue; // 
 						}
 						graph.setEdgeWeight(edge, Math.log10(1/transProb.get(j)));
 					}

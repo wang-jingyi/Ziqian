@@ -20,50 +20,43 @@ public class ConvergenceTest {
 
 	public static void main(String[] args) throws FileNotFoundException, ClassNotFoundException, IOException {
 
-//		Config.initConfig();
-		@SuppressWarnings("unchecked")
-		List<Predicate> pres = (List<Predicate>) FileUtil.readObject(Config.OUTPUT_MODEL_PATH+"/predicates");
+		String pres_path = args[0];
+		String data_path = args[1];
+		String output_path = args[2];
+		int data_size = Integer.valueOf(args[3]);
 		
-		//		if(FileUtil.isDirEmpty(Config.DATA_PATH_LOT)){
-		//			for(int i=1; i<=2000; i++){
-		//				System.out.println("simulation: " + i);
-		//				Simulation sim = new Simulation(Config.ORIG_MODEL_FILE, Config.DATA_PATH_LOT, "path"+i, Config.MODEL_SETTING);
-		//				sim.run();
-		//			}
-		//		}
-
-		boolean random_length = false;
-		List<String> varsSet = PrismPathData.extractPathVars(Config.DATA_PATH, Config.DELIMITER);
-		//
-		ExtractPrismData epd_lot = new ExtractPrismData(Config.DATA_PATH, Config.CONVERGE_TEST_DATA_SIZE, Config.STEP_SIZE, Config.DELIMITER, random_length);
+		@SuppressWarnings("unchecked")
+		List<Predicate> pres = (List<Predicate>) FileUtil.readObject(pres_path);
+		
+		// for swat
+		boolean random_length = true;
+		long random_seed = 379824;
+		
+		List<String> varsSet = PrismPathData.extractPathVars(data_path, " ");
+		ExtractPrismData epd_lot = new ExtractPrismData(data_path, data_size, 1, " ", random_length, random_seed);
 		VariablesValueInfo vvi_lot = epd_lot.getVariablesValueInfo(varsSet);
 
 		long start_time = System.nanoTime();
-		learn(pres, vvi_lot, Config.LEARN_METHOD+ "_lot");
+		learn(pres, vvi_lot, output_path, "AA_lot");
 		long end_time = System.nanoTime();
-		System.out.println("total time : " + TimeProfile.nanoToSeconds(end_time-start_time) + " s");
+		System.out.println("--- Total time : " + TimeProfile.nanoToSeconds(end_time-start_time) + " s");
 
 	}
 
 
-	private static void learn(List<Predicate> pres, VariablesValueInfo vvi, String name) throws IOException, ClassNotFoundException{
+	private static void learn(List<Predicate> pres, VariablesValueInfo vvi, String output_path, String name) throws IOException, ClassNotFoundException{
 
 		PredicateAbstraction pa = new PredicateAbstraction(pres);
 		Input data = pa.abstractInput(vvi.getVarsValues());
 
-		String modelName = Config.MODEL_NAME + "_" + name;
-
+		System.out.println("*** Learning ***");
 		ModelSelection gs = new AAlergia(1, 64); //
 		LearningDTMC bestDTMC = gs.selectCriterion(data);
-		bestDTMC.PrismModelTranslation(data, pres, modelName); //
-
-		//		LearnMergeEvolutions bestDTMC = new LearnMergeEvolutions();
-		//		bestDTMC.learn(data);
-		//		bestDTMC.PrismModelTranslation(data, ps, modelName);
+		bestDTMC.PrismModelTranslation(data, pres, name); //
 
 		// format to .pm file
-		System.out.println("formatting the model to .pm file for model checking...");
-		FormatPrismModel fpm = new FormatPrismModel("dtmc", Config.OUTPUT_MODEL_PATH , modelName);
+		System.out.println("- Formatting the model to .pm file for model checking...");
+		FormatPrismModel fpm = new FormatPrismModel("dtmc", output_path, name);
 		fpm.translateToFormat(bestDTMC.getPrismModel(), data);
 
 	}
