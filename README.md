@@ -9,7 +9,7 @@
 
 ### What is this repository for? ###
 
-* This repository is maintained for the development of ZiQian. The evaluation results of multiple systems of submitted research papers are hosted in another neighborhood repository called ziqian_evaluation [here](https://bitbucket.org/jingyi_wang/ziqian_evaluation). 
+* This repository is maintained for the development of ZiQian. The running guide and evalution results of multiple systems of submitted research papers are hosted in another neighborhood repository called Ziqian_evaluation [here](https://github.com/wang-jingyi/Ziqian_evaluation). 
 
 ### How do I set up? ###
 
