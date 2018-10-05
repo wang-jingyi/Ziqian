@@ -57,6 +57,7 @@ Usage: AA [-hV] [--random_length] [--additional_traces=<additional_trace_path>]
       --length=<data_length> The total data length.
       --model_setting=<model_setting> The model setting.
       --random_length      Whether the sample length is randmized.
+      --random_seed=<random_seed>   The random seed for random generator.
       --step=<data_step>   The sampling frequency.
       -h, --help               Show this help message and exit.
       -V, --version            Print version information and exit.
@@ -82,6 +83,7 @@ Usage: GA [-hV] [--random_length] [--additional_traces=<additional_trace_path>]
       --mutation=<mutation_rate> The mutation rate.
       --prob=<select_prob>   The probability to select the winner.
       --random_length        Whether the sample length is randmized.
+      --random_seed=<random_seed>   The random seed for random generator.
       --size=<gen_size>      The number of chromosomes in each generation.
       --step=<data_step>     The sampling frequency.
       -h, --help                 Show this help message and exit.
@@ -113,6 +115,7 @@ Usage: GA [-hV] [--random_length] [--additional_traces=<additional_trace_path>]
       --max_iter=<max_iteration> The maximum number of iterations.
       --min_acc=<min_svm_accuracy> The minimum classification accuracy for SVM.
       --random_length       Whether the sample length is randmized.
+      --random_seed=<random_seed>   The random seed for random generator.
       --sampler=<sampler>   The sampler to sample a new path.
       --sigma=<sigma>       The indifference region of hypothesis testing.
       --step=<data_step>    The sampling frequency.
